@@ -1,20 +1,20 @@
-FROM node:22-alpine AS base
+# ---- build ----
+FROM node:22-alpine AS build
 WORKDIR /app
-RUN corepack enable
 
-FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package*.json ./
+RUN npm ci
 
-FROM base AS build
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+RUN npm run build   # xmcp build && node build.mjs -> dist/server.cjs + dist/public
 
-FROM base AS runtime
+# ---- runtime ----
+FROM node:22-alpine
+WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
+
 COPY --from=build /app/dist ./dist
-COPY package.json ./
+
+USER node
 EXPOSE 3000
-CMD ["node", "dist/http.js"]
+CMD ["node", "--enable-source-maps", "dist/server.cjs"]
