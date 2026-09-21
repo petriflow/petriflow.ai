@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Petriflow MCP Server</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f8;
+      --bg-elevated: #ffffff;
+      --border: #e3e3e6;
+      --text: #1a1a1f;
+      --text-muted: #5c5c66;
+      --accent: #6d28d9;
+      --accent-2: #0ea5a4;
+      --code-bg: #1a1a1f;
+      --code-text: #e6e6ea;
+      --pill-bg: #efeaff;
+      --pill-text: #5b21b6;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e0e12;
+        --bg-elevated: #17171d;
+        --border: #2a2a33;
+        --text: #f0f0f3;
+        --text-muted: #a3a3ad;
+        --accent: #a78bfa;
+        --accent-2: #2dd4bf;
+        --code-bg: #0a0a0d;
+        --code-text: #e6e6ea;
+        --pill-bg: #241a3d;
+        --pill-text: #c4b5fd;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 20px 96px;
+    }
+
+    header.hero {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .tagline {
+      color: var(--text-muted);
+      margin: 4px 0 0;
+      font-size: 0.98rem;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0 32px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .badge.dot::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-2);
+    }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p {
+      color: var(--text-muted);
+      margin: 0 0 12px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .endpoint-grid {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 8px 16px;
+      font-size: 0.9rem;
+    }
+
+    .endpoint-grid dt {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .endpoint-grid dd {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      word-break: break-all;
+    }
+
+    .client-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    details.client {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    details.client[open] {
+      padding-bottom: 4px;
+    }
+
+    details.client summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 14px 18px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    details.client summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.client summary::after {
+      content: "+";
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 1.1rem;
+      transition: transform 0.15s ease;
+    }
+
+    details.client[open] summary::after {
+      content: "\2212";
+    }
+
+    .client-body {
+      padding: 0 18px 16px;
+    }
+
+    .client-body p {
+      font-size: 0.88rem;
+      margin-bottom: 10px;
+    }
+
+    .code-wrap {
+      position: relative;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 14px 44px 14px 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      margin: 0 0 4px;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--code-text);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.87rem;
+      box-shadow: var(--shadow);
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    td code {
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.82rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.83rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      justify-content: space-between;
+    }
+
+    footer .links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+<main>
+
+  <header class="hero">
+    <img alt="logo"
+         src="data:image/png;base64,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"/>
+    <div>
+      <h1>Petriflow MCP Server</h1>
+      <p class="tagline">Model Context Protocol server exposing Petriflow to AI tools</p>
+    </div>
+  </header>
+
+  <div class="badges">
+    <span class="badge dot">Streamable HTTP transport</span>
+    <span class="badge">Apache-2.0</span>
+  </div>
+
+  <section id="about">
+    <h2>About</h2>
+    <p>
+      This server implements the <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context
+      Protocol</a>
+      for <a href="https://github.com/netgrif/petriflow" target="_blank" rel="noopener">Petriflow</a>, letting
+      MCP-compatible
+      AI tools call Petriflow functionality as tools, read Petriflow data as resources, and reuse ready-made prompts
+      &mdash;
+      all over a single HTTP endpoint. It's built with <a href="https://xmcp.dev" target="_blank"
+                                                          rel="noopener">xmcp</a>.
+    </p>
+    <p>
+      <strong>Status:</strong> early scaffold &mdash; the tools, prompts, and resources listed below are placeholder
+      examples from the project template. Real Petriflow functionality is still being implemented.
+    </p>
+  </section>
+
+  <section id="endpoint">
+    <h2>Server details</h2>
+    <div class="card">
+      <dl class="endpoint-grid">
+        <dt>MCP endpoint</dt>
+        <dd class="mcp-url">http://localhost:3001/mcp</dd>
+        <dt>Transport</dt>
+        <dd>Streamable HTTP (stateless)</dd>
+        <dt>Health check</dt>
+        <dd>GET <span class="health-url">http://localhost:3001/health</span></dd>
+      </dl>
+    </div>
+    <p style="margin-top:12px; font-size:0.85rem;">
+      These URLs are filled in automatically from wherever this page is served, assuming the default
+      <code>/mcp</code> endpoint. Update the path below if you've customized it in <code>xmcp.config.ts</code>.
+    </p>
+  </section>
+
+  <section id="connect">
+    <h2>Connect from an AI tool</h2>
+    <div class="client-list">
+
+      <details class="client" open>
+        <summary>Claude Code (CLI)</summary>
+        <div class="client-body">
+          <p>Register the server with the Claude Code CLI:</p>
+          <div class="code-wrap">
+            <pre><code>claude mcp add --transport http petriflow <span class="mcp-url">http://localhost:3001/mcp</span></code></pre>
+            <button class="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="client">
+        <summary>Claude Desktop</summary>
+        <div class="client-body">
+          <p>Add a custom connector in Settings &rarr; Connectors, or add this entry to your config file:</p>
+          <div class="code-wrap">
+            <pre><code>{
+  "mcpServers": {
+    "petriflow": {
+      "url": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+    }
+  }
+}</code></pre>
+            <button class="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="client">
+        <summary>Cursor</summary>
+        <div class="client-body">
+          <p>Add to <code>~/.cursor/mcp.json</code> (or your project's <code>.cursor/mcp.json</code>):</p>
+          <div class="code-wrap">
+            <pre><code>{
+  "mcpServers": {
+    "petriflow": {
+      "url": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+    }
+  }
+}</code></pre>
+            <button class="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="client">
+        <summary>VS Code (MCP / Copilot Chat)</summary>
+        <div class="client-body">
+          <p>Add to <code>.vscode/mcp.json</code> in your workspace:</p>
+          <div class="code-wrap">
+            <pre><code>{
+  "servers": {
+    "petriflow": {
+      "type": "http",
+      "url": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+    }
+  }
+}</code></pre>
+            <button class="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="client">
+        <summary>Windsurf</summary>
+        <div class="client-body">
+          <p>Add to <code>~/.codeium/windsurf/mcp_config.json</code>:</p>
+          <div class="code-wrap">
+            <pre><code>{
+  "mcpServers": {
+    "petriflow": {
+      "serverUrl": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+    }
+  }
+}</code></pre>
+            <button class="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="client">
+        <summary>Other MCP clients</summary>
+        <div class="client-body">
+          <p>
+            Any client that supports the MCP <strong>Streamable HTTP</strong> transport can connect directly to
+            <code class="mcp-url">http://localhost:3001/mcp</code> &mdash; no API key required by default.
+          </p>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <section id="tools">
+    <h2>Tools</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Parameters</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><code>greet</code></td>
+          <td>Greet the user</td>
+          <td><code>name</code>: string</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="prompts">
+    <h2>Prompts</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Arguments</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><code>review-code</code></td>
+          <td>Review code for best practices and potential issues</td>
+          <td><code>code</code>: string (required)</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="resources">
+    <h2>Resources</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>URI</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><code>app-config</code></td>
+          <td><code>config://app</code></td>
+          <td>Application configuration data</td>
+        </tr>
+        <tr>
+          <td><code>user-profile</code></td>
+          <td><code>users://{userId}</code></td>
+          <td>User profile information</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Licensed under Apache-2.0</span>
+    <span class="links">
+      <a href="https://github.com/netgrif/petriflow.ai" target="_blank" rel="noopener">Source on GitHub</a>
+      <a href="https://petriflow.org" target="_blank" rel="noopener">Petriflow</a>
+      <a href="https://xmcp.dev/docs" target="_blank" rel="noopener">xmcp docs</a>
+      <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP docs</a>
+    </span>
+  </footer>
+
+</main>
+
+<script>
+  (function () {
+    var mcpUrl = window.location.origin + "/mcp";
+    var healthUrl = window.location.origin + "/health";
+    document.querySelectorAll(".mcp-url").forEach(function (el) {
+      el.textContent = mcpUrl;
+    });
+    document.querySelectorAll(".health-url").forEach(function (el) {
+      el.textContent = healthUrl;
+    });
+  })();
+
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = btn.previousElementSibling;
+      var text = pre ? pre.textContent : "";
+      if (!navigator.clipboard) return;
+      navigator.clipboard.writeText(text).then(function () {
+        var original = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(function () {
+          btn.textContent = original;
+        }, 1500);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
