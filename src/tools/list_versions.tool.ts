@@ -55,5 +55,5 @@ export default async function getVersions() {
   cache.set("latestVersion", latestTag);
   logger.info(`Cached latest version: ${latestTag}`);
 
-  return {versions};
+  return {structuredContent: {versions}};
 }

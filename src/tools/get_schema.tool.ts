@@ -1,6 +1,6 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
-import cache from "../services/cache.service";
+import cache, {getLatestVersion} from "../services/cache.service";
 import {logger} from "../services/logger.service";
 
 const PETRIFLOW_URL = "https://github.com/petriflow/petriflow/raw/refs/heads/main/docs/v{VERSION}/petriflow.schema.xsd"
@@ -24,10 +24,7 @@ export const metadata = {
 
 export default async function getSchema({version}: InferSchema<typeof schema>) {
   if (version === "latest") {
-    version = cache.get("latestVersion");
-    if (!version) {
-      throw new Error("Latest version not found. Please specify exact version. Call tool list-versions");
-    }
+    version = getLatestVersion();
     logger.info(`Using cached latest version: ${version}`);
   }
 
