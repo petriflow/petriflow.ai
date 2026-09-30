@@ -1,7 +1,8 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
-import cache, {getLatestVersion} from "../services/cache.service";
+import cache from "../services/cache.service";
 import {logger} from "../services/logger.service";
+import {getLatestVersion} from "../services/utils";
 
 const PETRIFLOW_URL = "https://github.com/petriflow/petriflow/raw/refs/heads/main/docs/v{VERSION}/petriflow.schema.xsd"
 const SCHEMA_CACHE_KEY = "petriflow.schema.v{VERSION}.xsd"

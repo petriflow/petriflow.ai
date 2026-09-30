@@ -11,7 +11,7 @@ const config: XmcpConfig = {
       name: "Petriflow MCP",
       description: "MCP server for Petriflow, exposing Petriflow tools, prompts, and resources to MCP-compatible AI clients.",
       instructions: "",
-      icons: [{src: "src/assets/logo.png", mimeType: "image/png"}],
+      icons: [{src: "src/public/assets/logo.png", mimeType: "image/png"}],
     },
     experimental: {
       adapter: "fastify"

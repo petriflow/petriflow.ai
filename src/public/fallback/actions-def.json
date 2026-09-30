@@ -1,0 +1,25 @@
+{
+  "change": {
+    "signature": "change <field> value <closure with new value>",
+    "description": "Change the value of a field in the current case. Value returned by the closure will be used as the new value.",
+    "params": [
+      {
+        "name": "field",
+        "type": "string",
+        "required": true,
+        "description": "Reference to process data field. The local variable from the action reference mapping can be used."
+      },
+      {
+        "name": "closure",
+        "type": "closure",
+        "required": true,
+        "description": "Groovy closure which returned object is set as new value of the data field."
+      }
+    ],
+    "examples": [
+      "change text_field value { 'some new text' }",
+      "change number_field value { 123 + 546 }",
+      "change enum_field value { def keys = enum_field.options.keySet(); return keys.first() }"
+    ]
+  }
+}

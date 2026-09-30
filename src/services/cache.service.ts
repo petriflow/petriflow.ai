@@ -97,13 +97,3 @@ export class CacheService {
 
 const cache = new CacheService();
 export default cache;
-
-// --- Utilities functions ---
-
-export function getLatestVersion(): string {
-  const version = cache.get("latestVersion");
-  if (!version) {
-    throw new Error("Latest version not found. Please specify exact version. Call tool list-versions first");
-  }
-  return version;
-}
