@@ -5,6 +5,8 @@ import path from "node:path";
 import {existsSync} from "node:fs";
 import cache from "./services/cache.service";
 import {setLogger, logger} from "./services/logger.service";
+import validationService from "./services/validation.service";
+import {rules} from "./services/rules";
 
 const app = Fastify({
   logger: {
@@ -12,6 +14,7 @@ const app = Fastify({
   }
 });
 setLogger(app.log);
+validationService.registerRules(rules);
 const port = Number(process.env.PORT ?? 3000);
 const publicDir = [path.join(__dirname, 'public'), path.join(__dirname, '../public')]
   .find(existsSync)!

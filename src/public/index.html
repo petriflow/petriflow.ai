@@ -334,14 +334,13 @@
       Protocol</a>
       for <a href="https://github.com/netgrif/petriflow" target="_blank" rel="noopener">Petriflow</a>, letting
       MCP-compatible
-      AI tools call Petriflow functionality as tools, read Petriflow data as resources, and reuse ready-made prompts
+      AI tools explore the Petriflow language (schema, elements, actions, examples) and validate processes
       &mdash;
       all over a single HTTP endpoint. It's built with <a href="https://xmcp.dev" target="_blank"
-                                                          rel="noopener">xmcp</a>.
+                                                          rel="noopener">xmcp</a> + Fastify.
     </p>
     <p>
-      <strong>Status:</strong> early scaffold &mdash; the tools, prompts, and resources listed below are placeholder
-      examples from the project template. Real Petriflow functionality is still being implemented.
+      <strong>Status:</strong> functional MCP server exposing the Petriflow tooling listed below.
     </p>
   </section>
 
@@ -350,11 +349,11 @@
     <div class="card">
       <dl class="endpoint-grid">
         <dt>MCP endpoint</dt>
-        <dd class="mcp-url">http://localhost:3001/mcp</dd>
+        <dd class="mcp-url">http://localhost:3000/mcp</dd>
         <dt>Transport</dt>
         <dd>Streamable HTTP (stateless)</dd>
         <dt>Health check</dt>
-        <dd>GET <span class="health-url">http://localhost:3001/health</span></dd>
+        <dd>GET <span class="health-url">http://localhost:3000/health</span></dd>
       </dl>
     </div>
     <p style="margin-top:12px; font-size:0.85rem;">
@@ -372,7 +371,7 @@
         <div class="client-body">
           <p>Register the server with the Claude Code CLI:</p>
           <div class="code-wrap">
-            <pre><code>claude mcp add --transport http petriflow <span class="mcp-url">http://localhost:3001/mcp</span></code></pre>
+            <pre><code>claude mcp add --transport http petriflow <span class="mcp-url">http://localhost:3000/mcp</span></code></pre>
             <button class="copy-btn" type="button">Copy</button>
           </div>
         </div>
@@ -386,7 +385,7 @@
             <pre><code>{
   "mcpServers": {
     "petriflow": {
-      "url": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+      "url": "<span class="mcp-url">http://localhost:3000/mcp</span>"
     }
   }
 }</code></pre>
@@ -403,7 +402,7 @@
             <pre><code>{
   "mcpServers": {
     "petriflow": {
-      "url": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+      "url": "<span class="mcp-url">http://localhost:3000/mcp</span>"
     }
   }
 }</code></pre>
@@ -421,7 +420,7 @@
   "servers": {
     "petriflow": {
       "type": "http",
-      "url": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+      "url": "<span class="mcp-url">http://localhost:3000/mcp</span>"
     }
   }
 }</code></pre>
@@ -438,7 +437,7 @@
             <pre><code>{
   "mcpServers": {
     "petriflow": {
-      "serverUrl": "<span class="mcp-url">http://localhost:3001/mcp</span>"
+      "serverUrl": "<span class="mcp-url">http://localhost:3000/mcp</span>"
     }
   }
 }</code></pre>
@@ -452,7 +451,7 @@
         <div class="client-body">
           <p>
             Any client that supports the MCP <strong>Streamable HTTP</strong> transport can connect directly to
-            <code class="mcp-url">http://localhost:3001/mcp</code> &mdash; no API key required by default.
+            <code class="mcp-url">http://localhost:3000/mcp</code> &mdash; no API key required by default.
           </p>
         </div>
       </details>
@@ -473,58 +472,54 @@
         </thead>
         <tbody>
         <tr>
-          <td><code>greet</code></td>
-          <td>Greet the user</td>
-          <td><code>name</code>: string</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section id="prompts">
-    <h2>Prompts</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Arguments</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td><code>review-code</code></td>
-          <td>Review code for best practices and potential issues</td>
-          <td><code>code</code>: string (required)</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section id="resources">
-    <h2>Resources</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>URI</th>
-          <th>Description</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td><code>app-config</code></td>
-          <td><code>config://app</code></td>
-          <td>Application configuration data</td>
+          <td><code>list-versions</code></td>
+          <td>List available Petriflow versions (flags the latest stable one)</td>
+          <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>user-profile</code></td>
-          <td><code>users://{userId}</code></td>
-          <td>User profile information</td>
+          <td><code>get-schema</code></td>
+          <td>Get the complete XSD schema of the Petriflow language</td>
+          <td><code>version</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>get-overview</code></td>
+          <td>Show the Petriflow language overview</td>
+          <td><code>version</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>list-actions</code></td>
+          <td>List available action functions</td>
+          <td><code>version</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>get-action</code></td>
+          <td>Get the definition of one action</td>
+          <td><code>version</code>, <code>name</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>list-elements</code></td>
+          <td>List Petriflow elements</td>
+          <td><code>version</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>get-element</code></td>
+          <td>Get the XSD schema of one Petriflow element</td>
+          <td><code>version</code>, <code>name</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>list-examples</code></td>
+          <td>List example processes</td>
+          <td><code>version</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>get-example</code></td>
+          <td>Get the content of one example process</td>
+          <td><code>version</code>, <code>example</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>validate-process</code></td>
+          <td>Validate a process XML against its schema and semantic rules</td>
+          <td><code>version</code>, <code>xml</code>: string</td>
         </tr>
         </tbody>
       </table>

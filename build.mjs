@@ -14,7 +14,7 @@ await build({
   // esbuild reads tsconfig `paths`, so @xmcp/adapter usually resolves on its own.
   // If it doesn't, uncomment:
   // alias: { '@xmcp/adapter': './.xmcp/adapter' },
-  external: [], // native modules only, e.g. 'sharp'
+  external: ['libxmljs2'], // native module; loaded from node_modules at runtime
 })
 
 await cp('src/public', 'dist/public', { recursive: true })

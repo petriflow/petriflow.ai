@@ -1,126 +1,66 @@
 # petriflow.ai
 
-An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/netgrif/petriflow), built with [xmcp](https://xmcp.dev). It exposes Petriflow tools, prompts, and resources to MCP-compatible AI clients over HTTP.
-
-> **Status:** early scaffold. The tools/prompts/resources below are placeholder examples from the project template — real Petriflow functionality has not been implemented yet.
+An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/netgrif/petriflow), built with [xmcp](https://xmcp.dev) + Fastify. It exposes Petriflow tools to MCP-compatible AI clients over HTTP.
 
 ## Getting Started
 
-Install dependencies and start the development server:
+Requires Node.js >= 22 and pnpm.
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev        # build then run
 ```
 
-This starts the MCP server over HTTP.
+This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with the `PORT` env var.
+
+## Commands
+
+- `pnpm dev` — build then run the server
+- `pnpm build` — `xmcp build && node build.mjs` (regenerates `.xmcp/`, bundles to `dist/server.cjs`, copies `src/public` → `dist/public`)
+- `pnpm typecheck` — `tsc --noEmit`
+- `pnpm start` — run the already-built server
 
 ## Project Structure
 
-Tools, prompts, and resources are automatically discovered from their respective directories:
-
-- `src/tools` - Tool definitions
-- `src/prompts` - Prompt templates
-- `src/resources` - Resource handlers
+- `src/index.ts` — Fastify entrypoint (registers `@xmcp/adapter`, static files, validation rules)
+- `src/tools/` — MCP tool definitions, auto-discovered from `*.tool.ts`
+- `src/services/` — shared services (cache, logger, schema, validation, utils)
+- `src/services/rules/` — semantic validation rules
+- `src/public/fallback/` — static content (examples, `overview.md`, `actions-def.json`, `elements/`)
+- `src/public/assets/` — logo/favicon
 
 ### Tools
 
-Each tool is defined in its own file:
+Each `src/tools/*.tool.ts` exports a `schema` (zod inputs), optional `outputSchema`, `metadata`, and a `default` function.
 
-```typescript
-import { z } from "zod";
-import { type InferSchema, type ToolMetadata } from "xmcp";
+Current tools:
 
-export const schema = {
-  name: z.string().describe("The name of the user to greet"),
-};
+| Tool | Purpose |
+|---|---|
+| `list-versions` | List available Petriflow versions (flags the latest) |
+| `get-schema` | Get the full XSD schema for a version |
+| `get-overview` | Show the Petriflow language overview |
+| `list-actions` | List available action functions |
+| `get-action` | Get the definition of one action |
+| `list-elements` | List Petriflow elements |
+| `get-element` | Get the XSD schema of one element |
+| `list-examples` | List example processes |
+| `get-example` | Get the content of one example process |
+| `validate-process` | Validate a process XML against its schema and semantic rules |
 
-export const metadata: ToolMetadata = {
-  name: "greet",
-  description: "Greet the user",
-  annotations: {
-    title: "Greet the user",
-    readOnlyHint: true,
-    destructiveHint: false,
-    idempotentHint: true,
-  },
-};
+Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
 
-export default function greet({ name }: InferSchema<typeof schema>) {
-  return `Hello, ${name}!`;
-}
-```
+## Validation
 
-### Prompts
+`validate-process` runs a pipeline in `src/services/validation.service.ts`:
 
-Prompts are template definitions for AI interactions:
+1. XML well-formedness
+2. XSD schema validation (via the native `libxmljs2` module)
+3. registered semantic rules
 
-```typescript
-import { z } from "zod";
-import { type InferSchema, type PromptMetadata } from "xmcp";
+Semantic rules live in `src/services/rules/*.rule.ts` and are registered in `src/services/rules/index.ts`. Each rule exports `{ name, description, validate(doc, ctx) }` and returns `ValidationIssue[]` (`rule`, `severity`, `message`, optional `path`/`line`/`column`).
 
-export const schema = {
-  code: z.string().describe("The code to review"),
-};
-
-export const metadata: PromptMetadata = {
-  name: "review-code",
-  title: "Review Code",
-  description: "Review code for best practices and potential issues",
-  role: "user",
-};
-
-export default function reviewCode({ code }: InferSchema<typeof schema>) {
-  return `Please review this code: ${code}`;
-}
-```
-
-### Resources
-
-Resources provide data or content with URI-based access:
-
-```typescript
-import { z } from "zod";
-import { type ResourceMetadata, type InferSchema } from "xmcp";
-
-export const schema = {
-  userId: z.string().describe("The ID of the user"),
-};
-
-export const metadata: ResourceMetadata = {
-  name: "user-profile",
-  title: "User Profile",
-  description: "User profile information",
-};
-
-export default function handler({ userId }: InferSchema<typeof schema>) {
-  return `Profile data for user ${userId}`;
-}
-```
-
-## Adding New Components
-
-### Adding New Tools
-
-1. Create a new `.ts` file in the `src/tools` directory
-2. Export a `schema` object defining the tool parameters using Zod
-3. Export a `metadata` object with tool information
-4. Export a default function that implements the tool logic
-
-### Adding New Prompts
-
-1. Create a new `.ts` file in the `src/prompts` directory
-2. Export a `schema` object defining the prompt parameters using Zod
-3. Export a `metadata` object with prompt information and role
-4. Export a default function that returns the prompt text
-
-### Adding New Resources
-
-1. Create a new `.ts` file in the `src/resources` directory
-2. Use folder structure to define the URI (e.g., `(users)/[userId]/profile.ts` → `users://{userId}/profile`)
-3. Export a `schema` object for dynamic parameters (optional for static resources)
-4. Export a `metadata` object with resource information
-5. Export a default function that returns the resource content
+> `libxmljs2` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`).
 
 ## Building for Production
 
@@ -128,15 +68,11 @@ export default function handler({ userId }: InferSchema<typeof schema>) {
 pnpm build
 ```
 
-This compiles the TypeScript code and outputs it to the `dist` directory.
-
 ## Running the Server
 
 ```bash
-pnpm start
+pnpm start            # node dist/server.cjs
 ```
-
-This runs the built HTTP server (`dist/http.js`).
 
 ## Learn More
 
