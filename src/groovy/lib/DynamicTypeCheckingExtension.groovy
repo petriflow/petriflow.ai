@@ -58,6 +58,12 @@ class DynamicTypeCheckingExtension extends TypeCheckingExtension {
             return false
         }
         storeType(pexp, ClassHelper.OBJECT_TYPE)
+        // Mark the access as dynamically resolved so the class generator emits a
+        // dynamic dispatch instead of rejecting the property ("Access to ... is
+        // forbidden"). Without this, property reads on `def` parameters (common in
+        // function bodies) fail at class-generation time even though the STC pass
+        // accepted them.
+        pexp.putNodeMetaData(StaticTypesMarker.DYNAMIC_RESOLUTION, Boolean.TRUE)
         return true
     }
 }

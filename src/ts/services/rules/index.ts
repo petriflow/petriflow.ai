@@ -6,6 +6,7 @@ import {validVersionRule} from "./valid-version.rule";
 import {arcConnectivityRule} from "./arc-connectivity.rule";
 import {arcDirectionRule} from "./arc-direction.rule";
 import {placeTokensRule} from "./place-tokens.rule";
+import {actionValidationRule} from "./action-validation.rule";
 
 /**
  * All semantic validation rules, registered with the {@link ValidationService}
@@ -18,5 +19,6 @@ export const rules: ValidationRule[] = [
   validVersionRule,
   arcConnectivityRule,
   arcDirectionRule,
-  placeTokensRule
+  placeTokensRule,
+  actionValidationRule
 ];

@@ -125,10 +125,25 @@ The generator:
 
 The daemon speaks newline-delimited JSON over stdio.
 
-Request (stdin):
+Three request shapes are accepted:
+
+**Validate an action (standalone):**
 
 ```json
 {"source": "Field c_active = null\nchange c_active value { true }"}
+```
+
+**Validate an action with injected process functions:**
+
+```json
+{"source": "Field h = null\nlog_entry(h, \"hi\")",
+ "functions": [{"name": "log_entry", "body": "{ def a, def b -> change a value { b } }"}]}
+```
+
+**Validate a standalone function body (a Groovy closure):**
+
+```json
+{"function": "{ def u -> u.fullName }"}
 ```
 
 Response (stdout):
@@ -143,20 +158,31 @@ or
 {"ok": false, "issues": [{"rule": "compile", "severity": "error", "line": 2, "column": 1, "message": "..."}]}
 ```
 
-Line/column numbers are reported relative to the original action source (the
-wrapper preamble is subtracted).
+Line/column numbers are reported relative to the original action/function source
+(the wrapper preamble is subtracted).
+
+### Function injection
+
+Process `<function>` bodies are Groovy closures (`{ def a, def b -> ... }`). To
+make them resolvable under `@CompileStatic`, the daemon rewrites each closure
+header into a method signature (`def <name>(def a, def b) { ... }`) before
+compiling. The closure parameter names are preserved; parameter *types* are
+`def` (dynamically typed), matching NAE's dynamic dispatch.
 
 ## Known limitations
 
-- **Custom functions** — process-specific `<function>` definitions are not on the
-  classpath, so calls to them are reported as undefined methods. Validating them
-  requires the whole process context and belongs in `validate-process`.
-- **Direct field access** — fields referenced without a field-ref declaration
-  (e.g. `change pu_authority ...` where `pu_authority` is not declared via
-  `pu_authority: f.pu_authority;`) cannot be resolved without the process's data
-  fields.
-- **Field existence** — `validate-action` does not check that referenced fields
-  exist in the process; that is a `validate-process` concern.
+- **Custom delegate methods** — methods added by a customized `ActionDelegate`
+  (e.g. `usersWithRole`, `assignTask` from a custom `CustomActionDelegate`) are
+  neither base DSL methods nor process `<function>`s, so they are reported as
+  undefined. This is inherent to validating without the deployment's full
+  classpath.
+- **Dynamic property access inside functions** — function bodies with `def`
+  parameters access properties dynamically (e.g. `u.fullName`); these are allowed
+  (typed `Object`), so typos in those properties are not caught. DSL method-name
+  typos are still caught.
+- **Field existence** — `validate-action` (standalone) does not check field
+  existence; the `validate-process` rule does (it has the process's `<data>` and
+  `<transition>` declarations).
 
 ## Requirements
 

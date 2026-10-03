@@ -207,6 +207,13 @@ methods.each { m ->
     sb << "    ${ret} ${m.name}(${params}) ${body}\n"
 }
 
+// Loose `Object` overloads for the DSL chain methods that take a field/transition
+// as their primary argument. Process `<function>` bodies use dynamically-typed
+// (`def`) parameters, so calls like `change(fieldParam)` must resolve even when
+// `fieldParam` is typed `Object`.
+sb << "\n    // Loose overloads for dynamically-typed function bodies.\n"
+sb << "    ChangeResult change(Object field, Case targetCase = null, Optional targetTask = null) { null }\n"
+sb << "    MakeResult make(Object fieldOrList, Closure behavior) { null }\n"
 sb << "}\n"
 
 outFile.parentFile.mkdirs()

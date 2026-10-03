@@ -11,15 +11,22 @@ import org.codehaus.groovy.syntax.SyntaxException
 /**
  * Groovy action validator daemon.
  *
- * Reads newline-delimited JSON requests on stdin, each of the form:
- *   {"source": "<normalized action code>"}
+ * Reads newline-delimited JSON requests on stdin and writes one JSON response
+ * per request to stdout. Two request shapes are accepted:
  *
- * For each request it wraps the code in a @CompileStatic class extending the
- * stripped ActionDelegate and compiles it (compile-only, never executed).
- * It writes one JSON response per request to stdout:
- *   {"ok": true}  or  {"ok": false, "issues": [{rule, severity, line, column, message}]}
+ *   1. Validate an action (optionally with injected process functions):
+ *        {"source": "<normalized action code>",
+ *         "functions": [{"name": "who", "body": "{ def u -> ... }"}, ...]}
  *
- * The action code is expected to already have Petriflow field references
+ *   2. Validate a standalone function body (a Groovy closure):
+ *        {"function": "{ def u -> ... }"}
+ *
+ * Each response is either:
+ *   {"ok": true}
+ * or
+ *   {"ok": false, "issues": [{rule, severity, line, column, message}]}
+ *
+ * The action `source` is expected to already have Petriflow field references
  * (e.g. "c_active: f.c_active;") normalized to typed declarations
  * (e.g. "Field c_active = null") by the Node side.
  */
@@ -63,13 +70,33 @@ def validate(String line, JsonSlurper slurper, String delegateSource, GroovyClas
         return [ok: false, issues: [[rule: "request", severity: "error", message: "Invalid request JSON: ${e.message}"]]]
     }
 
-    def source = request.source
-    if (source == null) {
-        return [ok: false, issues: [[rule: "request", severity: "error", message: "Missing 'source' field"]]]
+    // Mode 1: validate a standalone function body (a Groovy closure).
+    if (request.function != null) {
+        return compile(functionWrap(request.function), delegateSource, classLoader, FUNCTION_LINE_OFFSET)
     }
 
-    def wrapped = wrap(source)
+    // Mode 2 (and default): validate an action, optionally with injected functions.
+    def source = request.source
+    if (source == null) {
+        return [ok: false, issues: [[rule: "request", severity: "error", message: "Missing 'source' or 'function' field"]]]
+    }
+    def functions = request.functions ?: []
+    return compile(wrap(source, functions), delegateSource, classLoader, actionLineOffset(functions))
+}
 
+// Number of lines in the action wrapper preamble *before* the injected functions.
+@Field int ACTION_BASE_LINE_OFFSET = 5
+
+// Number of lines prepended to a standalone function body by functionWrap().
+@Field int FUNCTION_LINE_OFFSET = 5
+
+// The action wrapper emits one line per injected function plus one blank line,
+// so the total preamble length depends on the number of functions.
+int actionLineOffset(List functions) {
+    return ACTION_BASE_LINE_OFFSET + functions.size() + 1
+}
+
+def compile(String wrapped, String delegateSource, GroovyClassLoader classLoader, int lineOffset) {
     def cu = new CompilationUnit(classLoader)
     cu.addSource("ActionDelegate.groovy", delegateSource)
     cu.addSource("ActionScript.groovy", wrapped)
@@ -78,33 +105,77 @@ def validate(String line, JsonSlurper slurper, String delegateSource, GroovyClas
         cu.compile(Phases.CLASS_GENERATION)
         return [ok: true]
     } catch (MultipleCompilationErrorsException e) {
-        def issues = e.errorCollector.errors.collect { err -> toIssue(err) }
+        def issues = e.errorCollector.errors.collect { err -> toIssue(err, lineOffset) }
         return [ok: false, issues: issues]
     } catch (Exception e) {
         return [ok: false, issues: [[rule: "compile", severity: "error", message: "Unexpected error: ${e.message}"]]]
     }
 }
 
-// Number of lines prepended to the action source by wrap().
-@Field int LINE_OFFSET = 5
+def wrap(String source, List functions) {
+    def sb = new StringBuilder()
+    sb << "import groovy.transform.CompileStatic\n\n"
+    sb << "@CompileStatic(extensions = [\"DynamicTypeCheckingExtension\"])\n"
+    sb << "class ActionScript extends ActionDelegate {\n"
+    // Inject process functions as methods so they resolve under static
+    // compilation. Function bodies are Groovy closures ("{ def a, def b -> ... }"),
+    // so we rewrite the closure header into a method signature.
+    functions.each { fn ->
+        sb << methodFromClosure(fn.name, fn.body)
+    }
+    sb << "\n    void run() {\n"
+    sb << source
+    sb << "\n    }\n"
+    sb << "}\n"
+    return sb.toString()
+}
 
-def wrap(String source) {
+// Rewrites a closure body of the form "{ def a, def b -> BODY }" (params may
+// span multiple lines) into an equivalent method "def name(def a, def b) { BODY }".
+def methodFromClosure(String name, String body) {
+    def trimmed = body.trim()
+    if (!trimmed.startsWith("{")) {
+        // Not a closure with an obvious header; fall back to a no-arg def method
+        // wrapping the raw body (best effort — will likely fail to compile).
+        return "    def ${name}() { ${body} }\n"
+    }
+    // Strip the outer braces.
+    def inner = trimmed.substring(1, trimmed.length() - 1).trim()
+    def arrow = inner.indexOf("->")
+    if (arrow < 0) {
+        // No params: "{ BODY }".
+        return "    def ${name}() { ${inner} }\n"
+    }
+    def params = inner.substring(0, arrow).trim()
+    def methodBody = inner.substring(arrow + 2).trim()
+    if (params.isEmpty()) {
+        return "    def ${name}() { ${methodBody} }\n"
+    }
+    // The closure params are typically "def a, def b" — use them directly as a
+    // method parameter list (with `def` they are dynamically typed).
+    return "    def ${name}(${params}) { ${methodBody} }\n"
+}
+
+// Wraps a standalone function body (a closure) so it can be compiled in isolation.
+// Uses the same closure-to-method transformation as injected functions, and adds
+// a dummy run() so the class surfaces the method via static checking.
+def functionWrap(String body) {
+    def method = methodFromClosure("\$fn", body)
     return """import groovy.transform.CompileStatic
 
 @CompileStatic(extensions = ["DynamicTypeCheckingExtension"])
 class ActionScript extends ActionDelegate {
-    void run() {
-${source}
-    }
+${method}
+    void run() { }
 }
 """
 }
 
-def toIssue(Object err) {
+def toIssue(Object err, int lineOffset) {
     if (err instanceof SyntaxErrorMessage) {
         def cause = err.cause
         if (cause instanceof SyntaxException) {
-            def line = cause.line - LINE_OFFSET
+            def line = cause.line - lineOffset
             def message = cause.message?.replaceAll(/\s*@ line \d+, column \d+\.?\s*$/, "")?.trim()
             return [
                 rule: "compile",

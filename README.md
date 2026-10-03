@@ -60,11 +60,13 @@ Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest r
 2. XSD schema validation (via the native `libxmljs2` module)
 3. registered semantic rules
 
-Semantic rules live in `src/ts/services/rules/*.rule.ts` and are registered in `src/ts/services/rules/index.ts`. Each rule exports `{ name, description, validate(doc, ctx) }` and returns `ValidationIssue[]` (`rule`, `severity`, `message`, optional `path`/`line`/`column`).
+Semantic rules live in `src/ts/services/rules/*.rule.ts` and are registered in `src/ts/services/rules/index.ts`. Each rule exports `{ name, description, validate(doc, ctx) }` and returns `ValidationIssue[]` (or a `Promise` of one) — `rule`, `severity`, `message`, optional `path`/`line`/`column`.
+
+The `action-validation` rule compiles every `<action>` and every `<function>` in the process against the Petriflow DSL (via the Groovy daemon), checks that `f.*`/`t.*` references resolve to declared fields/transitions, and warns about unused functions.
 
 `validate-action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See `src/groovy/README.md` for details.
 
-> `libxmljs2` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`).
+> `libxmljs2` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`). The `action-validation` rule additionally requires a JVM + Groovy at runtime.
 
 ## Building for Production
 

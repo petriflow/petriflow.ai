@@ -51,6 +51,7 @@ Return convention:
 - Register new rules in `src/ts/services/rules/index.ts` (`rules` array); they are wired into the service on startup.
 - `src/ts/services/rules/helpers.ts` has shared DOM/XPath helpers (`childText`, `findRootChildren`, `isJavaIdentifier`, `JAVA_RESERVED_WORDS`, `GROOVY_RESERVED_WORDS`, `parseInteger`).
 - `validate(doc, ctx)` receives a libxmljs2 `Document`; use `doc.find(xpath)` / element `.attr()` / `.text()`.
+- `validate` may return a `Promise<ValidationIssue[]>` (the service `await`s every rule); `action-validation.rule.ts` is async (it drives the Groovy daemon).
 
 ## Native module: libxmljs2 (non-obvious)
 

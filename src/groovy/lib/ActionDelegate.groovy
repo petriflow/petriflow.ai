@@ -348,4 +348,8 @@ class ActionDelegate {
     def getCorrectedUri(String uncheckedPath) { null }
     def getFieldOfTask(String taskId, String fieldId) { null }
     def resolveStoragePath(Case aCase, String fileFieldId, String fileName) { null }
+
+    // Loose overloads for dynamically-typed function bodies.
+    ChangeResult change(Object field, Case targetCase = null, Optional targetTask = null) { null }
+    MakeResult make(Object fieldOrList, Closure behavior) { null }
 }

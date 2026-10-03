@@ -45,7 +45,14 @@ export interface ValidationRule {
   name: string;
   /** Human-readable description of what this rule checks. */
   description: string;
-  validate(doc: ReturnType<typeof parseXml>, ctx: ValidationContext): ValidationIssue[];
+  /**
+   * Inspects the parsed DOM and returns zero or more issues.
+   *
+   * May return a Promise to support asynchronous checks (e.g. the Groovy action
+   * compilation rules). Synchronous rules return a plain array, which the
+   * service awaits transparently.
+   */
+  validate(doc: ReturnType<typeof parseXml>, ctx: ValidationContext): ValidationIssue[] | Promise<ValidationIssue[]>;
 }
 
 /**
@@ -132,7 +139,7 @@ export class ValidationService {
     for (const rule of this._rules.values()) {
       let ruleIssues: ValidationIssue[];
       try {
-        ruleIssues = rule.validate(doc, ctx);
+        ruleIssues = await rule.validate(doc, ctx);
       } catch (err) {
         ruleIssues = [{
           rule: rule.name,

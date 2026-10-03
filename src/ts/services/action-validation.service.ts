@@ -30,6 +30,12 @@ export interface ActionValidationResult {
   issues: ActionValidationIssue[];
 }
 
+/** A process-scoped `<function>` definition (name + closure body). */
+export interface CompiledFunction {
+  name: string;
+  body: string;
+}
+
 /**
  * Matches a Petriflow field/transition reference of the form
  *   name: f.fieldId;   or   name: t.transitionId;
@@ -38,6 +44,37 @@ export interface ActionValidationResult {
  * local declarations that static compilation can resolve.
  */
 const FIELD_REF_RE = /(\w+)\s*:\s*([ft])\.\w+\s*[,;]?/g;
+
+/**
+ * Matches a single field/transition identifier reference in a label.
+ * Used to extract the referenced ids for the field-existence check.
+ */
+const FIELD_REF_ID_RE = /(\w+)\s*:\s*([ft])\.(\w+)/g;
+
+/** A parsed field/transition reference: `{name, kind, id}`. */
+export interface FieldReference {
+  /** The local variable name declared by the label. */
+  name: string;
+  /** `"f"` (field) or `"t"` (transition). */
+  kind: "f" | "t";
+  /** The referenced field/transition id. */
+  id: string;
+}
+
+/**
+ * Extracts all field/transition references from an action source, returning
+ * `{name, kind, id}` for each. Used by the action-validation rule to check that
+ * referenced ids exist in the process.
+ */
+export function extractFieldRefs(source: string): FieldReference[] {
+  const refs: FieldReference[] = [];
+  let match: RegExpExecArray | null;
+  const re = new RegExp(FIELD_REF_ID_RE.source, "g");
+  while ((match = re.exec(source)) !== null) {
+    refs.push({name: match[1], kind: match[2] as "f" | "t", id: match[3]});
+  }
+  return refs;
+}
 
 /**
  * Rewrites Petriflow field/transition references into typed local variables:
@@ -82,16 +119,38 @@ class ActionValidationService {
    */
   async validate(definition: string): Promise<ActionValidationResult> {
     const normalized = normalizeFieldRefs(definition);
-    return this._request(normalized);
+    return this._request({source: normalized});
   }
 
-  private async _request(source: string): Promise<ActionValidationResult> {
+  /**
+   * Validates an action with an associated set of process-scoped `<function>`
+   * definitions. The functions are injected so bare (non-DSL) calls in the
+   * action resolve against them.
+   *
+   * The `definition` must already be normalized (field references rewritten to
+   * typed declarations) — the caller is responsible for that.
+   */
+  async validateWithFunctions(
+    definition: string,
+    functions: CompiledFunction[] = []
+  ): Promise<ActionValidationResult> {
+    return this._request({source: definition, functions});
+  }
+
+  /**
+   * Validates a single `<function>` body (a Groovy closure) in isolation.
+   */
+  async validateFunction(body: string): Promise<ActionValidationResult> {
+    return this._request({function: body});
+  }
+
+  private async _request(request: Record<string, unknown>): Promise<ActionValidationResult> {
     await this._ensureDaemon();
     const daemon = this._daemon!;
 
     return new Promise<ActionValidationResult>((resolve, reject) => {
       this._queue.push({resolve, reject});
-      daemon.stdin.write(JSON.stringify({source}) + "\n");
+      daemon.stdin.write(JSON.stringify(request) + "\n");
     });
   }
 
