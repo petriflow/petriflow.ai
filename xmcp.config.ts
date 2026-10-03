@@ -3,7 +3,7 @@ import {type XmcpConfig} from "xmcp";
 const config: XmcpConfig = {
     http: true,
     paths: {
-      tools: "./src/tools",
+      tools: "./src/ts/tools",
       prompts: false,
       resources: false,
     },

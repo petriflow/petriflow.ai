@@ -12,7 +12,7 @@ tools to be implemented
 - [x] listExample (version) - get list of exmaples processes
 - [x] getExample (id) - get complete annotated example - id of example get via listExample
 - [x] validateProcess (xml) - validate process xml - XSD validation, semantic checks, verbous errors
-- [ ] validateAction (definition) - validate one action as a code - syntax, semantics, best practices
+- [x] validateAction (definition) - validate one action as a code - syntax, semantics, best practices
 
 optional
 

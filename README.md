@@ -16,22 +16,23 @@ This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Ove
 ## Commands
 
 - `pnpm dev` — build then run the server
-- `pnpm build` — `xmcp build && node build.mjs` (regenerates `.xmcp/`, bundles to `dist/server.cjs`, copies `src/public` → `dist/public`)
+- `pnpm build` — `xmcp build && node build.mjs` (regenerates `.xmcp/`, bundles to `dist/server.cjs`, copies `src/public` → `dist/public` and `src/groovy` → `dist/groovy`)
 - `pnpm typecheck` — `tsc --noEmit`
 - `pnpm start` — run the already-built server
 
 ## Project Structure
 
-- `src/index.ts` — Fastify entrypoint (registers `@xmcp/adapter`, static files, validation rules)
-- `src/tools/` — MCP tool definitions, auto-discovered from `*.tool.ts`
-- `src/services/` — shared services (cache, logger, schema, validation, utils)
-- `src/services/rules/` — semantic validation rules
+- `src/ts/index.ts` — Fastify entrypoint (registers `@xmcp/adapter`, static files, validation rules)
+- `src/ts/tools/` — MCP tool definitions, auto-discovered from `*.tool.ts`
+- `src/ts/services/` — shared services (cache, logger, schema, validation, utils)
+- `src/ts/services/rules/` — semantic validation rules
+- `src/groovy/` — Groovy action-validation daemon (see `src/groovy/README.md`)
 - `src/public/fallback/` — static content (examples, `overview.md`, `actions-def.json`, `elements/`)
 - `src/public/assets/` — logo/favicon
 
 ### Tools
 
-Each `src/tools/*.tool.ts` exports a `schema` (zod inputs), optional `outputSchema`, `metadata`, and a `default` function.
+Each `src/ts/tools/*.tool.ts` exports a `schema` (zod inputs), optional `outputSchema`, `metadata`, and a `default` function.
 
 Current tools:
 
@@ -47,18 +48,21 @@ Current tools:
 | `list-examples` | List example processes |
 | `get-example` | Get the content of one example process |
 | `validate-process` | Validate a process XML against its schema and semantic rules |
+| `validate-action` | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
 
 Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
 
 ## Validation
 
-`validate-process` runs a pipeline in `src/services/validation.service.ts`:
+`validate-process` runs a pipeline in `src/ts/services/validation.service.ts`:
 
 1. XML well-formedness
 2. XSD schema validation (via the native `libxmljs2` module)
 3. registered semantic rules
 
-Semantic rules live in `src/services/rules/*.rule.ts` and are registered in `src/services/rules/index.ts`. Each rule exports `{ name, description, validate(doc, ctx) }` and returns `ValidationIssue[]` (`rule`, `severity`, `message`, optional `path`/`line`/`column`).
+Semantic rules live in `src/ts/services/rules/*.rule.ts` and are registered in `src/ts/services/rules/index.ts`. Each rule exports `{ name, description, validate(doc, ctx) }` and returns `ValidationIssue[]` (`rule`, `severity`, `message`, optional `path`/`line`/`column`).
+
+`validate-action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See `src/groovy/README.md` for details.
 
 > `libxmljs2` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`).
 

@@ -4,7 +4,7 @@ import { cp, rm } from 'node:fs/promises'
 await rm('dist', { recursive: true, force: true })
 
 await build({
-  entryPoints: ['src/index.ts'],
+  entryPoints: ['src/ts/index.ts'],
   outfile: 'dist/server.cjs',
   bundle: true,
   platform: 'node',
@@ -18,3 +18,4 @@ await build({
 })
 
 await cp('src/public', 'dist/public', { recursive: true })
+await cp('src/groovy', 'dist/groovy', { recursive: true })
