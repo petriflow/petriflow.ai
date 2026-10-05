@@ -41,3 +41,7 @@ app.listen({port}, (err, address) => {
 });
 
 export default app;
+
+// TODO make versions cache on start and the only reference them in tool and resource
+// TODO implement endpoint for refreshing versions cache
+// TODO make resources - schema, actions, elements, example; but also keep them as tools; so unify their fetch

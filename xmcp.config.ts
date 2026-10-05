@@ -5,7 +5,7 @@ const config: XmcpConfig = {
     paths: {
       tools: "./src/ts/tools",
       prompts: false,
-      resources: false,
+      resources:"./src/ts/resources",
     },
     template: {
       name: "Petriflow MCP",
@@ -15,6 +15,19 @@ const config: XmcpConfig = {
     },
     experimental: {
       adapter: "fastify"
+    },
+    bundler: (config:any) => {
+      const configuredExternals = config.externals;
+      const externals = Array.isArray(configuredExternals)
+        ? configuredExternals
+        : configuredExternals
+          ? [configuredExternals]
+          : [];
+
+      return {
+        ...config,
+        externals: [...externals, {libxmljs2: "commonjs libxmljs2"}]
+      };
     }
   };
 
