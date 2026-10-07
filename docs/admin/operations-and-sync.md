@@ -29,8 +29,9 @@ must be valid JSON. Releases are immutable: successful installs are not overwrit
 
 The default storage path is `__dirname/storage`. In the bundled production server this resolves to `dist/storage`. It
 survives a process restart only while that directory is preserved. **`pnpm build` deletes and recreates `dist`, so it
-also removes `dist/storage`.** Back up or preserve the storage directory before rebuilding; configuring a separate
-durable storage path is not implemented yet.
+also removes `dist/storage`.** A named Docker volume mounted at `/app/dist/storage` preserves releases across
+container/image replacement; outside Docker, back up or preserve the storage directory before rebuilding. Configuring a
+separate durable storage path is not implemented yet.
 
 There is no fallback dataset. If a release is listed but its ZIP is missing or invalid, tools and resources requiring
 that version cannot return its content until a successful sync.

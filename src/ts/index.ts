@@ -9,6 +9,7 @@ import validationService from "./services/validation.service";
 import {rules} from "./services/rules";
 import releaseSyncService from "./services/release-sync.service";
 import {registerPetriflowSyncRoute} from "./routes/petriflow-sync.route";
+import {getServerHost} from "./services/server-config.service";
 
 const app = Fastify({
   logger: {
@@ -18,6 +19,7 @@ const app = Fastify({
 setLogger(app.log);
 validationService.registerRules(rules);
 const port = Number(process.env.PORT ?? 3000);
+const host = getServerHost();
 const publicDir = [path.join(__dirname, 'public'), path.join(__dirname, '../public')]
   .find(existsSync)!
 
@@ -42,7 +44,7 @@ async function start(): Promise<void> {
   }
 
   try {
-    const address = await app.listen({port});
+    const address = await app.listen({port, host});
     app.log.info("Cache initialized: ");
     app.log.info(cache.status());
     app.log.info(`Server running at ${address}`);

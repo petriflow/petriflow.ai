@@ -50,6 +50,10 @@ Return convention:
 - Use `logger` from `src/ts/services/logger.service` (named export). Never `console.log`.
 - Do NOT pass a pino instance to `Fastify({logger})`: esbuild bundles pino separately from Fastify's copy, so Fastify's `instanceof pino` check fails. Pass a config object and call `setLogger(app.log)` (already done in `src/ts/index.ts`).
 
+## HTTP binding
+
+- `PORT` defaults to `3000`; `HOST` defaults to `127.0.0.1` for local use. The Docker image sets `HOST=0.0.0.0` so published container ports are reachable.
+
 ## Services
 
 - `src/ts/services/cache.service.ts` — file-backed key-value cache singleton; the default file is `cache.json` under `__dirname`. It is for metadata/cache values, not release files.
@@ -84,7 +88,15 @@ Return convention:
   - Locally it needs to be compiled — pnpm build is enabled via `allowBuilds.libxmljs2 = true` in `pnpm-workspace.yaml` (and it needs `python3 make g++ libxml2-dev` to build from source; see `Dockerfile` build stage).
 - The `.node` binary is required at runtime and is loaded via `require("libxmljs2")`, so the runtime image must contain `node_modules` (see `Dockerfile`).
 
+## Docker
+
+- The Docker build uses Corepack/pnpm with `pnpm-lock.yaml` and `pnpm-workspace.yaml`; preserve `--frozen-lockfile` and copy the workspace config before install so native build permissions apply.
+- Builder and runtime share the digest-pinned Node 22.23.3/Alpine 3.24 image so `libxmljs2` is built for the runtime ABI. Update the digest together with the tag.
+- Groovy 4.0.33 is downloaded from Apache and SHA-256 verified. Update its version and checksum together.
+- The application defaults to `HOST=127.0.0.1`; the container sets `HOST=0.0.0.0` for published ports.
+- Runtime writes `dist/cache.json` and `dist/storage`; the image makes `dist` writable by `node` and declares `/app/dist/storage` as a volume. Deployments should use a named volume there.
+- The Node base image and application lockfile are pinned, but `apk add` still resolves packages from Alpine repositories at build time. For byte-for-byte image reproducibility, also pin/snapshot those OS packages; update them regularly for security fixes.
+
 ## Notes
 
 - `.github/workflows/build.yml` is fully commented out (inactive).
-- The Dockerfile uses `npm ci` but the repo uses pnpm (`pnpm-lock.yaml`, no `package-lock.json`) — Docker deploy is currently broken/out of sync; fix the package manager or regenerate a lockfile before relying on it.

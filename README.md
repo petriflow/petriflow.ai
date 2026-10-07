@@ -13,7 +13,7 @@ pnpm install
 pnpm dev        # build then run
 ```
 
-This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with the `PORT` env var.
+This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with `PORT` or the bind address with `HOST`; the default host is loopback (`127.0.0.1`). The Docker image sets `HOST=0.0.0.0` for container port publishing.
 
 ## Commands
 
