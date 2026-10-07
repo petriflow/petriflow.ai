@@ -1,9 +1,7 @@
 import path from "node:path";
 import * as fs from "node:fs";
-import {logger} from "./logger.service";
 
 
-const FILE_CACHE = path.join(__dirname, "cache.d");
 const DATA_CACHE = path.join(__dirname, "cache.json");
 
 /**
@@ -26,13 +24,11 @@ export class CacheService {
   /**
    * Returns a summary of the current cache state.
    *
-   * @returns an object containing the number of data entries, the number of cached files
-   * and the list of data keys currently present in the cache
+   * @returns an object containing the number of data entries and the list of data keys currently present in the cache
    */
   status() {
     return {
       dataCount: Object.keys(this._cache).length,
-      fileCount: fs.existsSync(FILE_CACHE) ? fs.readdirSync(FILE_CACHE).length : 0,
       dataKeys: Object.keys(this._cache)
     };
   }
@@ -66,31 +62,6 @@ export class CacheService {
   delete(key: string): void {
     delete this._cache[key];
     fs.writeFileSync(DATA_CACHE, JSON.stringify(this._cache));
-  }
-
-  /**
-   * Reads the contents of a cached file with the given key.
-   *
-   * @param key the file key to look up
-   * @returns the file contents as a string, or {@code undefined} if no such file exists
-   */
-  file(key: string): string | undefined {
-    if (!fs.existsSync(path.join(FILE_CACHE, key)))
-      return undefined;
-    return fs.readFileSync(path.join(FILE_CACHE, key), "utf-8");
-  }
-
-  /**
-   * Writes a file with the given key, creating the cache directory if necessary.
-   *
-   * @param key the file key under which the value is stored
-   * @param value the contents to write to the file
-   */
-  write(key: string, value: string): void {
-    if (!fs.existsSync(FILE_CACHE)) {
-      fs.mkdirSync(FILE_CACHE, {recursive: true});
-    }
-    fs.writeFileSync(path.join(FILE_CACHE, key), value);
   }
 
 }
