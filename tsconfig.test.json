@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": [
+    "xmcp-env.d.ts",
+    ".xmcp/**/*.d.ts",
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "vitest.config.mts"
+  ]
+}

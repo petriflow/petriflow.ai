@@ -107,7 +107,7 @@ interface PendingRequest {
   reject: (err: Error) => void;
 }
 
-class ActionValidationService {
+export class ActionValidationService {
   private _daemon: ChildProcessWithoutNullStreams | null = null;
   private _queue: PendingRequest[] = [];
   private _buffer = "";

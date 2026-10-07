@@ -1,11 +1,6 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
-import {getLatestVersion, getVersionedPath} from "../services/utils";
-import {logger} from "../services/logger.service";
-import fs from "node:fs";
-
-
-const ACTIONS_FILE = "actions-def.json";
+import petriflowDataService from "../services/petriflow-data.service";
 
 export const schema = {
   version: z.string().describe("Version of the schema"),
@@ -48,22 +43,6 @@ export const metadata = {
 };
 
 export default async function getAction({name, version}: InferSchema<typeof schema>) {
-  if (version === "latest") {
-    version = getLatestVersion();
-    logger.info(`Using cached latest version: ${version}`);
-  }
-
-  const actionsFile = getVersionedPath(version, [ACTIONS_FILE]);
-  const actionsContent = await fs.promises.readFile(actionsFile, {encoding: "utf-8"});
-  const actions = JSON.parse(actionsContent);
-  logger.info(`Loaded actions from ${actionsFile}`);
-
-  const action = actions[name];
-  if (!action) {
-    throw new Error(`Action ${name} not found`);
-  }
-  action.name = name;
-  logger.info(`Action: ${JSON.stringify(action)}`);
-
-  return {structuredContent: {action}}; //TODO tu to padne na schema validation
+  const action = petriflowDataService.getAction(version, name);
+  return {structuredContent: {action}};
 }

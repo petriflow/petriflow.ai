@@ -13,11 +13,13 @@ const DATA_CACHE = path.join(__dirname, "cache.json");
 export class CacheService {
 
   private readonly _cache: { [key: string]: any };
+  private readonly cacheFile: string;
 
-  constructor() {
+  constructor(cacheFile = DATA_CACHE) {
+    this.cacheFile = cacheFile;
     this._cache = {};
-    if (fs.existsSync(DATA_CACHE)) {
-      this._cache = JSON.parse(fs.readFileSync(DATA_CACHE, "utf-8"));
+    if (fs.existsSync(this.cacheFile)) {
+      this._cache = JSON.parse(fs.readFileSync(this.cacheFile, "utf-8"));
     }
   }
 
@@ -51,7 +53,7 @@ export class CacheService {
    */
   set(key: string, value: any): void {
     this._cache[key] = value;
-    fs.writeFileSync(DATA_CACHE, JSON.stringify(this._cache));
+    fs.writeFileSync(this.cacheFile, JSON.stringify(this._cache));
   }
 
   /**
@@ -61,7 +63,7 @@ export class CacheService {
    */
   delete(key: string): void {
     delete this._cache[key];
-    fs.writeFileSync(DATA_CACHE, JSON.stringify(this._cache));
+    fs.writeFileSync(this.cacheFile, JSON.stringify(this._cache));
   }
 
 }

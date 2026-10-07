@@ -1,8 +1,6 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
-import {logger} from "../services/logger.service";
-import {getLatestVersion} from "../services/utils";
-import {getSchemaXsd} from "../services/schema.service";
+import petriflowDataService from "../services/petriflow-data.service";
 
 export const schema = {
   version: z.string().describe("Version of the schema"),
@@ -21,10 +19,5 @@ export const metadata = {
 };
 
 export default async function getSchema({version}: InferSchema<typeof schema>) {
-  if (version === "latest") {
-    version = getLatestVersion();
-    logger.info(`Using cached latest version: ${version}`);
-  }
-
-  return getSchemaXsd(version);
+  return petriflowDataService.getSchemaXsd(version);
 }

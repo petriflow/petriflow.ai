@@ -1,29 +1,21 @@
 import {InferSchema} from "xmcp";
-import {getLatestVersion, getVersionedPath} from "../../../../services/utils";
-import {logger} from "../../../../services/logger.service";
-import fs from "node:fs";
+import petriflowDataService from "../../../../services/petriflow-data.service";
+import versionCompletions from "../../../../services/version-completions.service";
 import {z} from "zod";
-
-
-const OVERVIEW_FILE = 'overview.md';
 
 export const schema = {
   version: z.string().describe("Version of the schema"),
 };
 
+export const complete = versionCompletions;
+
 export const metadata = {
   name: "overview",
   title: "Petriflow Overview",
-  description: "Show overview of Petriflow language"
+  description: "Show overview of Petriflow language",
+  mimeType: "text/markdown",
 };
 
 export default function getOverview({version}: InferSchema<typeof schema>) {
-  if (version === "latest") {
-    version = getLatestVersion();
-    logger.info(`Using cached latest version: ${version}`);
-  }
-
-  const overviewFilePath = getVersionedPath(version, [OVERVIEW_FILE]);
-
-  return fs.readFileSync(overviewFilePath, {encoding: "utf-8"});
+  return petriflowDataService.getOverview(version);
 }

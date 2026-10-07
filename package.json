@@ -14,18 +14,20 @@
     "url": "https://github.com/netgrif/petriflow.ai/issues"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "build": "xmcp build && node build.mjs",
     "start": "node dist/server.cjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
     "dev": "pnpm build && pnpm start"
   },
   "dependencies": {
     "@fastify/static": "^10.1.4",
     "@xmldom/xmldom": "^0.9.12",
     "fastify": "^5.12.5",
+    "fflate": "^0.8.3",
     "libxmljs2": "^0.37.0",
     "pino": "^10.3.1",
     "semver": "^7.8.5",
@@ -36,8 +38,8 @@
     "@types/semver": "^7.8.0",
     "@xmcp-dev/compiler": "^1.6.0",
     "esbuild": "^0.28.2",
-    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vitest": "^5.0.3",
     "xmcp": "^1.6.0"
   },
   "packageManager": "pnpm@12.9.1"

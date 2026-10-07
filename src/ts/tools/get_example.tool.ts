@@ -1,11 +1,6 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
-import {getLatestVersion, getVersionedPath} from "../services/utils";
-import {logger} from "../services/logger.service";
-import fs from "node:fs";
-
-
-const EXAMPLES_FOLDER = "examples";
+import petriflowDataService from "../services/petriflow-data.service";
 
 export const schema = {
   version: z.string().describe("Version of the example"),
@@ -25,12 +20,5 @@ export const metadata = {
 };
 
 export default async function getExample({version, example}: InferSchema<typeof schema>) {
-  if (version === "latest") {
-    version = getLatestVersion();
-    logger.info(`Using cached latest version: ${version}`);
-  }
-
-  const exampleFile = getVersionedPath(version, [EXAMPLES_FOLDER, example + ".xml"])
-
-  return fs.promises.readFile(exampleFile, {encoding: "utf-8"});
+  return petriflowDataService.getExample(version, example);
 }

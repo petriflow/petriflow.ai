@@ -7,6 +7,8 @@ import cache from "./services/cache.service";
 import {setLogger, logger} from "./services/logger.service";
 import validationService from "./services/validation.service";
 import {rules} from "./services/rules";
+import releaseSyncService from "./services/release-sync.service";
+import {registerPetriflowSyncRoute} from "./routes/petriflow-sync.route";
 
 const app = Fastify({
   logger: {
@@ -23,25 +25,33 @@ const publicDir = [path.join(__dirname, 'public'), path.join(__dirname, '../publ
 app.get("/health", async () => ({status: "ok"}));
 app.post("/mcp", xmcpHandler);
 app.get("/mcp", xmcpHandler);
+registerPetriflowSyncRoute(app);
 
 app.register(fastifyStatic, {
   root: publicDir
 })
 
-app.listen({port}, (err, address) => {
-  if (err) {
-    app.log.error(err);
-    process.exit(1);
+async function start(): Promise<void> {
+  try {
+    const report = await releaseSyncService.sync();
+    if (report.failedVersions.length > 0) {
+      app.log.warn({failedVersions: report.failedVersions}, "Petriflow startup synchronization was incomplete");
+    }
+  } catch (error) {
+    app.log.warn({err: error}, "Petriflow startup synchronization failed; continuing with locally stored releases");
   }
 
-  app.log.info("Cache initialized: ");
-  app.log.info(cache.status());
+  try {
+    const address = await app.listen({port});
+    app.log.info("Cache initialized: ");
+    app.log.info(cache.status());
+    app.log.info(`Server running at ${address}`);
+  } catch (err) {
+    app.log.error(err);
+    process.exitCode = 1;
+  }
+}
 
-  app.log.info(`Server running at ${address}`);
-});
+void start();
 
 export default app;
-
-// TODO make versions cache on start and the only reference them in tool and resource
-// TODO implement endpoint for refreshing versions cache
-// TODO make resources - schema, actions, elements, example; but also keep them as tools; so unify their fetch

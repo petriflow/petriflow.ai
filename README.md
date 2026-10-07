@@ -2,9 +2,11 @@
 
 An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/netgrif/petriflow), built with [xmcp](https://xmcp.dev) + Fastify. It exposes Petriflow tools to MCP-compatible AI clients over HTTP.
 
+See the [project documentation](docs/README.md) for user, server administration, and developer guides.
+
 ## Getting Started
 
-Requires Node.js >= 22 and pnpm.
+Requires Node.js >= 22.12.0 and pnpm.
 
 ```bash
 pnpm install
@@ -17,17 +19,19 @@ This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Ove
 
 - `pnpm dev` — build then run the server
 - `pnpm build` — `xmcp build && node build.mjs` (regenerates `.xmcp/`, bundles to `dist/server.cjs`, copies `src/public` → `dist/public` and `src/groovy` → `dist/groovy`)
-- `pnpm typecheck` — `tsc --noEmit`
+- `pnpm typecheck` — type-check source and test files
+- `pnpm test` — run Vitest once (no watch mode)
 - `pnpm start` — run the already-built server
 
 ## Project Structure
 
 - `src/ts/index.ts` — Fastify entrypoint (registers `@xmcp/adapter`, static files, validation rules)
 - `src/ts/tools/` — MCP tool definitions, auto-discovered from `*.tool.ts`
-- `src/ts/services/` — shared services (cache, logger, schema, validation, utils)
+- `src/ts/services/` — shared services for cache, storage, release synchronization, Petriflow data, and validation
 - `src/ts/services/rules/` — semantic validation rules
+- `src/ts/resources/` — MCP resources and resource templates
+- `test/` — Vitest service and route tests
 - `src/groovy/` — Groovy action-validation daemon (see `src/groovy/README.md`)
-- `src/public/fallback/` — static content (examples, `overview.md`, `actions-def.json`, `elements/`)
 - `src/public/assets/` — logo/favicon
 
 ### Tools
@@ -51,6 +55,12 @@ Current tools:
 | `validate-action` | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
 
 Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
+
+### Resources and release synchronization
+
+Resources mirror the version, schema, overview, element, action, and example data exposed by the tools. Versioned resource templates use URIs such as `petriflow://versions/{version}/schema` and complete versions from the synchronized release list, including `latest`.
+
+At startup, the server checks releases from `petriflow/petriflow` and installs missing assets named `petriflow-vX.Y.Z.zip`. Each archive contains `petriflow.schema.xsd`, `overview.md`, `actions-definitions.json`, `elements/`, and `examples/`. Installed releases are immutable and are not deleted or overwritten. The same check can be triggered with `POST /admin/petriflow/sync`; endpoint access control is expected to be provided by deployment infrastructure.
 
 ## Validation
 
