@@ -37,10 +37,12 @@ test("sends normalized action requests and reuses the spawned daemon", async () 
   const requests = prepareFakeDaemon();
   const service = new ActionValidationService();
 
-  const result = await service.validate("field: f.fieldId;");
+  const result = await service.validate("field: f.fieldId; change field value { \"New Value\" }");
 
+  console.log(JSON.stringify(result));
   expect(result).toEqual({valid: true, issues: []});
-  expect(requests).toEqual([{source: "Field field = null\n"}]);
+  console.log(JSON.stringify(requests));
+  expect(requests).toEqual([{source: "Field field = null\n change field value { \"New Value\" }"}]);
   expect(spawnMock).toHaveBeenCalledTimes(1);
   await service.validateWithFunctions("return helper()", [{name: "helper", body: "return 1"}]);
   await service.validateFunction("return 2");

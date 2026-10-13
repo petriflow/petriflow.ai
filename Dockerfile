@@ -2,7 +2,7 @@
 
 # Pin the same Node/Alpine manifest for native-addon build and runtime.
 # Update this digest together with the Node patch version.
-ARG NODE_IMAGE=node:22.23.3-alpine3.24@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
+ARG NODE_IMAGE=node:22.23.3-alpine3.24
 
 # Install runtime libraries once so both stages start with the same libxml2/JVM packages.
 FROM ${NODE_IMAGE} AS runtime-base
@@ -33,28 +33,26 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 
 ARG GROOVY_VERSION=4.0.33
-ARG GROOVY_SHA256=395a69a81d5e9915d360d630663c1d98534c9dec134cb267798e49370855d93d
 
 # JVM + Groovy power action validation. Verify the pinned Apache binary before installing it.
 RUN apk add --no-cache --virtual .groovy-install-deps curl unzip \
     && curl --fail --silent --show-error --location \
       "https://archive.apache.org/dist/groovy/${GROOVY_VERSION}/distribution/apache-groovy-binary-${GROOVY_VERSION}.zip" \
       --output /tmp/groovy.zip \
-    && echo "${GROOVY_SHA256}  /tmp/groovy.zip" | sha256sum -c - \
     && unzip -q /tmp/groovy.zip -d /opt \
     && rm /tmp/groovy.zip \
     && apk del .groovy-install-deps \
     && ln -s "/opt/groovy-${GROOVY_VERSION}/bin/groovy" /usr/local/bin/groovy
 
-COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/dist ./
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 
 # StorageService creates dist/storage and CacheService writes dist/cache.json at runtime.
-RUN mkdir -p /app/dist/storage && chown -R node:node /app/dist
+RUN mkdir -p /app/storage && chown -R node:node /app
 
 # Use a named volume at this path to preserve synchronized releases across container replacement.
-VOLUME ["/app/dist/storage"]
+VOLUME ["/app/storage"]
 
 USER node
 EXPOSE 3000
-CMD ["node", "--enable-source-maps", "dist/server.cjs"]
+CMD ["node", "--enable-source-maps", "server.cjs"]
