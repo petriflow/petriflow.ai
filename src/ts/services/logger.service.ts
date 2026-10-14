@@ -1,10 +1,19 @@
 import {pino} from "pino";
 import type {FastifyBaseLogger} from "fastify";
+import {getSingleton} from "./singleton-registry.service";
 
-export let logger: FastifyBaseLogger = pino({
-  level: process.env.LOG_LEVEL ?? "info"
-});
+interface LoggerState {
+  current: FastifyBaseLogger;
+}
+
+const state = getSingleton<LoggerState>("netgrif.petriflow.ai/logger", () => ({
+  current: pino({level: process.env.LOG_LEVEL ?? "info"}),
+}));
+
+export function getLogger(): FastifyBaseLogger {
+  return state.current;
+}
 
 export function setLogger(log: FastifyBaseLogger): void {
-  logger = log;
+  state.current = log;
 }

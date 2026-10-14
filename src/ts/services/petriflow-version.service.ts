@@ -1,9 +1,13 @@
 import releaseSyncService, {type PetriflowVersion, type ReleaseSyncService} from "./release-sync.service";
 import type {SnapshotManifest} from "./petriflow-snapshot.service";
+import {getLogger} from "./logger.service";
+import {getSingleton} from "./singleton-registry.service";
 
 export interface PetriflowVersionCatalog {
   listVersions(): PetriflowVersion[];
+
   getLatestVersion(): string;
+
   resolveVersion(version: string): string;
 }
 
@@ -12,13 +16,15 @@ type RemoteVersionProvider = Pick<ReleaseSyncService, "listVersions" | "getLates
 export class PetriflowVersionService implements PetriflowVersionCatalog {
   private localVersion: PetriflowVersion | null = null;
 
-  constructor(private readonly remote: RemoteVersionProvider = releaseSyncService) {}
+  constructor(private readonly remote: RemoteVersionProvider = releaseSyncService) {
+  }
 
   useRemote(): void {
     this.localVersion = null;
   }
 
   useLocal(manifest: SnapshotManifest): void {
+    getLogger().info("Using local version " + manifest.version);
     this.localVersion = {
       version: manifest.version,
       releaseDate: manifest.releaseDate,
@@ -44,5 +50,8 @@ export class PetriflowVersionService implements PetriflowVersionCatalog {
   }
 }
 
-const petriflowVersionService = new PetriflowVersionService();
+const petriflowVersionService = getSingleton(
+  "netgrif.petriflow.ai/petriflow-version",
+  () => new PetriflowVersionService(),
+);
 export default petriflowVersionService;

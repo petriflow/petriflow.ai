@@ -9,6 +9,7 @@ export const schema = {
 export const outputSchema = {
   examples: z.array(z.object({
     name: z.string().describe("Name of the example"),
+    app: z.string().describe("Name of the app"),
     description: z.string().describe("Description of the example"),
   })).describe("List of examples"),
 };

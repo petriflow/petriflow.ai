@@ -2,7 +2,7 @@ import {mkdtempSync, rmSync} from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {strToU8, zipSync} from "fflate";
-import {expect, test} from "vitest";
+import {expect, test, vi} from "vitest";
 import {StorageService} from "../../src/ts/services/storage.service";
 import {ReleaseSyncService} from "../../src/ts/services/release-sync.service";
 
@@ -114,4 +114,12 @@ test("caches release metadata and identifies the latest stable version", async (
       ]);
     },
   );
+});
+
+test("shares the default release synchronizer across module reloads", async () => {
+  const first = (await import("../../src/ts/services/release-sync.service")).default;
+  vi.resetModules();
+  const reloaded = (await import("../../src/ts/services/release-sync.service")).default;
+
+  expect(reloaded).toBe(first);
 });

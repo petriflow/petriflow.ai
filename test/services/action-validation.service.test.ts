@@ -1,4 +1,4 @@
-import {expect, test} from "vitest";
+import {expect, test, vi} from "vitest";
 import {extractFieldRefs, normalizeFieldRefs} from "../../src/ts/services/action-validation.service";
 
 test("extracts field and transition references with their local names", () => {
@@ -19,4 +19,12 @@ test("leaves source without references unchanged", () => {
   const source = "return 42";
   expect(extractFieldRefs(source)).toEqual([]);
   expect(normalizeFieldRefs(source)).toBe(source);
+});
+
+test("shares the default action-validation daemon across module reloads", async () => {
+  const first = (await import("../../src/ts/services/action-validation.service")).default;
+  vi.resetModules();
+  const reloaded = (await import("../../src/ts/services/action-validation.service")).default;
+
+  expect(reloaded).toBe(first);
 });

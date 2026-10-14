@@ -1,3 +1,4 @@
+import {randomUUID} from "node:crypto";
 import {beforeEach, expect, test, vi} from "vitest";
 
 const {getSchemaXsd} = vi.hoisted(() => ({getSchemaXsd: vi.fn()}));
@@ -86,4 +87,17 @@ test("returns XSD errors and converts a thrown rule into an issue while continui
     message: 'Rule "throws" threw while validating: broken rule',
   }));
   expect(laterRule).toHaveBeenCalledOnce();
+});
+
+test("shares registered rules across default validation service module reloads", async () => {
+  const firstModule = await import("../../src/ts/services/validation.service");
+  const first = firstModule.default;
+  const ruleName = `registry-${randomUUID()}`;
+  first.registerRule({name: ruleName, description: "registry test", validate: () => []});
+
+  vi.resetModules();
+  const reloadedModule = await import("../../src/ts/services/validation.service");
+
+  expect(reloadedModule.default).toBe(first);
+  expect(reloadedModule.default.rules().map(({name}) => name)).toContain(ruleName);
 });

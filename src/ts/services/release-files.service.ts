@@ -1,4 +1,29 @@
-/** Validates the content layout shared by downloaded releases and the bundled snapshot. */
+/** Validates the required relative paths without opening any release files. */
+export function validateReleasePaths(paths: string[], sourceName: string): void {
+  for (const relativePath of paths) {
+    const segments = relativePath.split("/");
+    if (!relativePath || relativePath.startsWith("/") || relativePath.includes("\\") ||
+      /^[A-Za-z]:/.test(relativePath) ||
+      segments.some((segment) => !segment || segment === "." || segment === "..")) {
+      throw new Error(`Unsafe path in ${sourceName}: ${relativePath}`);
+    }
+  }
+
+  for (const filename of ["petriflow.schema.xsd", "overview.md", "actions-definitions.json"]) {
+    if (!paths.includes(filename)) {
+      throw new Error(`${sourceName} is missing required file ${filename}`);
+    }
+  }
+
+  if (!paths.some((relativePath) => relativePath.startsWith("elements/") && relativePath.endsWith(".xsd"))) {
+    throw new Error(`${sourceName} is missing element XSD files`);
+  }
+  if (!paths.some((relativePath) => relativePath.startsWith("examples/") && relativePath.endsWith(".xml"))) {
+    throw new Error(`${sourceName} is missing XML examples`);
+  }
+}
+
+/** Validates text content for remote release ZIPs. */
 export function validateReleaseFiles(files: Record<string, string>, sourceName: string): void {
   for (const filename of ["petriflow.schema.xsd", "overview.md", "actions-definitions.json"]) {
     if (!files[filename]?.trim()) {

@@ -1,7 +1,7 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
 import {getLatestVersion} from "../services/utils";
-import {logger} from "../services/logger.service";
+import {getLogger} from "../services/logger.service";
 import validationService from "../services/validation.service";
 
 export const schema = {
@@ -36,11 +36,11 @@ export const metadata = {
 export default async function validateProcess({version, xml}: InferSchema<typeof schema>) {
   if (version === "latest") {
     version = getLatestVersion();
-    logger.info(`Using cached latest version: ${version}`);
+    getLogger().info(`Using cached latest version: ${version}`);
   }
 
   const result = await validationService.validate(xml, version);
 
-  logger.info(`Validation result: ${result.valid ? "valid" : "invalid"} (${result.issues.length} issue(s))`);
+  getLogger().info(`Validation result: ${result.valid ? "valid" : "invalid"} (${result.issues.length} issue(s))`);
   return {structuredContent: result};
 }

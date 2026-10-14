@@ -1,4 +1,4 @@
-import {expect, test} from "vitest";
+import {expect, test, vi} from "vitest";
 import {PetriflowVersionService} from "../../src/ts/services/petriflow-version.service";
 
 const manifest = {version: "1.2.3", releaseDate: "2026-01-01T00:00:00Z"};
@@ -41,4 +41,25 @@ test("rejects versions other than the local snapshot", () => {
   versions.useLocal(manifest);
 
   expect(() => versions.resolveVersion("1.2.2")).toThrow(/unavailable.*LOCAL/i);
+});
+
+test("shares local version state across default-service module reloads", async () => {
+  const firstModule = await import("../../src/ts/services/petriflow-version.service");
+  const first = firstModule.default;
+  first.useLocal(manifest);
+
+  try {
+    vi.resetModules();
+    const reloadedModule = await import("../../src/ts/services/petriflow-version.service");
+
+    expect(reloadedModule.default).toBe(first);
+    expect(reloadedModule.default.listVersions()).toEqual([{
+      version: "1.2.3",
+      releaseDate: "2026-01-01T00:00:00Z",
+      prerelease: false,
+      latest: true,
+    }]);
+  } finally {
+    first.useRemote();
+  }
 });

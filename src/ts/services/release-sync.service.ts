@@ -2,8 +2,9 @@ import {unzipSync} from "fflate";
 import {rcompare, valid} from "semver";
 import storage, {StorageService} from "./storage.service";
 import cache from "./cache.service";
-import {logger} from "./logger.service";
+import {getLogger} from "./logger.service";
 import {validateReleaseFiles} from "./release-files.service";
+import {getSingleton} from "./singleton-registry.service";
 
 const RELEASES_URL = "https://api.github.com/repos/petriflow/petriflow/releases";
 
@@ -122,11 +123,11 @@ export class ReleaseSyncService {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         report.failedVersions.push({version, message});
-        logger.warn(`Failed to install Petriflow ${version}: ${message}`);
+        getLogger().warn(`Failed to install Petriflow ${version}: ${message}`);
       }
     }
 
-    logger.info({
+    getLogger().info({
       discoveredVersions: report.discoveredVersions,
       downloadedVersions: report.downloadedVersions,
       alreadyInstalledVersions: report.alreadyInstalledVersions,
@@ -222,5 +223,5 @@ export class ReleaseSyncService {
 
 }
 
-const releaseSyncService = new ReleaseSyncService();
+const releaseSyncService = getSingleton("netgrif.petriflow.ai/release-sync", () => new ReleaseSyncService());
 export default releaseSyncService;

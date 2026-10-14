@@ -2,6 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import {randomUUID} from "node:crypto";
 import {valid as isValidVersion} from "semver";
+import {getSingleton} from "./singleton-registry.service";
 
 export enum FileType {
   SCHEMA = "schemas",
@@ -44,15 +45,15 @@ export class StorageService {
     return fs.readFileSync(filePath, "utf-8");
   }
 
-  /** Lists direct file entries inside a directory of an installed release. */
-  listVersionFiles(version: string, relativeDirectory: string): string[] {
-    const directoryPath = this.getVersionFilePath(version, relativeDirectory);
+
+  /** Lists absolute paths of the direct entries in a version subdirectory. */
+  listVersionFiles(version: string, childDirectory: string): string[] {
+    const directoryPath = this.getVersionFilePath(version, childDirectory);
     if (!this.hasVersion(version) || !fs.existsSync(directoryPath) || !fs.statSync(directoryPath).isDirectory()) {
       return [];
     }
     return fs.readdirSync(directoryPath, {withFileTypes: true})
-      .filter((entry) => entry.isFile())
-      .map((entry) => entry.name)
+      .map((entry) => path.join(directoryPath, entry.name))
       .sort((a, b) => a.localeCompare(b));
   }
 
@@ -92,6 +93,49 @@ export class StorageService {
     }
   }
 
+  /** Atomically installs files by copying them from a source directory without decoding their contents. */
+  installVersionFromDirectory(version: string, sourceDirectory: string, relativePaths: string[]): boolean {
+    const targetPath = this.getVersionPath(version);
+    if (fs.existsSync(targetPath)) {
+      if (this.hasVersion(version)) return false;
+      throw new Error(`Incomplete release directory exists for ${version}`);
+    }
+
+    const sourceRoot = path.resolve(sourceDirectory);
+    if (!fs.existsSync(sourceRoot) || !fs.statSync(sourceRoot).isDirectory()) {
+      throw new Error(`Release source directory not found: ${sourceDirectory}`);
+    }
+
+    const temporaryPath = fs.mkdtempSync(path.join(this.storagePath, `.tmp-${version}-${randomUUID()}-`));
+    try {
+      for (const relativePath of relativePaths) {
+        if (relativePath === ".complete") {
+          throw new Error("Release file path is reserved");
+        }
+
+        const sourceFile = this.getVersionFilePath(version, relativePath, sourceRoot);
+        const sourceStat = fs.lstatSync(sourceFile);
+        if (!sourceStat.isFile() || sourceStat.isSymbolicLink()) {
+          throw new Error(`Release source path is not a regular file: ${relativePath}`);
+        }
+
+        const destination = this.getVersionFilePath(version, relativePath, temporaryPath);
+        fs.mkdirSync(path.dirname(destination), {recursive: true});
+        fs.copyFileSync(sourceFile, destination, fs.constants.COPYFILE_EXCL);
+      }
+
+      fs.writeFileSync(path.join(temporaryPath, ".complete"), version, {encoding: "utf-8", flag: "wx"});
+      fs.renameSync(temporaryPath, targetPath);
+      return true;
+    } catch (error) {
+      fs.rmSync(temporaryPath, {recursive: true, force: true});
+      if (fs.existsSync(targetPath) && this.hasVersion(version)) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
   private getVersionPath(version: string): string {
     if (!isValidVersion(version)) {
       throw new Error(`Invalid release version: ${version}`);
@@ -99,6 +143,16 @@ export class StorageService {
     return path.join(this.storagePath, version);
   }
 
+  /**
+   * Resolves the absolute file path for a specific version and relative path.
+   * Ensures the relative path is valid and does not escape the intended root directory for the version.
+   *
+   * @param {string} version - The version identifier for which to resolve the file path.
+   * @param {string} relativePath - The relative file path to be resolved within the version's directory.
+   * @param {string} [root=this.getVersionPath(version)] - The root directory for the specified version. Defaults to the output of the `getVersionPath` method.
+   * @return {string} The resolved absolute file path for the given version and relative path.
+   * @throws {Error} If the `relativePath` is invalid, empty, absolute, or escapes the intended root directory.
+   */
   private getVersionFilePath(version: string, relativePath: string, root = this.getVersionPath(version)): string {
     const segments = relativePath.split(/[\\/]/);
     if (!relativePath || path.posix.isAbsolute(relativePath) || path.win32.isAbsolute(relativePath) ||
@@ -163,5 +217,5 @@ export class StorageService {
 
 }
 
-const storage = new StorageService();
+const storage = getSingleton("netgrif.petriflow.ai/storage", () => new StorageService());
 export default storage;

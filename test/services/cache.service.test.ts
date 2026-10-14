@@ -1,7 +1,7 @@
 import {existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import {expect, test} from "vitest";
+import {expect, test, vi} from "vitest";
 import {CacheService} from "../../src/ts/services/cache.service";
 
 function withCache(run: (cacheFile: string) => void): void {
@@ -43,4 +43,12 @@ test("persists values across instances and removes deleted keys", () => {
     reopened.delete("versions");
     expect(new CacheService(cacheFile).status()).toEqual({dataCount: 1, dataKeys: ["latestVersion"]});
   });
+});
+
+test("shares the default cache across module reloads", async () => {
+  const first = (await import("../../src/ts/services/cache.service")).default;
+  vi.resetModules();
+  const reloaded = (await import("../../src/ts/services/cache.service")).default;
+
+  expect(reloaded).toBe(first);
 });

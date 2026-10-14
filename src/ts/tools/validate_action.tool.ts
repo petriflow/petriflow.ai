@@ -1,6 +1,6 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
-import {logger} from "../services/logger.service";
+import {getLogger} from "../services/logger.service";
 import actionValidationService from "../services/action-validation.service";
 
 export const schema = {
@@ -33,6 +33,6 @@ export const metadata = {
 export default async function validateAction({definition}: InferSchema<typeof schema>) {
   const result = await actionValidationService.validate(definition);
 
-  logger.info(`Action validation result: ${result.valid ? "valid" : "invalid"} (${result.issues.length} issue(s))`);
+  getLogger().info(`Action validation result: ${result.valid ? "valid" : "invalid"} (${result.issues.length} issue(s))`);
   return {structuredContent: result};
 }

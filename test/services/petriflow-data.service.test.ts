@@ -1,7 +1,7 @@
 import {mkdtempSync, rmSync} from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import {expect, test} from "vitest";
+import {expect, test, vi} from "vitest";
 import {StorageService} from "../../src/ts/services/storage.service";
 import {PetriflowDataService} from "../../src/ts/services/petriflow-data.service";
 import {PetriflowVersionService} from "../../src/ts/services/petriflow-version.service";
@@ -15,15 +15,23 @@ function withData(run: (service: PetriflowDataService) => void): void {
       "overview.md": "# Overview",
       "actions-definitions.json": JSON.stringify({
         send: {signature: "send()", description: "Send"},
-        choose: {alts: [
-          {signature: "choose(a)", description: "First"},
-          {signature: "choose(b)", description: "Second"},
-        ]},
+        choose: {
+          alts: [
+            {signature: "choose(a)", description: "First"},
+            {signature: "choose(b)", description: "Second"},
+          ]
+        },
         chain: {dslChain: {then: {signature: "then()", description: "Chain"}}},
       }),
       "elements/place.xsd": "<place />",
       "elements/role.xsd": "<role />",
-      "examples/sample.xml": "<process><title> Sample process </title></process>",
+      "examples/sample/manifest.json": JSON.stringify({
+        processes: [{
+          id: "sample-process",
+          description: "Sample process"
+        }]
+      }),
+      "examples/sample/working.xml": "<process><title> Sample process </title></process>",
     });
     run(new PetriflowDataService(storage, {
       resolveVersion: (version) => version === "latest" ? "1.2.3" : version,
@@ -52,9 +60,10 @@ test("reads schema, overview, elements, actions, and examples from release stora
       name: "send", signature: "send()", description: "Send",
     });
     expect(service.listExamples("1.2.3")).toEqual([
-      {name: "sample", description: "Sample process"},
+      {name: "sample-process", app: "sample", description: "Sample process"},
     ]);
-    expect(service.getExample("1.2.3", "sample")).toBe("<process><title> Sample process </title></process>");
+    expect(service.getExample("1.2.3", "sample", "working"))
+      .toBe("<process><title> Sample process </title></process>");
   });
 });
 
@@ -80,4 +89,12 @@ test("rejects old stored versions when the LOCAL catalog exposes only its snapsh
   } finally {
     rmSync(directory, {recursive: true, force: true});
   }
+});
+
+test("shares the default data service across module reloads", async () => {
+  const first = (await import("../../src/ts/services/petriflow-data.service")).default;
+  vi.resetModules();
+  const reloaded = (await import("../../src/ts/services/petriflow-data.service")).default;
+
+  expect(reloaded).toBe(first);
 });

@@ -1,11 +1,11 @@
 import {InferSchema} from "xmcp";
 import {z} from "zod";
-import petriflowDataService from "../../../../../services/petriflow-data.service";
-import versionCompletions from "../../../../../services/version-completions.service";
+import petriflowDataService from "../../../../../../services/petriflow-data.service";
+import versionCompletions from "../../../../../../services/version-completions.service";
 
 export const schema = {
   version: z.string().describe("Petriflow language version"),
-  name: z.string().describe("Name of the element"),
+  element: z.string().describe("Name of the element"),
 };
 
 export const complete = versionCompletions;
@@ -17,6 +17,6 @@ export const metadata = {
   mimeType: "application/xml",
 };
 
-export default function getElement({version, name}: InferSchema<typeof schema>): string {
-  return petriflowDataService.getElement(version, name);
+export default function getElement({version, element}: InferSchema<typeof schema>): string {
+  return petriflowDataService.getElement(version, element);
 }

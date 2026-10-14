@@ -1,4 +1,5 @@
 import petriflowVersionService from "../../services/petriflow-version.service";
+import {getLogger} from "../../services/logger.service";
 
 export const metadata = {
   name: "petriflow-versions",

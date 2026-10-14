@@ -1,6 +1,7 @@
 import {parseXml} from "libxmljs2";
 import {getSchemaXsd} from "./schema.service";
-import {logger} from "./logger.service";
+import {getLogger} from "./logger.service";
+import {getSingleton} from "./singleton-registry.service";
 
 export type ValidationSeverity = "error" | "warning";
 
@@ -152,7 +153,7 @@ export class ValidationService {
 
     const valid = !issues.some(i => i.severity === "error");
 
-    logger.info(`Validation of version ${version}: ${valid ? "valid" : "invalid"} (${issues.length} issue(s))`);
+    getLogger().info(`Validation of version ${version}: ${valid ? "valid" : "invalid"} (${issues.length} issue(s))`);
     return {valid, issues};
   }
 
@@ -182,4 +183,5 @@ export class ValidationService {
   }
 }
 
-export default new ValidationService();
+const validationService = getSingleton("netgrif.petriflow.ai/validation", () => new ValidationService());
+export default validationService;

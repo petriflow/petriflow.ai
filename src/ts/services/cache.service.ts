@@ -1,5 +1,6 @@
 import path from "node:path";
 import * as fs from "node:fs";
+import {getSingleton} from "./singleton-registry.service";
 
 
 const DATA_CACHE = path.join(__dirname, "cache.json");
@@ -68,5 +69,5 @@ export class CacheService {
 
 }
 
-const cache = new CacheService();
+const cache = getSingleton("netgrif.petriflow.ai/cache", () => new CacheService());
 export default cache;

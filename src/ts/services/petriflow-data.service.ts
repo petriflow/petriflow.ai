@@ -1,5 +1,9 @@
 import storage, {StorageService} from "./storage.service";
 import petriflowVersionService from "./petriflow-version.service";
+import fs from "node:fs";
+import path from "node:path";
+import {getSingleton} from "./singleton-registry.service";
+import {getLogger} from "./logger.service";
 
 const ELEMENT_DESCRIPTIONS: Record<string, string> = {
   transaction: "Transaction definition",
@@ -33,6 +37,7 @@ export interface ListedAction {
 
 export interface ListedExample {
   name: string;
+  app: string;
   description: string;
 }
 
@@ -40,7 +45,8 @@ export class PetriflowDataService {
   constructor(
     private readonly fileStorage: StorageService = storage,
     private readonly versionProvider: LatestVersionProvider = petriflowVersionService,
-  ) {}
+  ) {
+  }
 
   getSchemaXsd(version: string): string {
     return this.readRequired(version, "petriflow.schema.xsd");
@@ -55,7 +61,7 @@ export class PetriflowDataService {
     return this.fileStorage.listVersionFiles(resolvedVersion, "elements")
       .filter((file) => file.endsWith(".xsd"))
       .map((file) => {
-        const name = file.slice(0, -4);
+        const name = path.basename(file, ".xsd");
         return {name, description: ELEMENT_DESCRIPTIONS[name] ?? ""};
       })
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -99,18 +105,22 @@ export class PetriflowDataService {
   listExamples(version: string): ListedExample[] {
     const resolvedVersion = this.resolveVersion(version);
     return this.fileStorage.listVersionFiles(resolvedVersion, "examples")
-      .filter((file) => file.endsWith(".xml"))
-      .map((file) => {
-        const name = file.slice(0, -4);
-        const content = this.readRequired(resolvedVersion, `examples/${file}`);
-        const title = /<\s*title\b[^>]*>([\s\S]*?)<\s*\/\s*title\s*>/i.exec(content)?.[1]?.trim() ?? "";
-        return {name, description: title};
+      .filter((appDir) => fs.existsSync(path.join(appDir, "manifest.json")))
+      .map((appDir) => {
+        const manifest = JSON.parse(fs.readFileSync(path.join(appDir, "manifest.json"), "utf8"));
+        const appName = path.basename(appDir);
+        return manifest.processes.map((process: any) => ({
+          name: process.id,
+          app: appName,
+          description: process.description,
+        }));
       })
+      .flat()
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  getExample(version: string, example: string): string {
-    return this.readRequired(version, `examples/${example}.xml`);
+  getExample(version: string, app: string, example: string): string {
+    return this.readRequired(version, path.join("examples", app, `${example}.xml`));
   }
 
   private readRequired(version: string, relativePath: string): string {
@@ -136,5 +146,8 @@ export class PetriflowDataService {
   }
 }
 
-const petriflowDataService = new PetriflowDataService();
+const petriflowDataService = getSingleton(
+  "netgrif.petriflow.ai/petriflow-data",
+  () => new PetriflowDataService(),
+);
 export default petriflowDataService;

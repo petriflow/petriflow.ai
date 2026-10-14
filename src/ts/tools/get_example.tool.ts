@@ -4,6 +4,7 @@ import petriflowDataService from "../services/petriflow-data.service";
 
 export const schema = {
   version: z.string().describe("Version of the example"),
+  app: z.string().describe("Name of the app"),
   example: z.string().describe("Name of the example"),
 };
 
@@ -19,6 +20,6 @@ export const metadata = {
   }
 };
 
-export default async function getExample({version, example}: InferSchema<typeof schema>) {
-  return petriflowDataService.getExample(version, example);
+export default async function getExample({version, app, example}: InferSchema<typeof schema>) {
+  return petriflowDataService.getExample(version, app, example);
 }

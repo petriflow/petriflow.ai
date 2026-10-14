@@ -1,7 +1,7 @@
 import type {ValidationRule, ValidationIssue} from "../validation.service";
 import {findLocal, childText} from "./helpers";
 import actionValidationService, {extractFieldRefs, normalizeFieldRefs, CompiledFunction} from "../action-validation.service";
-import {logger} from "../logger.service";
+import {getLogger} from "../logger.service";
 
 /**
  * Validates every Petriflow action (and every custom `<function>`) in a process
@@ -116,7 +116,7 @@ export const actionValidationRule: ValidationRule = {
       }
     }
 
-    logger.info(`action-validation: validated ${actionNodes.length} action(s), ${functions.length} function(s), ${issues.length} issue(s)`);
+    getLogger().info(`action-validation: validated ${actionNodes.length} action(s), ${functions.length} function(s), ${issues.length} issue(s)`);
     return issues;
   }
 };

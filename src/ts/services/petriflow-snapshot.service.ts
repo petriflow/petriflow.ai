@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import {valid as isValidVersion} from "semver";
 import storage, {StorageService} from "./storage.service";
-import {validateReleaseFiles} from "./release-files.service";
+import {validateReleasePaths} from "./release-files.service";
+import {getSingleton} from "./singleton-registry.service";
 
 export interface SnapshotManifest {
   version: string;
@@ -27,9 +28,9 @@ export class PetriflowSnapshotService {
     }
 
     const manifest = this.readManifest(manifestPath);
-    const files = this.readSnapshotFiles();
-    validateReleaseFiles(files, "Petriflow snapshot");
-    this.fileStorage.installVersion(manifest.version, files);
+    const relativePaths = this.listSnapshotFiles();
+    validateReleasePaths(relativePaths, "Petriflow snapshot");
+    this.fileStorage.installVersionFromDirectory(manifest.version, this.snapshotPath, relativePaths);
     return manifest;
   }
 
@@ -57,9 +58,8 @@ export class PetriflowSnapshotService {
     return {version: manifest.version, releaseDate: manifest.releaseDate ?? ""};
   }
 
-  private readSnapshotFiles(): Record<string, string> {
-    const files = Object.create(null) as Record<string, string>;
-    const decoder = new TextDecoder("utf-8", {fatal: true});
+  private listSnapshotFiles(): string[] {
+    const relativePaths: string[] = [];
 
     const visit = (directory: string): void => {
       for (const entry of fs.readdirSync(directory, {withFileTypes: true})) {
@@ -76,14 +76,17 @@ export class PetriflowSnapshotService {
           throw new Error(`Unsupported entry in Petriflow snapshot: ${relativePath}`);
         }
         if (relativePath === "manifest.json") continue;
-        files[relativePath] = decoder.decode(fs.readFileSync(absolutePath));
+        relativePaths.push(relativePath);
       }
     };
 
     visit(this.snapshotPath);
-    return files;
+    return relativePaths;
   }
 }
 
-const petriflowSnapshotService = new PetriflowSnapshotService();
+const petriflowSnapshotService = getSingleton(
+  "netgrif.petriflow.ai/petriflow-snapshot",
+  () => new PetriflowSnapshotService(),
+);
 export default petriflowSnapshotService;

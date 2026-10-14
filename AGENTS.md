@@ -47,7 +47,7 @@ Return convention:
 
 ## Logging
 
-- Use `logger` from `src/ts/services/logger.service` (named export). Never `console.log`.
+- Use `getLogger()` from `src/ts/services/logger.service`. Never `console.log`.
 - Do NOT pass a pino instance to `Fastify({logger})`: esbuild bundles pino separately from Fastify's copy, so Fastify's `instanceof pino` check fails. Pass a config object and call `setLogger(app.log)` (already done in `src/ts/index.ts`).
 
 ## HTTP binding
@@ -62,9 +62,10 @@ Return convention:
 - `src/ts/services/petriflow-snapshot.service.ts` — validates and installs the checked-in snapshot in LOCAL mode.
 - `src/ts/services/petriflow-version.service.ts` — mode-selected version catalog for listing, latest resolution, and version validation.
 - `src/ts/services/petriflow-runtime.service.ts` — selects local snapshot initialization or remote synchronization before listening.
+- `src/ts/services/singleton-registry.service.ts` — registry on `globalThis[Symbol.for("netgrif.petriflow.ai.services")]` for default service instances shared across the main bundle and XMCP adapter module graph. Use stable namespaced keys; do not add a production reset.
 - `src/ts/services/petriflow-data.service.ts` — shared readers for schema, overview, elements, action definitions, and examples. Tools, resources, and validation should use this service rather than reading files directly.
 - `src/ts/services/version-completions.service.ts` — resource-template completion values from the active catalog; completion must not fetch from GitHub.
-- `src/ts/services/logger.service.ts` — `export let logger` (live binding) + `setLogger()`.
+- `src/ts/services/logger.service.ts` — `getLogger()` returns the process-shared logger and `setLogger()` updates it; call `getLogger()` rather than capturing a module-local logger binding.
 - `src/ts/services/utils.ts` — latest-version helper.
 - `src/ts/services/schema.service.ts` — `getSchemaXsd(version)` delegates to `PetriflowDataService` (used by `get-schema` tool and `ValidationService`).
 - `src/ts/services/validation.service.ts` — `ValidationService` singleton (default export). `validate(xml, version)` runs: well-formedness → XSD validation (`libxmljs2`) → registered semantic rules. Rules are registered at startup in `src/ts/index.ts`.

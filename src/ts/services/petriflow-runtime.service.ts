@@ -2,6 +2,7 @@ import type {ReleaseSyncService, SyncReport} from "./release-sync.service";
 import type {PetriflowSnapshotService} from "./petriflow-snapshot.service";
 import type {PetriflowVersionService} from "./petriflow-version.service";
 import type {PetriflowMode} from "./server-config.service";
+import {getLogger} from "./logger.service";
 
 type SnapshotInstaller = Pick<PetriflowSnapshotService, "install">;
 type VersionSelector = Pick<PetriflowVersionService, "useLocal" | "useRemote">;
@@ -14,16 +15,19 @@ export class PetriflowRuntimeService {
     private readonly versions: VersionSelector,
     private readonly synchronizer: ReleaseSynchronizer,
     private readonly warn: StartupWarning,
-  ) {}
+  ) {
+  }
 
   async initialize(mode: PetriflowMode): Promise<void> {
     if (mode === "LOCAL") {
+      getLogger().info("Initializing Petriflow runtime in local mode");
       const manifest = this.snapshot.install();
       this.versions.useLocal(manifest);
       return;
     }
 
     this.versions.useRemote();
+    getLogger().info("Initializing Petriflow runtime in remote mode");
     try {
       const report: SyncReport = await this.synchronizer.sync();
       if (report.failedVersions.length > 0) {

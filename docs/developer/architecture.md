@@ -28,6 +28,7 @@ validate-process
 | `src/ts/services/petriflow-snapshot.service.ts`| Validation and installation of the checked-in snapshot in LOCAL mode.                      |
 | `src/ts/services/petriflow-version.service.ts` | Mode-selected version listing, latest resolution, and version availability.                |
 | `src/ts/services/petriflow-runtime.service.ts` | Startup initialization for LOCAL snapshots or REMOTE synchronization.                      |
+| `src/ts/services/singleton-registry.service.ts` | Process-wide default service instances shared across the main and XMCP adapter bundles.     |
 | `src/ts/services/storage.service.ts`           | Per-version filesystem storage and atomic installation.                                      |
 | `src/ts/services/cache.service.ts`             | Small persistent metadata cache, not release-file storage.                                   |
 | `src/ts/services/petriflow-data.service.ts`    | Shared version resolution and readers for schema, overview, elements, actions, and examples. |
@@ -49,6 +50,10 @@ complete validated install.
 - `xmcp build` generates `.xmcp/`; never edit generated files by hand.
 - `build.mjs` bundles the server as CommonJS with esbuild and copies `src/public`, `src/groovy`, and
   `src/petriflow/snapshot` to `dist`.
+- The main server entry and generated XMCP adapter can contain separate module graphs. Module-local `new Service()`
+  exports are therefore not process singletons; default services use the `globalThis`/`Symbol.for` registry. Keep
+  registry keys stable and namespaced. The registry is per Node.js realm, not across workers or processes.
+- Logger consumers use `getLogger()` so `setLogger(app.log)` is visible across those module graphs.
 - `libxmljs2` is a native addon and remains external to the bundle.
 - `__dirname` in the built server resolves under `dist`; this is also why the current default release storage is
   `dist/storage`.

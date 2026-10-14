@@ -1,7 +1,8 @@
 import {spawn, ChildProcessWithoutNullStreams} from "node:child_process";
 import {existsSync} from "node:fs";
 import path from "node:path";
-import {logger} from "./logger.service";
+import {getLogger} from "./logger.service";
+import {getSingleton} from "./singleton-registry.service";
 
 /**
  * Validation of a single Petriflow action (a Groovy code snippet).
@@ -171,7 +172,7 @@ export class ActionValidationService {
       const groovyDir = findGroovyDir();
       const validatorPath = path.join(groovyDir, "Validator.groovy");
 
-      logger.info(`Starting Groovy action validator daemon: groovy ${validatorPath}`);
+      getLogger().info(`Starting Groovy action validator daemon: groovy ${validatorPath}`);
       const daemon = spawn("groovy", [validatorPath], {
         stdio: ["pipe", "pipe", "pipe"],
       });
@@ -181,15 +182,15 @@ export class ActionValidationService {
 
       daemon.stdout.on("data", (chunk: Buffer) => this._onData(chunk.toString()));
       daemon.stderr.on("data", (chunk: Buffer) => {
-        logger.warn(`[groovy-validator] ${chunk.toString().trim()}`);
+        getLogger().warn(`[groovy-validator] ${chunk.toString().trim()}`);
       });
       daemon.on("error", (err) => {
-        logger.error(`Groovy validator daemon error: ${err.message}`);
+        getLogger().error(`Groovy validator daemon error: ${err.message}`);
         this._failAll(err);
         this._daemon = null;
       });
       daemon.on("exit", (code) => {
-        logger.warn(`Groovy validator daemon exited with code ${code}`);
+        getLogger().warn(`Groovy validator daemon exited with code ${code}`);
         this._failAll(new Error(`Groovy validator daemon exited (code ${code})`));
         this._daemon = null;
       });
@@ -215,7 +216,7 @@ export class ActionValidationService {
   private _handleResponse(line: string): void {
     const pending = this._queue.shift();
     if (!pending) {
-      logger.warn(`[groovy-validator] Unexpected response with no pending request: ${line}`);
+      getLogger().warn(`[groovy-validator] Unexpected response with no pending request: ${line}`);
       return;
     }
     try {
@@ -239,4 +240,8 @@ export class ActionValidationService {
   }
 }
 
-export default new ActionValidationService();
+const actionValidationService = getSingleton(
+  "netgrif.petriflow.ai/action-validation",
+  () => new ActionValidationService(),
+);
+export default actionValidationService;
