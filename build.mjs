@@ -19,3 +19,4 @@ await build({
 
 await cp('src/public', 'dist/public', { recursive: true })
 await cp('src/groovy', 'dist/groovy', { recursive: true })
+await cp('src/petriflow/snapshot', 'dist/petriflow/snapshot', { recursive: true })

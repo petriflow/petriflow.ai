@@ -2,17 +2,18 @@
 
 ## A version is listed but its files cannot be read
 
-`list-versions` reflects GitHub release metadata. Data tools and resources additionally require the matching release
-asset `petriflow-vX.Y.Z.zip` to have been downloaded and installed. Ask the server administrator to inspect startup logs
-or retry `POST /admin/petriflow/sync`.
+In `REMOTE` mode, `list-versions` reflects GitHub release metadata. Data tools and resources additionally require the
+matching release asset `petriflow-vX.Y.Z.zip` to have been downloaded and installed. Ask the server administrator to
+inspect startup logs or retry `POST /admin/petriflow/sync`.
 
-The server deliberately has no bundled fallback data. It does not silently substitute files from another version.
+In `LOCAL` mode, only the bundled snapshot version is available. Older versions are rejected even if the storage
+directory contains them; the server does not silently substitute files from another version.
 
 ## `latest` cannot be resolved
 
-The server populates its version cache during startup synchronization. If GitHub could not be reached before the first
-successful sync, restart after connectivity is restored or ask the administrator to call the sync endpoint. Use an
-explicit version only if its release data is already installed.
+In `REMOTE` mode, the server populates its version cache during startup synchronization. If GitHub could not be reached
+before the first successful sync, restart after connectivity is restored or ask the administrator to call the sync
+endpoint. In `LOCAL` mode, `latest` resolves to the one bundled snapshot version.
 
 ## Process validation fails
 

@@ -1,5 +1,5 @@
 import type {ResourceCompletions} from "xmcp";
-import releaseSyncService from "./release-sync.service";
+import petriflowVersionService from "./petriflow-version.service";
 
 export function createVersionCompletions(listVersions: () => string[]): ResourceCompletions {
   return {
@@ -9,7 +9,7 @@ export function createVersionCompletions(listVersions: () => string[]): Resource
 }
 
 const versionCompletions = createVersionCompletions(() =>
-  releaseSyncService.listVersions().map(({version}) => version),
+  petriflowVersionService.listVersions().map(({version}) => version),
 );
 
 export default versionCompletions;

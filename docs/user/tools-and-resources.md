@@ -39,8 +39,9 @@ resources are JSON text; XSD and XML resources are returned as text with an appr
 | `petriflow://versions/{version}/examples`           | Example list.           |
 | `petriflow://versions/{version}/examples/{example}` | Example process XML.    |
 
-The dynamic `{version}` parameter offers completion suggestions from synchronized release metadata, including `latest`.
-Completion suggests values; it does not download data or replace validation when reading a resource.
+The dynamic `{version}` parameter offers completion suggestions from the active version catalog, including `latest`.
+REMOTE uses synchronized release metadata; LOCAL suggests only the bundled snapshot version. Completion suggests values; it
+does not download data or replace validation when reading a resource.
 
 ## Validation results
 

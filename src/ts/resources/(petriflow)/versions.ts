@@ -1,4 +1,4 @@
-import releaseSyncService from "../../services/release-sync.service";
+import petriflowVersionService from "../../services/petriflow-version.service";
 
 export const metadata = {
   name: "petriflow-versions",
@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function listVersions(): string {
-  return JSON.stringify({versions: releaseSyncService.listVersions()}, null, 2);
+  return JSON.stringify({versions: petriflowVersionService.listVersions()}, null, 2);
 }

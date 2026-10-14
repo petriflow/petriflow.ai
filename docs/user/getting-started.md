@@ -20,9 +20,9 @@ guarantee that every Petriflow release asset is available.
 Use `list-versions` to discover published Petriflow versions. Most versioned tools and resources accept a concrete
 SemVer version or `latest`, which means the latest stable release.
 
-The server synchronizes release metadata and missing ZIP assets at startup. If an asset is missing or synchronization
-fails, version metadata can still be listed, but tools that need files for that version will report that the release
-data is unavailable. There is no local fallback copy.
+By default, the server synchronizes release metadata and missing ZIP assets at startup (`PETRIFLOW_MODE=REMOTE`). For an
+offline/local run, set `PETRIFLOW_MODE=LOCAL`; the server then exposes only the bundled snapshot version and `latest`,
+without contacting GitHub. The LOCAL snapshot is stored in `src/petriflow/snapshot/` and included by the build.
 
 ## Typical workflow
 

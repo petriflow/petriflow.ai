@@ -4,8 +4,16 @@ import releaseSyncService, {type ReleaseSyncService} from "../services/release-s
 export function registerPetriflowSyncRoute(
   app: FastifyInstance,
   service: Pick<ReleaseSyncService, "sync"> = releaseSyncService,
+  options: {syncEnabled?: boolean} = {},
 ): void {
   app.post("/admin/petriflow/sync", async (_request, reply) => {
+    if (options.syncEnabled === false) {
+      return reply.code(409).send({
+        status: "disabled",
+        error: "Petriflow synchronization is disabled in LOCAL mode",
+      });
+    }
+
     try {
       const report = await service.sync();
       const partial = report.failedVersions.length > 0;

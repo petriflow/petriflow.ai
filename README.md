@@ -13,12 +13,12 @@ pnpm install
 pnpm dev        # build then run
 ```
 
-This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with `PORT` or the bind address with `HOST`; the default host is loopback (`127.0.0.1`). The Docker image sets `HOST=0.0.0.0` for container port publishing.
+This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with `PORT` or the bind address with `HOST`; the default host is loopback (`127.0.0.1`). Set `PETRIFLOW_MODE=LOCAL` to use the bundled Petriflow snapshot without GitHub, or leave it unset (`REMOTE`) to synchronize releases. The Docker image sets `HOST=0.0.0.0` for container port publishing.
 
 ## Commands
 
 - `pnpm dev` — build then run the server
-- `pnpm build` — `xmcp build && node build.mjs` (regenerates `.xmcp/`, bundles to `dist/server.cjs`, copies `src/public` → `dist/public` and `src/groovy` → `dist/groovy`)
+- `pnpm build` — `xmcp build && node build.mjs` (regenerates `.xmcp/`, bundles to `dist/server.cjs`, copies `src/public` → `dist/public`, `src/groovy` → `dist/groovy`, and `src/petriflow/snapshot` → `dist/petriflow/snapshot`)
 - `pnpm typecheck` — type-check source and test files
 - `pnpm test` — run Vitest once (no watch mode)
 - `pnpm start` — run the already-built server
@@ -58,9 +58,9 @@ Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest r
 
 ### Resources and release synchronization
 
-Resources mirror the version, schema, overview, element, action, and example data exposed by the tools. Versioned resource templates use URIs such as `petriflow://versions/{version}/schema` and complete versions from the synchronized release list, including `latest`.
+Resources mirror the version, schema, overview, element, action, and example data exposed by the tools. Versioned resource templates use URIs such as `petriflow://versions/{version}/schema` and complete versions from the active catalog, including `latest`.
 
-At startup, the server checks releases from `petriflow/petriflow` and installs missing assets named `petriflow-vX.Y.Z.zip`. Each archive contains `petriflow.schema.xsd`, `overview.md`, `actions-definitions.json`, `elements/`, and `examples/`. Installed releases are immutable and are not deleted or overwritten. The same check can be triggered with `POST /admin/petriflow/sync`; endpoint access control is expected to be provided by deployment infrastructure.
+In `REMOTE` mode (the default), startup checks releases from `petriflow/petriflow` and installs missing assets named `petriflow-vX.Y.Z.zip`. In `LOCAL` mode, the server installs the single checked-in snapshot from `src/petriflow/snapshot/` and makes no GitHub requests. The snapshot includes `manifest.json` and the same schema, overview, actions, elements, and examples files as a release archive. `POST /admin/petriflow/sync` remains available in REMOTE mode and returns HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or overwritten.
 
 ## Validation
 

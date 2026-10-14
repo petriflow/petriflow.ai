@@ -26,6 +26,15 @@ pnpm start
 | `PORT`      |  `3000` | Fastify listening port. |
 | `HOST`      | `127.0.0.1` | Bind address. The Docker image sets `0.0.0.0` so published container ports are reachable. |
 | `LOG_LEVEL` |  `info` | Fastify/Pino log level. |
+| `PETRIFLOW_MODE` | `REMOTE` | `REMOTE` synchronizes releases from GitHub; `LOCAL` uses the bundled snapshot and does not contact GitHub. |
+
+The bundled LOCAL snapshot source is `src/petriflow/snapshot/`; `pnpm build` copies it to `dist/petriflow/snapshot/`.
+The initial snapshot is SemVer `1.1.0`, copied from the approved `_old_resources/` dataset; its publication date is
+unknown, so `manifest.json` leaves `releaseDate` empty. To refresh it, replace the files with a complete, verified
+Petriflow release dataset and update `manifest.json` with its SemVer and published date (or leave the date empty when
+the source does not provide one). The snapshot must contain `petriflow.schema.xsd`, `overview.md`,
+`actions-definitions.json`, at least one `elements/*.xsd`, and at least one `examples/*.xml`. The build and server never
+download snapshot data. A missing or invalid snapshot prevents startup in LOCAL mode.
 
 The application does not authenticate the sync endpoint. Protect it at the deployment ingress or reverse proxy.
 

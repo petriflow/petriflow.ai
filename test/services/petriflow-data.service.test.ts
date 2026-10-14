@@ -4,6 +4,7 @@ import path from "node:path";
 import {expect, test} from "vitest";
 import {StorageService} from "../../src/ts/services/storage.service";
 import {PetriflowDataService} from "../../src/ts/services/petriflow-data.service";
+import {PetriflowVersionService} from "../../src/ts/services/petriflow-version.service";
 
 function withData(run: (service: PetriflowDataService) => void): void {
   const directory = mkdtempSync(path.join(os.tmpdir(), "petriflow-data-"));
@@ -24,7 +25,9 @@ function withData(run: (service: PetriflowDataService) => void): void {
       "elements/role.xsd": "<role />",
       "examples/sample.xml": "<process><title> Sample process </title></process>",
     });
-    run(new PetriflowDataService(storage, {getLatestVersion: () => "1.2.3"}));
+    run(new PetriflowDataService(storage, {
+      resolveVersion: (version) => version === "latest" ? "1.2.3" : version,
+    }));
   } finally {
     rmSync(directory, {recursive: true, force: true});
   }
@@ -60,4 +63,21 @@ test("resolves latest and reports missing release files clearly", () => {
     expect(service.getOverview("latest")).toBe("# Overview");
     expect(() => service.getElement("1.2.3", "missing")).toThrow(/not found/i);
   });
+});
+
+test("rejects old stored versions when the LOCAL catalog exposes only its snapshot", () => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "petriflow-local-data-"));
+  try {
+    const storage = new StorageService(directory);
+    storage.installVersion("1.2.2", {"overview.md": "Old release"});
+    storage.installVersion("1.2.3", {"overview.md": "Bundled snapshot"});
+    const versions = new PetriflowVersionService({listVersions: () => [], getLatestVersion: () => ""});
+    versions.useLocal({version: "1.2.3", releaseDate: "2026-01-01T00:00:00Z"});
+    const service = new PetriflowDataService(storage, versions);
+
+    expect(service.getOverview("latest")).toBe("Bundled snapshot");
+    expect(() => service.getOverview("1.2.2")).toThrow(/unavailable.*LOCAL/i);
+  } finally {
+    rmSync(directory, {recursive: true, force: true});
+  }
 });

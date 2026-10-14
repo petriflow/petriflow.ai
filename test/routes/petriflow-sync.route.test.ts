@@ -27,6 +27,23 @@ test("POST sync returns the report from the shared release synchronizer", async 
   await app.close();
 });
 
+test("returns 409 without syncing when disabled", async () => {
+  const app = Fastify({logger: false});
+  let calls = 0;
+  registerPetriflowSyncRoute(app, {
+    sync: async () => {
+      calls++;
+      return completeReport;
+    },
+  }, {syncEnabled: false});
+
+  const response = await app.inject({method: "POST", url: "/admin/petriflow/sync"});
+  expect(response.statusCode).toBe(409);
+  expect(response.json()).toEqual({status: "disabled", error: "Petriflow synchronization is disabled in LOCAL mode"});
+  expect(calls).toBe(0);
+  await app.close();
+});
+
 test("POST sync reports partial release failures with HTTP 503", async () => {
   const app = Fastify({logger: false});
   registerPetriflowSyncRoute(app, {

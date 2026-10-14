@@ -23,8 +23,11 @@ validate-process
 
 | Area                                           | Responsibility                                                                               |
 |------------------------------------------------|----------------------------------------------------------------------------------------------|
-| `src/ts/index.ts`                              | Fastify setup, MCP/static routes, startup sync, and server startup.                          |
+| `src/ts/index.ts`                              | Fastify setup, MCP/static routes, mode selection, and server startup.                       |
 | `src/ts/services/release-sync.service.ts`      | GitHub API pagination, SemVer latest selection, ZIP validation, and install orchestration.   |
+| `src/ts/services/petriflow-snapshot.service.ts`| Validation and installation of the checked-in snapshot in LOCAL mode.                      |
+| `src/ts/services/petriflow-version.service.ts` | Mode-selected version listing, latest resolution, and version availability.                |
+| `src/ts/services/petriflow-runtime.service.ts` | Startup initialization for LOCAL snapshots or REMOTE synchronization.                      |
 | `src/ts/services/storage.service.ts`           | Per-version filesystem storage and atomic installation.                                      |
 | `src/ts/services/cache.service.ts`             | Small persistent metadata cache, not release-file storage.                                   |
 | `src/ts/services/petriflow-data.service.ts`    | Shared version resolution and readers for schema, overview, elements, actions, and examples. |
@@ -35,15 +38,17 @@ validate-process
 
 ## Release data contract
 
-Each published language version is represented by a GitHub release asset named `petriflow-vX.Y.Z.zip`. Its archive root
-contains the schema, overview, action definitions, element XSDs, and process examples. The MCP server does not ship a
-duplicate fallback dataset. Installed version directories are immutable and are only marked available after a complete
-validated install.
+In REMOTE mode each published language version is represented by a GitHub release asset named
+`petriflow-vX.Y.Z.zip`. Its archive root contains the schema, overview, action definitions, element XSDs, and process
+examples. In LOCAL mode the server installs the one checked-in snapshot from `src/petriflow/snapshot/`; it is an explicit
+data source, not a REMOTE fallback. Installed version directories are immutable and are only marked available after a
+complete validated install.
 
 ## Build/runtime details
 
 - `xmcp build` generates `.xmcp/`; never edit generated files by hand.
-- `build.mjs` bundles the server as CommonJS with esbuild and copies `src/public` and `src/groovy` to `dist`.
+- `build.mjs` bundles the server as CommonJS with esbuild and copies `src/public`, `src/groovy`, and
+  `src/petriflow/snapshot` to `dist`.
 - `libxmljs2` is a native addon and remains external to the bundle.
 - `__dirname` in the built server resolves under `dist`; this is also why the current default release storage is
   `dist/storage`.

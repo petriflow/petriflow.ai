@@ -1,6 +1,6 @@
-import releaseSyncService from "./release-sync.service";
+import petriflowVersionService from "./petriflow-version.service";
 
-/** Returns the latest stable version cached by release synchronization. */
+/** Returns the latest version selected by the active Petriflow mode. */
 export function getLatestVersion(): string {
-  return releaseSyncService.getLatestVersion();
+  return petriflowVersionService.getLatestVersion();
 }

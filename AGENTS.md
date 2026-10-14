@@ -39,11 +39,11 @@ Return convention:
 
 - `src/ts/services/release-sync.service.ts` fetches paginated GitHub release metadata for `petriflow/petriflow`, caches the version list and latest stable version, and synchronizes missing published releases.
 - Release assets are named `petriflow-vX.Y.Z.zip`. The archive root contains `petriflow.schema.xsd`, `overview.md`, `actions-definitions.json`, `elements/`, and `examples/`.
-- Synchronization runs before the server starts listening and can be retried through `POST /admin/petriflow/sync`. Deployment infrastructure is responsible for endpoint authentication.
+- `PETRIFLOW_MODE` defaults to `REMOTE`. Synchronization runs before listening in REMOTE and can be retried through `POST /admin/petriflow/sync`; LOCAL returns HTTP 409 from that endpoint. Deployment infrastructure is responsible for endpoint authentication.
 - `storage.service.ts` persists extracted release files under a versioned directory rooted at `StorageService.STORAGE_PATH` (`__dirname/storage`). A version becomes available only after a complete atomic install. Installed releases are immutable: synchronization does not overwrite or delete them.
 - `cache.service.ts` is only for cache data (including release version metadata); release files belong in `storage.service.ts`.
-- Tools and resources resolve `"latest"` through the synchronized latest-version cache. `list-versions` no longer needs to be called first.
-- There is no local `public/fallback` data. Do not reintroduce fallback reads or copy release data into the MCP repository.
+- Tools and resources resolve `"latest"` through the active version catalog. `list-versions` no longer needs to be called first.
+- In LOCAL, `src/petriflow/snapshot/` is the explicit checked-in snapshot source; `build.mjs` copies it to `dist/petriflow/snapshot/` and startup installs only that version. Do not add implicit fallback behavior: REMOTE never substitutes the bundle.
 
 ## Logging
 
@@ -59,8 +59,11 @@ Return convention:
 - `src/ts/services/cache.service.ts` — file-backed key-value cache singleton; the default file is `cache.json` under `__dirname`. It is for metadata/cache values, not release files.
 - `src/ts/services/storage.service.ts` — versioned release-file storage with atomic install and read/list helpers. Its production path is intentionally unchanged.
 - `src/ts/services/release-sync.service.ts` — GitHub release listing, SemVer latest selection, ZIP validation, synchronization, and version metadata cache.
+- `src/ts/services/petriflow-snapshot.service.ts` — validates and installs the checked-in snapshot in LOCAL mode.
+- `src/ts/services/petriflow-version.service.ts` — mode-selected version catalog for listing, latest resolution, and version validation.
+- `src/ts/services/petriflow-runtime.service.ts` — selects local snapshot initialization or remote synchronization before listening.
 - `src/ts/services/petriflow-data.service.ts` — shared readers for schema, overview, elements, action definitions, and examples. Tools, resources, and validation should use this service rather than reading files directly.
-- `src/ts/services/version-completions.service.ts` — resource-template completion values from cached release metadata; completion must not fetch from GitHub.
+- `src/ts/services/version-completions.service.ts` — resource-template completion values from the active catalog; completion must not fetch from GitHub.
 - `src/ts/services/logger.service.ts` — `export let logger` (live binding) + `setLogger()`.
 - `src/ts/services/utils.ts` — latest-version helper.
 - `src/ts/services/schema.service.ts` — `getSchemaXsd(version)` delegates to `PetriflowDataService` (used by `get-schema` tool and `ValidationService`).

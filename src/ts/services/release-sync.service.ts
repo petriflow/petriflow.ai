@@ -3,6 +3,7 @@ import {rcompare, valid} from "semver";
 import storage, {StorageService} from "./storage.service";
 import cache from "./cache.service";
 import {logger} from "./logger.service";
+import {validateReleaseFiles} from "./release-files.service";
 
 const RELEASES_URL = "https://api.github.com/repos/petriflow/petriflow/releases";
 
@@ -193,7 +194,7 @@ export class ReleaseSyncService {
 
     const archive = new Uint8Array(await response.arrayBuffer());
     const files = this.extractReleaseFiles(archive);
-    this.validateReleaseFiles(files, assetName);
+    validateReleaseFiles(files, assetName);
     return this.storage.installVersion(version, files);
   }
 
@@ -219,31 +220,6 @@ export class ReleaseSyncService {
     }
   }
 
-  private validateReleaseFiles(files: Record<string, string>, assetName: string): void {
-    const required = ["petriflow.schema.xsd", "overview.md", "actions-definitions.json"];
-    for (const filename of required) {
-      if (!files[filename]?.trim()) {
-        throw new Error(`${assetName} is missing required file ${filename}`);
-      }
-    }
-
-    try {
-      const actions: unknown = JSON.parse(files["actions-definitions.json"]);
-      if (!actions || typeof actions !== "object" || Array.isArray(actions)) {
-        throw new Error("Action definitions must be a JSON object");
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`${assetName} contains invalid actions-definitions.json: ${message}`);
-    }
-
-    if (!Object.keys(files).some((name) => name.startsWith("elements/") && name.endsWith(".xsd"))) {
-      throw new Error(`${assetName} is missing element XSD files`);
-    }
-    if (!Object.keys(files).some((name) => name.startsWith("examples/") && name.endsWith(".xml"))) {
-      throw new Error(`${assetName} is missing XML examples`);
-    }
-  }
 }
 
 const releaseSyncService = new ReleaseSyncService();

@@ -1,5 +1,5 @@
 import storage, {StorageService} from "./storage.service";
-import releaseSyncService from "./release-sync.service";
+import petriflowVersionService from "./petriflow-version.service";
 
 const ELEMENT_DESCRIPTIONS: Record<string, string> = {
   transaction: "Transaction definition",
@@ -17,7 +17,7 @@ const ELEMENT_DESCRIPTIONS: Record<string, string> = {
 };
 
 interface LatestVersionProvider {
-  getLatestVersion(): string;
+  resolveVersion(version: string): string;
 }
 
 export interface ListedElement {
@@ -39,7 +39,7 @@ export interface ListedExample {
 export class PetriflowDataService {
   constructor(
     private readonly fileStorage: StorageService = storage,
-    private readonly versionProvider: LatestVersionProvider = releaseSyncService,
+    private readonly versionProvider: LatestVersionProvider = petriflowVersionService,
   ) {}
 
   getSchemaXsd(version: string): string {
@@ -132,7 +132,7 @@ export class PetriflowDataService {
   }
 
   private resolveVersion(version: string): string {
-    return version === "latest" ? this.versionProvider.getLatestVersion() : version;
+    return this.versionProvider.resolveVersion(version);
   }
 }
 

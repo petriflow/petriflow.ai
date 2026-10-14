@@ -4,12 +4,15 @@ import {fastifyStatic} from "@fastify/static";
 import path from "node:path";
 import {existsSync} from "node:fs";
 import cache from "./services/cache.service";
-import {setLogger, logger} from "./services/logger.service";
+import {setLogger} from "./services/logger.service";
 import validationService from "./services/validation.service";
 import {rules} from "./services/rules";
 import releaseSyncService from "./services/release-sync.service";
+import petriflowSnapshotService from "./services/petriflow-snapshot.service";
+import petriflowVersionService from "./services/petriflow-version.service";
+import {PetriflowRuntimeService} from "./services/petriflow-runtime.service";
 import {registerPetriflowSyncRoute} from "./routes/petriflow-sync.route";
-import {getServerHost} from "./services/server-config.service";
+import {getPetriflowMode, getServerHost} from "./services/server-config.service";
 
 const app = Fastify({
   logger: {
@@ -20,6 +23,13 @@ setLogger(app.log);
 validationService.registerRules(rules);
 const port = Number(process.env.PORT ?? 3000);
 const host = getServerHost();
+const petriflowMode = getPetriflowMode();
+const petriflowRuntimeService = new PetriflowRuntimeService(
+  petriflowSnapshotService,
+  petriflowVersionService,
+  releaseSyncService,
+  (context, message) => app.log.warn(context, message),
+);
 const publicDir = [path.join(__dirname, 'public'), path.join(__dirname, '../public')]
   .find(existsSync)!
 
@@ -27,7 +37,7 @@ const publicDir = [path.join(__dirname, 'public'), path.join(__dirname, '../publ
 app.get("/health", async () => ({status: "ok"}));
 app.post("/mcp", xmcpHandler);
 app.get("/mcp", xmcpHandler);
-registerPetriflowSyncRoute(app);
+registerPetriflowSyncRoute(app, releaseSyncService, {syncEnabled: petriflowMode === "REMOTE"});
 
 app.register(fastifyStatic, {
   root: publicDir
@@ -35,12 +45,11 @@ app.register(fastifyStatic, {
 
 async function start(): Promise<void> {
   try {
-    const report = await releaseSyncService.sync();
-    if (report.failedVersions.length > 0) {
-      app.log.warn({failedVersions: report.failedVersions}, "Petriflow startup synchronization was incomplete");
-    }
+    await petriflowRuntimeService.initialize(petriflowMode);
   } catch (error) {
-    app.log.warn({err: error}, "Petriflow startup synchronization failed; continuing with locally stored releases");
+    app.log.error({err: error}, "Petriflow data initialization failed; server will not start");
+    process.exitCode = 1;
+    return;
   }
 
   try {

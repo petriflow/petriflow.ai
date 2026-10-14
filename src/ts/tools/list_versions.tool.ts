@@ -1,5 +1,5 @@
 import {z} from "zod";
-import releaseSyncService from "../services/release-sync.service";
+import petriflowVersionService from "../services/petriflow-version.service";
 
 export const outputSchema = {
   versions: z.array(z.object({
@@ -23,5 +23,5 @@ export const metadata = {
 };
 
 export default async function getVersions() {
-  return {structuredContent: {versions: releaseSyncService.listVersions()}};
+  return {structuredContent: {versions: petriflowVersionService.listVersions()}};
 }

@@ -9,17 +9,23 @@
 | `POST /admin/petriflow/sync` | Refresh release metadata and install missing release assets.                                        |
 
 Protect the administrative sync endpoint outside the application. The endpoint waits for synchronization to finish. It
-returns HTTP 200 with `status: "synchronized"` on complete success, or HTTP 503 with `status: "partial"` / `"failed"`
-and error details otherwise.
+returns HTTP 200 with `status: "synchronized"` on complete success, HTTP 503 with `status: "partial"` / `"failed"`
+and error details for remote failures, or HTTP 409 with `status: "disabled"` in LOCAL mode.
 
 Example successful response:
 `{"status":"synchronized","discoveredVersions":12,"downloadedVersions":["1.2.3"],"alreadyInstalledVersions":["1.2.2"],"failedVersions":[]}`.
 
 ## Startup behavior
 
-Before accepting requests, the server fetches published releases from `petriflow/petriflow`, updates cached version
-metadata, and downloads missing version assets. If GitHub or an asset is unavailable, startup logs the failure and
-continues with locally stored versions. The sync endpoint can retry failed or newly published versions.
+With `PETRIFLOW_MODE=REMOTE` (the default), before accepting requests the server fetches published releases from
+`petriflow/petriflow`, updates cached version metadata, and downloads missing version assets. If GitHub or an asset is
+unavailable, startup logs the failure and continues with locally stored versions. The sync endpoint can retry failed or
+newly published versions.
+
+With `PETRIFLOW_MODE=LOCAL`, startup validates and installs the bundled snapshot from `src/petriflow/snapshot/` (copied
+to `dist/petriflow/snapshot/` by the build). It exposes only the snapshot's SemVer, with `latest` resolving to that
+version, and makes no GitHub requests. `POST /admin/petriflow/sync` returns HTTP 409 without syncing. A missing or invalid
+snapshot stops startup; it is not replaced by a remote sync or an older stored release.
 
 An incomplete ZIP is not made available. The archive root must contain `petriflow.schema.xsd`, `overview.md`,
 `actions-definitions.json`, at least one `elements/*.xsd`, and at least one `examples/*.xml`. The action definitions
@@ -33,8 +39,9 @@ also removes `dist/storage`.** A named Docker volume mounted at `/app/dist/stora
 container/image replacement; outside Docker, back up or preserve the storage directory before rebuilding. Configuring a
 separate durable storage path is not implemented yet.
 
-There is no fallback dataset. If a release is listed but its ZIP is missing or invalid, tools and resources requiring
-that version cannot return its content until a successful sync.
+In REMOTE mode the bundled snapshot is not a fallback: if a release is listed but its ZIP is missing or invalid, tools
+and resources requiring that version cannot return its content until a successful sync. LOCAL mode intentionally uses
+only its one bundled snapshot and rejects other versions even when they exist in persistent storage.
 
 ## Troubleshooting synchronization
 
