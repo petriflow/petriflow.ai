@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>district_2</id>
+    <initials>OK2</initials>
+    <title>District</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="enumeration_map">
+        <id>enumeration_1</id>
+        <title>Municipalities</title>
+        <view>
+            <list/>
+        </view>
+    </data>
+    <data type="text">
+        <id>text_0</id>
+        <title>Mongo ID</title>
+    </data>
+    <data type="text">
+        <id>text_1</id>
+        <title>Title</title>
+    </data>
+    <data type="text">
+        <id>text_2</id>
+        <title>Region</title>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>220</x>
+        <y>100</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Add district</label>
+        <dataGroup>
+            <id>DataGroup_1</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_2</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id>1_finish</id>
+            <actions phase="pre">
+                <action>
+					municipalities: f.enumeration_1,
+                	mongoId: f.text_0,
+                	title: f.text_1;
+
+					change municipalities options {
+						municipalities.options + [(mongoId.value): title.value]
+                	}
+				</action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>221</x>
+        <y>101</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Municipalities</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>enumeration_1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>5</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

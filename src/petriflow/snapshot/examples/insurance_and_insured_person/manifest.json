@@ -1,0 +1,6 @@
+{
+  "processes": [
+    {"file": "insured_person.xml", "id": "insured_person", "description": "Stores insured person details for the insurance example."},
+    {"file": "insurance.xml", "id": "insurance", "description": "Models an insurance policy and its related information."}
+  ]
+}

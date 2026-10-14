@@ -1,0 +1,440 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>insurance</id>
+	<initials>INS</initials>
+	<title>Travel insurance</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>system</title>
+		<global>false</global>
+	</role>
+	<data type="button">
+		<id>add_insured_person</id>
+		<title/>
+		<placeholder>Add</placeholder>
+		<event type="set">
+			<id>button_0_set</id>
+			<actions phase="pre">
+				<action id="1">
+					<![CDATA[
+					id_of_process_insured_person: f.id_of_process_insured_person,
+					cases_insured_persons: f.cases_insured_persons,
+					tasks_data_of_insured_person: f.tasks_data_of_insured_person,
+					insurance_price: f.insurance_price,
+					length: f.length;
+					def new_insured_person = createCase(id_of_process_insured_person.value);
+					def task_data_insured_person = findTask ({it.caseId.eq(new_insured_person.stringId).and(it.transitionId.eq("t1"))})
+					assignTask(task_data_insured_person);
+					setData("t1", new_insured_person, ["id_of_insurance_case": ["value": useCase.stringId, "type": "text"]]);
+					change cases_insured_persons value { cases_insured_persons.value + new_insured_person.stringId }
+					change tasks_data_of_insured_person value { tasks_data_of_insured_person.value + task_data_insured_person.stringId };
+					change insurance_price value { length.value * tasks_data_of_insured_person.value.size() }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="caseRef">
+		<id>cases_insured_persons</id>
+		<title/>
+	</data>
+	<data type="button">
+		<id>delete_insured_persons</id>
+		<title/>
+		<placeholder>Delete</placeholder>
+		<event type="set">
+			<id>button_1_set</id>
+			<actions phase="pre">
+				<action id="2">
+					<![CDATA[
+					cases_insured_persons: f.cases_insured_persons,
+					tasks_data_of_insured_person: f.tasks_data_of_insured_person,
+					insurance_price: f.insurance_price,
+					length: f.length;
+					tasks_data_of_insured_person.value.each{ id_of_task_data_of_insured_person -> 
+					    def task_data_of_insured_person = findTask({it._id.eq(id_of_task_data_of_insured_person)});
+					    def case_insured_person = findCase {it._id.eq(task_data_of_insured_person.caseId)};
+					    if (case_insured_person.getFieldValue("to_delete") == true) {
+					        change tasks_data_of_insured_person value { tasks_data_of_insured_person.value - id_of_task_data_of_insured_person };
+					        change cases_insured_persons value { cases_insured_persons.value - case_insured_person.stringId }
+					        workflowService.deleteCase(case_insured_person.stringId);    
+					    }
+					}
+					change insurance_price value { length.value * tasks_data_of_insured_person.value.size() }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="i18n">
+		<id>divider</id>
+		<title>Insured persons</title>
+		<init>Insured persons</init>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>id_of_insurance_case</id>
+		<title>Id of insurance</title>
+	</data>
+	<data type="text">
+		<id>id_of_process_insured_person</id>
+		<title/>
+	</data>
+	<data type="date">
+		<id>insurance_begin</id>
+		<title>Insurance begin</title>
+	</data>
+	<data type="number">
+		<id>insurance_price</id>
+		<title>Insurance price (Premium)</title>
+	</data>
+	<data type="number">
+		<id>length</id>
+		<title>Insurance length in days</title>
+		<validations>
+			<validation>
+				<expression>inrange 1,365</expression>
+				<message>Min one day, max 365 days .</message>
+			</validation>
+		</validations>
+		<event type="set">
+			<id>number_0_set</id>
+			<actions phase="post">
+				<action id="4">
+					<![CDATA[
+					tasks_data_of_insured_person: f.tasks_data_of_insured_person,
+					insurance_price: f.insurance_price,
+					length: f.length;
+					change insurance_price value { length.value * tasks_data_of_insured_person.value.size() }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="taskRef">
+		<id>tasks_data_of_insured_person</id>
+		<title>Insured persons</title>
+	</data>
+	<data type="taskRef">
+		<id>tasks_insured_persons</id>
+		<title/>
+	</data>
+	<transition>
+		<id>t2</id>
+		<x>432</x>
+		<y>144</y>
+		<label>Conclude insurance contract</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>9</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>id_of_insurance_case</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>length</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>insurance_begin</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>insurance_price</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>7</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="fractionSize">2</property>
+					<property key="code">EUR</property>
+					<property key="locale">sk</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>7</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>divider</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>add_insured_person</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>7</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>delete_insured_persons</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>8</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tasks_data_of_insured_person</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>9</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+			<actions phase="pre">
+				<action id="11">
+					<![CDATA[
+					id_of_insurance_case: f.id_of_insurance_case,
+					cases_insured_persons: f.cases_insured_persons,
+					id_of_process_insured_person: f.id_of_process_insured_person;
+					def prefix_process_id = useCase.processIdentifier - useCase.processIdentifier.split("/").last();
+					change id_of_process_insured_person value { prefix_process_id + "insured_person"; }
+					change cases_insured_persons allowedNets { [id_of_process_insured_person.value]; }
+					change id_of_insurance_case value { useCase.stringId }
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+			<title>Conclude contract</title>
+			<actions phase="pre">
+				<action id="6">
+					<![CDATA[
+					tasks_data_of_insured_person: f.tasks_data_of_insured_person;
+					tasks_data_of_insured_person.value.each{id_of_task_data_of_insured_person -> 
+					  def task_data_of_insured_person = findTask({it._id.eq(id_of_task_data_of_insured_person)});
+					  finishTask(task_data_of_insured_person)
+					}
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="10">
+					<![CDATA[
+					tasks_insured_persons: f.tasks_insured_persons,
+					cases_insured_persons: f.cases_insured_persons;
+					change tasks_insured_persons value { 
+					    findTasks{(it.caseId.in(cases_insured_persons.value)).and(it.transitionId.eq("t2"))}?.collect{it.stringId}
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>656</x>
+		<y>144</y>
+		<label>Insurance summary</label>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>12</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>id_of_insurance_case</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>insurance_begin</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>length</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>6</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>insurance_price</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>9</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="code">EUR</property>
+					<property key="locale">sk</property>
+					<property key="fractionSize">2</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>12</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>tasks_insured_persons</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>12</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>304</x>
+		<y>144</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>528</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>mail_test</id>
+	<initials>MLT</initials>
+	<title>Mail Test</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>text_0</id>
+		<title>From</title>
+	</data>
+	<data type="text">
+		<id>text_1</id>
+		<title>To</title>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title>Body</title>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+	</data>
+	<data type="button">
+		<id>button_0</id>
+		<title></title>
+		<placeholder>Send</placeholder>
+		<action trigger="set">
+email_from_field: f.text_0,
+email_to_field: f.text_1,
+email_body_field: f.text_2;
+
+com.netgrif.workflow.mail.domain.MailDraft draft = com.netgrif.workflow.mail.domain.MailDraft
+    .builder(email_from_field.value, [email_to_field.value])
+    .body(email_body_field.value)
+    .isHtml(true)
+    .build()
+sendMail(draft)
+        </action>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>151</x>
+		<y>116</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>3</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>

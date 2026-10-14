@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>thesis</id>
+	<initials>PRC</initials>
+	<title>Thesis</title>
+	<defaultRole>false</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type="text">
+		<id>supervisor_first_name</id>
+		<title>Supervisor's first name</title>
+		<placeholder>Thesis supervisor's first name</placeholder>
+		<desc>Enter the thesis supervisor's first name</desc>
+	</data>
+	<data type="text">
+		<id>supervisor_last_name</id>
+		<title>Supervisor's last name</title>
+		<placeholder>Thesis supervisor's last name</placeholder>
+		<desc>Enter the thesis supervisor's last name</desc>
+	</data>
+	<data type="text">
+		<id>supervisor_email</id>
+		<title>Supervisor's email address</title>
+		<placeholder>Thesis supervisor's email address</placeholder>
+		<desc>Enter the thesis supervisor's email address</desc>
+	</data>
+	<data type="text">
+		<id>thesis_title</id>
+		<title>Thesis title</title>
+		<placeholder>Thesis title</placeholder>
+		<desc>Enter the thesis title</desc>
+	</data>
+	<data type="text">
+		<id>assignment</id>
+		<title>Assignment</title>
+		<placeholder>Thesis assignment</placeholder>
+		<desc>Enter the thesis assignment text</desc>
+		<values>area</values>
+	</data>
+	<data type="taskRef">
+		<id>student</id>
+		<title>Student</title>
+		<placeholder>Task reference to the student task</placeholder>
+		<desc>Task reference to the student task</desc>
+	</data>
+	<data type="text">
+		<id>student_first_name</id>
+		<title>Student's first name</title>
+	</data>
+	<data type="text">
+		<id>student_last_name</id>
+		<title>Student's last name</title>
+	</data>
+	<data type="file">
+		<id>thesis_file</id>
+		<title>Thesis PDF</title>
+		<placeholder>File containing the thesis</placeholder>
+		<desc>Upload the thesis PDF</desc>
+	</data>
+	<data type="enumeration">
+		<id>grade</id>
+		<title>Grade</title>
+		<placeholder>Final grade</placeholder>
+		<desc>Choose a final grade</desc>
+		<values>A</values>
+		<values>B</values>
+		<values>C</values>
+		<values>D</values>
+		<values>E</values>
+		<values>FX</values>
+		<values>FN</values>
+		<init>A</init>
+	</data>
+	<data type="taskRef">
+		<id>topic</id>
+		<title></title>
+	</data>
+	<data type="userList">
+		<id>autor</id>
+		<title/>
+	</data>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>300</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Topic</label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>supervisor_first_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supervisor_last_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supervisor_email</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>thesis_title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>assignment</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>100</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Init</label>
+		<trigger type="auto"/>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action>
+				first_name: f.supervisor_first_name,
+				last_name: f.supervisor_last_name,
+				email: f.supervisor_email,
+				topic: f.topic,
+				autor: f.autor;
+				change first_name value {userService.loggedOrSystem.name}
+				change last_name value {userService.loggedOrSystem.surname}
+				change email value {userService.loggedOrSystem.email}
+				change topic value {[useCase.tasks.find{it.transition=="t1"}?.task]
+					}
+				change autor value {
+						[userService.getLoggedOrSystem().id]
+					}
+                </action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>300</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Assign thesis topic</label>
+		<usersRef>
+			<id>autor</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</usersRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>topic</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>540</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Thesis reservation</label>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>780</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Confirm reservation</label>
+		<usersRef>
+			<id>autor</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</usersRef>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t5_finish</id>
+			<actions phase="pre">
+				<action>
+				student: f.student;
+				def student_task = findTask({it._id.eq(student.value[0])})
+				def case = findCase({it._id.eq(student_task.caseId)})
+				def task = findTask ({it.caseId.eq(case.stringId).and(it.transitionId.eq("t4"))})
+				
+						async.run {
+						assignTask(task)
+						finishTask(task)
+						}
+			</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>540</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Reject reservation</label>
+		<usersRef>
+			<id>autor</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</usersRef>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t6_finish</id>
+			<actions phase="pre">
+				<action>
+				student: f.student;
+				def student_task = findTask({it._id.eq(student.value[0])})
+				def case = findCase({it._id.eq(student_task.caseId)})
+				def task = findTask ({it.caseId.eq(case.stringId).and(it.transitionId.eq("t5"))})
+				
+						async.run {
+						assignTask(task)
+						finishTask(task)
+						}
+			</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t7</id>
+		<x>1020</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Thesis submission</label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>topic</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>DataGroup_2</id>
+			<dataRef>
+				<id>thesis_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t7_finish</id>
+			<actions phase="pre">
+				<action>
+				student: f.student,
+				first_name: f.student_first_name,
+				last_name: f.student_last_name;
+				def task = findTask({it._id.eq(student.value[0])})
+				def case = findCase({it._id.eq(task.caseId)})
+				change first_name value { case.getFieldValue("student_first_name")}
+				change last_name value { case.getFieldValue("student_last_name")}
+			</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t8</id>
+		<x>1260</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Thesis defense</label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>topic</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>DataGroup_2</id>
+			<dataRef>
+				<id>grade</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t8_finish</id>
+			<actions phase="post">
+				<action>
+					student: f.student,
+					grade: f.grade;
+					def task = findTask({it._id.eq(student.value[0])})
+					def case = findCase({it._id.eq(task.caseId)})
+					setData("t7", case, ["student_grade": ["value": grade.value.toString(), "type": "text"]])
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>20</x>
+		<y>140</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>180</x>
+		<y>140</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>420</x>
+		<y>140</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>660</x>
+		<y>140</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>900</x>
+		<y>140</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p6</id>
+		<x>1140</x>
+		<y>140</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>1380</x>
+		<y>140</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>regular</type>
+		<sourceId>t7</sourceId>
+		<destinationId>p6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>p6</sourceId>
+		<destinationId>t8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>t8</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

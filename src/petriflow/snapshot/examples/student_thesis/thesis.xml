@@ -1,0 +1,643 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>thesis</id>
+	<initials>PRC</initials>
+	<title>Thesis</title>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<data type="text">
+		<id>assignment</id>
+		<title>Assignment</title>
+		<placeholder>Thesis assignment</placeholder>
+		<desc>Enter the thesis assignment text</desc>
+		<component>
+			<name>area</name>
+		</component>
+	</data>
+	<data type="userList">
+		<id>author</id>
+		<title/>
+	</data>
+	<data type="enumeration">
+		<id>grade</id>
+		<title>Grade</title>
+		<placeholder>Final grade</placeholder>
+		<desc>Choose final grade</desc>
+		<options>
+			<option key="A">A</option>
+			<option key="B">B</option>
+			<option key="C">C</option>
+			<option key="D">D</option>
+			<option key="E">E</option>
+			<option key="FX">FX</option>
+			<option key="FN">FN</option>
+		</options>
+		<init>A</init>
+	</data>
+	<data type="taskRef">
+		<id>student</id>
+		<title>Student</title>
+		<placeholder>Task reference to the student's task</placeholder>
+		<desc>Task reference to the student's task</desc>
+	</data>
+	<data type="text">
+		<id>student_name</id>
+		<title>Student's name</title>
+	</data>
+	<data type="text">
+		<id>student_surname</id>
+		<title>Student's surname</title>
+	</data>
+	<data type="text">
+		<id>supervisor_email</id>
+		<title>Supervisor's email</title>
+		<placeholder>Supervisor's email</placeholder>
+		<desc>Enter the email of the supervisor</desc>
+	</data>
+	<data type="text">
+		<id>supervisor_name</id>
+		<title>Supervisor's name</title>
+		<placeholder>Supervisor's name</placeholder>
+		<desc>Enter the name of the thesis supervisor</desc>
+	</data>
+	<data type="text">
+		<id>supervisor_surname</id>
+		<title>Supervisor's surname</title>
+		<placeholder>Supervisor's surname</placeholder>
+		<desc>Enter the surname of the thesis supervisor</desc>
+	</data>
+	<data type="file">
+		<id>thesis</id>
+		<title>Thesis PDF</title>
+		<placeholder> The file containing the thesis</placeholder>
+		<desc>Upload the thesis PDF</desc>
+	</data>
+	<data type="text">
+		<id>thesis_name</id>
+		<title>Thesis topic title</title>
+		<placeholder>Thesis topic title</placeholder>
+		<desc>Enter the thesis topic title</desc>
+	</data>
+	<data type="taskRef">
+		<id>topic</id>
+		<title/>
+		<init>t1</init>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>304</x>
+		<y>48</y>
+		<label>Topic</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>supervisor_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supervisor_surname</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supervisor_email</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>thesis_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>assignment</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>112</x>
+		<y>144</y>
+		<label>Init</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<trigger type="auto"/>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action id="action_0">
+					<![CDATA[
+					name: f.supervisor_name,
+					                surname: f.supervisor_surname,
+					                email: f.supervisor_email,
+					                author: f.author;
+					                change name value {userService.loggedOrSystem.name}
+					                change surname value {userService.loggedOrSystem.surname}
+					                change email value {userService.loggedOrSystem.email}
+					                change author value {
+					                        [userService.getLoggedOrSystem().id]
+					                    }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>304</x>
+		<y>144</y>
+		<label>Assignment of the thesis topic</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<userRef>
+			<id>author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>topic</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>528</x>
+		<y>144</y>
+		<label>Reservation of thesis</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>784</x>
+		<y>144</y>
+		<label>Confirmation of reservation</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<userRef>
+			<id>author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t5_finish</id>
+			<actions phase="pre">
+				<action id="action_1">
+					<![CDATA[
+					student: f.student;
+					                def student_task = findTask({it._id.eq(student.value[0])})
+					                def a_case = findCase({it._id.eq(student_task.caseId)})
+					                def task = findTask ({it.caseId.eq(a_case.stringId).and(it.transitionId.eq("t4"))})
+					                        async.run {
+					                        assignTask(task)
+					                        finishTask(task)
+					                        }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>528</x>
+		<y>48</y>
+		<label>Reject reservation</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<userRef>
+			<id>author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t6_finish</id>
+			<actions phase="pre">
+				<action id="action_2">
+					<![CDATA[
+					student: f.student;
+					                def student_task = findTask({it._id.eq(student.value[0])})
+					                def a_case = findCase({it._id.eq(student_task.caseId)})
+					                def task = findTask ({it.caseId.eq(a_case.stringId).and(it.transitionId.eq("t5"))})
+					                        async.run {
+					                        assignTask(task)
+					                        finishTask(task)
+					                        }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t7</id>
+		<x>1008</x>
+		<y>144</y>
+		<label>Submission of thesis</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>topic</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>thesis</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t7_finish</id>
+			<actions phase="pre">
+				<action id="action_3">
+					<![CDATA[
+					student: f.student,
+					                name: f.student_name,
+					                surname: f.student_surname;
+					                def task = findTask({it._id.eq(student.value[0])})
+					                def a_case = findCase({it._id.eq(task.caseId)})
+					                change name value { a_case.getFieldValue("student_first_name")}
+					                change surname value { a_case.getFieldValue("student_last_name")}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t8</id>
+		<x>1264</x>
+		<y>144</y>
+		<label>Defence of thesis</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>topic</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>student</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>grade</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t8_finish</id>
+			<actions phase="post">
+				<action id="action_4">
+					<![CDATA[
+					student: f.student,
+					                    grade: f.grade;
+					                    def task = findTask({it._id.eq(student.value[0])})
+					                    def a_case = findCase({it._id.eq(task.caseId)})
+					                    setData("t7", a_case, ["student_grade": ["value": grade.value.toString(), "type": "text"]])
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>16</x>
+		<y>144</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>176</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>432</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>656</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>912</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p6</id>
+		<x>1136</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>1392</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>regular</type>
+		<sourceId>t7</sourceId>
+		<destinationId>p6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>p6</sourceId>
+		<destinationId>t8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>t8</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

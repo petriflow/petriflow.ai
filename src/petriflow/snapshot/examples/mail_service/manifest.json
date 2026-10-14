@@ -1,0 +1,5 @@
+{
+  "processes": [
+    {"file": "mail.xml", "id": "mail_test", "description": "Demonstrates handling email from a process."}
+  ]
+}

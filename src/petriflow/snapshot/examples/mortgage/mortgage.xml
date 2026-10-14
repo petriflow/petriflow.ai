@@ -1,0 +1,1707 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>mortgage</id>
+	<version>1.0.0</version>
+	<initials>MRT</initials>
+	<title>Mortgage</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>appraiser</id>
+		<caseLogic>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>banker</id>
+		<caseLogic>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>true</create>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<userRef>
+		<id>applicant</id>
+		<caseLogic>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</userRef>
+	<caseEvents>
+		<event type="create">
+			<id>mortgage_create</id>
+			<actions phase="post">
+				<action id="action18">
+					<![CDATA[
+					email: f.email,
+					surname: f.surname,
+					name: f.name,
+					applicant: f.applicant;
+					change name value { loggedUser().name; }
+					change surname value { loggedUser().surname; }
+					change email value { loggedUser().email; }
+					change applicant value { [loggedUser().id]; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<role>
+		<id>appraiser</id>
+		<title>Property appraiser</title>
+		<global>false</global>
+	</role>
+	<role>
+		<id>banker</id>
+		<title>Banker</title>
+		<global>false</global>
+	</role>
+	<role>
+		<id>system</id>
+		<title>System</title>
+		<global>false</global>
+	</role>
+	<function scope="process" name="calculation">
+		<![CDATA[
+		{amount_of_loan, time_period, payment -> 
+		change payment value { amount.value / (time_period.value * 12); }
+		}
+		]]>
+	</function>
+	<data type="number">
+		<id>amount</id>
+		<title>Loan amount</title>
+		<event type="set">
+			<id>amount_set</id>
+			<actions phase="post">
+				<action id="action1">
+					<![CDATA[
+					monthly_payment: f.monthly_payment,
+					period: f.period,
+					amount: f.amount;
+					calculation(amount, period, monthly_payment)
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="userList">
+		<id>applicant</id>
+		<title>Applicant</title>
+	</data>
+	<data type="file">
+		<id>appraisal_report</id>
+		<title>Appraisal report</title>
+	</data>
+	<data type="text">
+		<id>cadastral_number</id>
+		<title>Cadastral number</title>
+	</data>
+	<data type="text">
+		<id>city</id>
+		<title>City</title>
+	</data>
+	<data type="text">
+		<id>delete_request</id>
+		<title>Delete request</title>
+		<init>Please delete my personal information</init>
+	</data>
+	<data type="text">
+		<id>email</id>
+		<title>Email</title>
+		<validations>
+			<validation>
+				<expression>^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$</expression>
+			</validation>
+		</validations>
+	</data>
+	<data type="number">
+		<id>evaluation</id>
+		<title>Appraised value</title>
+	</data>
+	<data type="text">
+		<id>iban_number</id>
+		<title>IBAN number</title>
+	</data>
+	<data type="number">
+		<id>income</id>
+		<title>Monthly income</title>
+	</data>
+	<data type="enumeration">
+		<id>insurance</id>
+		<title>Insurance</title>
+		<options>
+			<option key="Allianz">Allianz</option>
+			<option key="Uniqa">Uniqa</option>
+			<option key="Third">Third</option>
+		</options>
+	</data>
+	<data type="number">
+		<id>monthly_payment</id>
+		<title>Monthly payment</title>
+	</data>
+	<data type="text">
+		<id>name</id>
+		<title>Name</title>
+	</data>
+	<data type="file">
+		<id>new_title_deed</id>
+		<title>New title deed</title>
+	</data>
+	<data type="number">
+		<id>period</id>
+		<title>Time period</title>
+		<event type="set">
+			<id>period_set</id>
+			<actions phase="post">
+				<action id="action2">
+					<![CDATA[
+					monthly_payment: f.monthly_payment,
+					period: f.period,
+					amount: f.amount;
+					calculation(amount, period, monthly_payment)
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>phone</id>
+		<title>Phone</title>
+	</data>
+	<data type="text">
+		<id>postal_code</id>
+		<title>Postal code</title>
+	</data>
+	<data type="enumeration">
+		<id>property_type</id>
+		<title>Property type</title>
+		<options>
+			<option key="House">House</option>
+			<option key="Flat">Flat</option>
+			<option key="Appartment">Appartment</option>
+			<option key="Cottage">Cottage</option>
+			<option key="Lot">Lot</option>
+		</options>
+	</data>
+	<data type="taskRef">
+		<id>reference_to_financial_info</id>
+		<title/>
+		<inits>
+			<init>t16</init>
+		</inits>
+	</data>
+	<data type="taskRef">
+		<id>reference_to_personal_info</id>
+		<title/>
+		<inits>
+			<init>t15</init>
+		</inits>
+	</data>
+	<data type="taskRef">
+		<id>reference_to_property_info</id>
+		<title/>
+		<inits>
+			<init>t17</init>
+		</inits>
+	</data>
+	<data type="taskRef">
+		<id>reference_to_status_info</id>
+		<title/>
+		<inits>
+			<init>t19</init>
+		</inits>
+	</data>
+	<data type="text">
+		<id>signature</id>
+		<title>Signature</title>
+		<init>By pressing the finish button you sign the mortgage contract</init>
+	</data>
+	<data type="text">
+		<id>state</id>
+		<title>State of the application</title>
+	</data>
+	<data type="taskRef">
+		<id>status_reference_to_property_info</id>
+		<title/>
+		<inits>
+			<init>t17</init>
+		</inits>
+	</data>
+	<data type="text">
+		<id>street</id>
+		<title>Street</title>
+	</data>
+	<data type="text">
+		<id>street_number</id>
+		<title>Number</title>
+	</data>
+	<data type="text">
+		<id>surname</id>
+		<title>Surname</title>
+	</data>
+	<data type="file">
+		<id>title_deed</id>
+		<title>Title deed</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>144</x>
+		<y>240</y>
+		<label>Apply for mortgage</label>
+		<assignPolicy>auto</assignPolicy>
+		<userRef>
+			<id>applicant</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>reference_to_personal_info</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_financial_info</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t1_finish</id>
+			<actions phase="pre">
+				<action id="action5">
+					<![CDATA[
+					state: f.state;
+					change state value { "Your application was submitted"; }
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="action3">
+					<![CDATA[
+					income: f.income,
+					monthly_payment: f.monthly_payment;
+					if (monthly_payment.value < income.value) {
+						async.run{
+						assignTask("t2")
+						finishTask("t2")
+					}
+					}else {
+						async.run{
+						assignTask("t10")
+						finishTask("t10")
+					}
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t10</id>
+		<x>336</x>
+		<y>336</y>
+		<label>Reject</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<event type="finish">
+			<id>t10_finish</id>
+			<actions phase="pre">
+				<action id="action15">
+					<![CDATA[
+					state: f.state;
+					change state value { "Your application was rejected due to your income"; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t11</id>
+		<x>880</x>
+		<y>336</y>
+		<label>Reject</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<event type="finish">
+			<id>t11_finish</id>
+			<actions phase="pre">
+				<action id="action16">
+					<![CDATA[
+					state: f.state;
+					change state value { "Your application was rejected due to the property value"; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t13</id>
+		<x>624</x>
+		<y>432</y>
+		<label>Delete personal info</label>
+		<userRef>
+			<id>applicant</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t13_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>delete_request</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t13_finish</id>
+			<actions phase="pre">
+				<action id="action17">
+					<![CDATA[
+					street_number: f.street_number,
+					street: f.street,
+					email: f.email,
+					surname: f.surname,
+					name: f.name;
+					change name value { " "; }
+					change surname value { " "; }
+					change email value { " "; }
+					change street value { " "; }
+					change street_number value { " "; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t14</id>
+		<x>880</x>
+		<y>432</y>
+		<label>Anonymized status</label>
+		<roleRef>
+			<id>banker</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t14_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>reference_to_status_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t15</id>
+		<x>208</x>
+		<y>80</y>
+		<label>Personal information</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t15_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>surname</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>email</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>phone</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>street_number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>city</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t16</id>
+		<x>368</x>
+		<y>80</y>
+		<label>Financial information</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t16_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>income</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="code">EUR</property>
+					<property key="fractionSize">2</property>
+					<property key="locale">sk</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>period</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>amount</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="code">EUR</property>
+					<property key="fractionSize">2</property>
+					<property key="locale">sk</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>monthly_payment</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="code">EUR</property>
+					<property key="fractionSize">2</property>
+					<property key="locale">sk</property>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t17</id>
+		<x>528</x>
+		<y>80</y>
+		<label>Property information</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t17_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>cadastral_number</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>property_type</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>3</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>list</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>title_deed</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+					<property key="borderWidth">0</property>
+					<property key="borderStyle">none</property>
+					<property key="borderColor">black</property>
+					<property key="borderEnabled">true</property>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t18</id>
+		<x>432</x>
+		<y>528</y>
+		<label>Status</label>
+		<roleRef>
+			<id>banker</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<userRef>
+			<id>applicant</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t18_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>reference_to_status_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t19</id>
+		<x>688</x>
+		<y>80</y>
+		<label>Status info</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t19_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>state</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_personal_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_financial_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>status_reference_to_property_info</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>evaluation</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>appraisal_report</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>new_title_deed</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>insurance</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>336</x>
+		<y>240</y>
+		<label>Pre-approve</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action id="action6">
+					<![CDATA[
+					state: f.state;
+					change state value { "Your application was pre-approved"; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>528</x>
+		<y>240</y>
+		<label>Info about property</label>
+		<icon>home</icon>
+		<assignPolicy>auto</assignPolicy>
+		<userRef>
+			<id>applicant</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>reference_to_property_info</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t3_finish</id>
+			<actions phase="pre">
+				<action id="action7">
+					<![CDATA[
+					t19: t.t19,
+					status_reference_to_property_info: f.status_reference_to_property_info,
+					state: f.state;
+					change state value { "Info about property was added"; }
+					make status_reference_to_property_info, visible on t19 when { true }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>720</x>
+		<y>240</y>
+		<label>Appraisal report</label>
+		<roleRef>
+			<id>appraiser</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>evaluation</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="code">EUR</property>
+					<property key="fractionSize">2</property>
+					<property key="locale">sk</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>appraisal_report</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+					<property key="borderWidth">0</property>
+					<property key="borderStyle">none</property>
+					<property key="borderColor">black</property>
+					<property key="borderEnabled">true</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_property_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="action13">
+					<![CDATA[
+					appraisal_report: f.appraisal_report,
+					t19: t.t19,
+					evaluation: f.evaluation;
+					make evaluation, visible on t19 when { true }
+					make appraisal_report, visible on t19 when { true }
+					]]>
+				</action>
+			</actions>
+			<actions phase="post">
+				<action id="action4">
+					<![CDATA[
+					evaluation: f.evaluation,
+					amount: f.amount;
+					if (amount.value < evaluation.value) {
+						async.run{
+						assignTask("t5")
+						finishTask("t5")
+					}
+					}else {
+						async.run{
+						assignTask("t11")
+						finishTask("t11")
+					}
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>880</x>
+		<y>240</y>
+		<label>Approve</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<event type="finish">
+			<id>t5_finish</id>
+			<actions phase="pre">
+				<action id="action8">
+					<![CDATA[
+					state: f.state;
+					change state value { "Your application was approved"; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>1040</x>
+		<y>240</y>
+		<label>Sign loan contract</label>
+		<assignPolicy>auto</assignPolicy>
+		<userRef>
+			<id>applicant</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t6_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>signature</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>iban_number</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_personal_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_financial_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_property_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t6_finish</id>
+			<actions phase="pre">
+				<action id="action9">
+					<![CDATA[
+					state: f.state;
+					change state value { "Your application was signed"; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t7</id>
+		<x>1200</x>
+		<y>144</y>
+		<label>Confirm lien inscription</label>
+		<roleRef>
+			<id>banker</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t7_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>new_title_deed</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_personal_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>reference_to_property_info</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t7_finish</id>
+			<actions phase="pre">
+				<action id="action11">
+					<![CDATA[
+					t19: t.t19,
+					new_title_deed: f.new_title_deed,
+					state: f.state;
+					change state value { "Lien inscription was confirmed"; }
+					make new_title_deed, visible on t19 when { true }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t8</id>
+		<x>1360</x>
+		<y>240</y>
+		<label>Send money</label>
+		<roleRef>
+			<id>banker</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t8_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>iban_number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>amount</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t8_finish</id>
+			<actions phase="pre">
+				<action id="action14">
+					<![CDATA[
+					state: f.state;
+					change state value { "Money sent"; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t9</id>
+		<x>1200</x>
+		<y>336</y>
+		<label>Sign insurance contract</label>
+		<assignPolicy>auto</assignPolicy>
+		<userRef>
+			<id>applicant</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t9_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>insurance</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t9_finish</id>
+			<actions phase="pre">
+				<action id="action12">
+					<![CDATA[
+					t19: t.t19,
+					insurance: f.insurance,
+					state: f.state;
+					change state value { "Your property was insured"; }
+					make insurance, visible on t19 when { true }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>48</x>
+		<y>240</y>
+		<label>Start</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p10</id>
+		<x>1104</x>
+		<y>336</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p11</id>
+		<x>1296</x>
+		<y>336</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p12</id>
+		<x>528</x>
+		<y>336</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p13</id>
+		<x>336</x>
+		<y>432</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p14</id>
+		<x>752</x>
+		<y>432</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>240</x>
+		<y>240</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>432</x>
+		<y>240</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>624</x>
+		<y>240</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>816</x>
+		<y>240</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p6</id>
+		<x>944</x>
+		<y>240</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>1104</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p8</id>
+		<x>1296</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p9</id>
+		<x>1456</x>
+		<y>240</y>
+		<label>End</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>p6</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>t7</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>p8</sourceId>
+		<destinationId>t8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>regular</type>
+		<sourceId>t8</sourceId>
+		<destinationId>p9</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a17</id>
+		<type>regular</type>
+		<sourceId>t6</sourceId>
+		<destinationId>p10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a18</id>
+		<type>regular</type>
+		<sourceId>p10</sourceId>
+		<destinationId>t9</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a19</id>
+		<type>regular</type>
+		<sourceId>t9</sourceId>
+		<destinationId>p11</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a20</id>
+		<type>regular</type>
+		<sourceId>p11</sourceId>
+		<destinationId>t8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a21</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a22</id>
+		<type>regular</type>
+		<sourceId>t10</sourceId>
+		<destinationId>p12</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a23</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t11</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a24</id>
+		<type>regular</type>
+		<sourceId>t11</sourceId>
+		<destinationId>p12</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p13</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a27</id>
+		<type>regular</type>
+		<sourceId>p12</sourceId>
+		<destinationId>t13</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a28</id>
+		<type>regular</type>
+		<sourceId>p13</sourceId>
+		<destinationId>t13</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a29</id>
+		<type>regular</type>
+		<sourceId>t13</sourceId>
+		<destinationId>p14</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a30</id>
+		<type>read</type>
+		<sourceId>p14</sourceId>
+		<destinationId>t14</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a31</id>
+		<type>read</type>
+		<sourceId>p13</sourceId>
+		<destinationId>t18</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

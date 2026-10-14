@@ -1,0 +1,173 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>real_estate</id>
+	<version>1.0.0</version>
+	<initials>NEH</initials>
+	<title>Real estate</title>
+	<icon>home</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<data type="enumeration_map">
+		<id>enumeration_map_0</id>
+		<title>Property type</title>
+		<options>
+			<option key="dom">House</option>
+			<option key="byt">Apartment</option>
+		</options>
+		<event type="set">
+			<id>enumeration_map_0_set</id>
+			<actions phase="post">
+				<action>
+					<!-- @formatter:off -->
+					enumeration_map_2: f.enumeration_map_2,
+number_2: f.number_2,
+t1: t.t1,
+number_0: f.number_0,
+number_1: f.number_1,
+enumeration_map_0: f.enumeration_map_0;
+
+if (enumeration_map_0.value == "dom") {
+    make number_0, editable on t1 when { true }
+    make number_1, editable on t1 when { true }
+    make number_0, required on t1 when { true }
+    make number_1, required on t1 when { true }
+
+    make number_2, hidden on t1 when { true }
+    make enumeration_map_2, hidden on t1 when { true }
+    make number_2, optional on t1 when { true }
+    make enumeration_map_2, optional on t1 when { true }
+    change number_2 value { null }
+    change enumeration_map_2 value { null }
+} else {
+    make number_2, editable on t1 when { true }
+    make enumeration_map_2, editable on t1 when { true }
+    make number_2, required on t1 when { true }
+    make enumeration_map_2, required on t1 when { true }
+
+    make number_0, hidden on t1 when { true }
+    make number_1, hidden on t1 when { true }
+    make number_0, optional on t1 when { true }
+    make number_1, optional on t1 when { true }
+    change number_0 value { null }
+    change number_1 value { null }
+} 
+					<!-- @formatter:on -->
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="number">
+		<id>number_0</id>
+		<title>Total area</title>
+	</data>
+	<data type="number">
+		<id>number_1</id>
+		<title>Number of rooms</title>
+	</data>
+	<data type="number">
+		<id>number_2</id>
+		<title>Floor</title>
+	</data>
+	<data type="enumeration">
+		<id>enumeration_0</id>
+		<title />
+	</data>
+	<data type="enumeration_map">
+		<id>enumeration_map_1</id>
+		<title />
+	</data>
+	<data type="enumeration_map">
+		<id>enumeration_map_2</id>
+		<title>Number of rooms</title>
+		<options>
+			<option key="key3">1</option>
+			<option key="key4">2</option>
+			<option key="key5">3</option>
+			<option key="key6">4</option>
+		</options>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>340</x>
+		<y>180</y>
+		<label />
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>enumeration_map_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_0</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_1</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>number_2</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_2</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>list</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+</document>

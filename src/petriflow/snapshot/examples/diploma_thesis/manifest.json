@@ -1,0 +1,7 @@
+{
+  "processes": [
+    {"file": "diploma_thesis.xml", "id": "thesis", "description": "Handles submission and evaluation of a diploma thesis."},
+    {"file": "committee.xml", "id": "committee_01", "description": "Models the committee involved in thesis evaluation."},
+    {"file": "student.xml", "id": "student", "description": "Captures student information for the thesis process."}
+  ]
+}

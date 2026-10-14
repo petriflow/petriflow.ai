@@ -1,0 +1,632 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>invoice</id>
+	<initials>INV</initials>
+	<title>Invoice</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseEvents>
+		<event type="create">
+			<id>new_model_create</id>
+			<actions phase="post">
+				<action id="1">
+					<![CDATA[
+					invoice_id: f.invoice_id;
+					change invoice_id value { useCase.stringId; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<data type="number">
+		<id>amount</id>
+		<title>Amount</title>
+	</data>
+	<data type="enumeration_map">
+		<id>decision</id>
+		<title>Decision</title>
+		<options>
+			<option key="OK">Accept</option>
+			<option key="KO">Reject</option>
+			<option key="later">Later</option>
+		</options>
+	</data>
+	<data type="text">
+		<id>IBAN</id>
+		<title>IBAN</title>
+	</data>
+	<data type="text">
+		<id>invoice_id</id>
+		<title>Invoice ID</title>
+	</data>
+	<data type="number">
+		<id>ko</id>
+		<title>KO</title>
+		<init>0</init>
+	</data>
+	<data type="number">
+		<id>later</id>
+		<title>Later</title>
+		<init>0</init>
+	</data>
+	<data type="number">
+		<id>ok</id>
+		<title>OK</title>
+		<init>0</init>
+	</data>
+	<data type="file">
+		<id>order_file</id>
+		<title>Order file</title>
+	</data>
+	<data type="file">
+		<id>Order_file</id>
+		<title>Order File</title>
+	</data>
+	<data type="enumeration_map">
+		<id>parent_order_id</id>
+		<title>Parent order ID</title>
+	</data>
+	<data type="text">
+		<id>rejeceted_text</id>
+		<title>Rejection reason</title>
+		<init>This invoice was rejected.</init>
+	</data>
+	<data type="text">
+		<id>state</id>
+		<title>State</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>464</x>
+		<y>112</y>
+		<label>Register invoice</label>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>8</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>invoice_id</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>amount</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>currency</name>
+					<property key="fractionSize">2</property>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>parent_order_id</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>6</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>IBAN</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>Order_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t1_assign</id>
+			<actions phase="pre">
+				<action id="5">
+					<![CDATA[
+					parent_order_id: f.parent_order_id;
+					def orders = findCases { it.processIdentifier.eq(workspace + "order").and(it.activePlaces.get("p5").eq(1))}.collectEntries { 
+					                        [(it.stringId): "Order: " + it.stringId] 
+					                    }
+					change parent_order_id options {orders}
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+			<actions phase="post">
+				<action id="4">
+					<![CDATA[
+					state: f.state,
+					invoice_id: f.invoice_id,
+					parent_order_id: f.parent_order_id;
+					def parent_order_case = findCase({it._id.eq(parent_order_id.value)});
+					setData("t1", parent_order_case, ["new_invoice_id": ["value": invoice_id.value, "type": "text"]]);
+					change state value { "Invoice registered"; }
+					
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>720</x>
+		<y>112</y>
+		<label>Invoice approval</label>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>8</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>invoice_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>parent_order_id</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>amount</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>decision</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>6</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action id="action1">
+					<![CDATA[
+					state: f.state,
+					later: f.later,
+					ko: f.ko,
+					ok: f.ok,
+					decision: f.decision;
+					if (decision.value == "OK") {
+						change ok value { 1; }
+					    change ko value { 0; }
+					    change later value { 0; }
+					    change state value { "Invoice accepted"; }
+					
+					}
+					if (decision.value == "KO") {
+						change ok value { 0; }
+					    change ko value { 1; }
+					    change later value { 0; }
+					    change state value { "Invoice rejected"; }
+					}
+					if (decision.value == "later") {
+						change ok value { 0; }
+					    change ko value { 0; }
+					    change later value { 1; }
+					    change state value { "Invoice postponed"; }
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>720</x>
+		<y>208</y>
+		<label>Read Invoice Detail</label>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>invoice_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>parent_order_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>amount</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>decision</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>state</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>Order_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+					<property key="borderWidth">0</property>
+					<property key="borderStyle">none</property>
+					<property key="borderColor">black</property>
+					<property key="borderEnabled">true</property>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>976</x>
+		<y>48</y>
+		<label>Invoice payment</label>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>IBAN</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>amount</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="action2">
+					<![CDATA[
+					state: f.state;
+					change state value { "Invoice paid"; }
+					
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>976</x>
+		<y>176</y>
+		<label>Sent invoice back</label>
+		<dataGroup>
+			<id>t5_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>rejeceted_text</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t5_finish</id>
+			<actions phase="pre">
+				<action id="action3">
+					<![CDATA[
+					state: f.state;
+					change state value { "Rejected invoice sent back"; }
+					
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>592</x>
+		<y>112</y>
+		<label>registered</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>336</x>
+		<y>112</y>
+		<label>start</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>592</x>
+		<y>208</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>848</x>
+		<y>48</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>848</x>
+		<y>176</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p6</id>
+		<x>1104</x>
+		<y>48</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>1104</x>
+		<y>176</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a12</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>later</reference>
+		<breakpoint>
+			<x>688</x>
+			<y>48</y>
+		</breakpoint>
+		<breakpoint>
+			<x>624</x>
+			<y>48</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>read</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>ok</reference>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>ko</reference>
+	</arc>
+</document>

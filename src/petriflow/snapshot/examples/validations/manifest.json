@@ -1,0 +1,5 @@
+{
+  "processes": [
+    {"file": "validations.xml", "id": "validations", "description": "Demonstrates process data validation rules."}
+  ]
+}

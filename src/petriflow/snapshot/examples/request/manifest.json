@@ -1,0 +1,9 @@
+{
+  "processes": [
+    {"file": "request.xml", "id": "request", "description": "Demonstrates a basic multi-department request workflow."},
+    {"file": "request_three_department_sliders.xml", "id": "request_three_dept", "description": "Routes a request across three departments using sliders."},
+    {"file": "request_three_department_enum.xml", "id": "request_three_dept_enum", "description": "Routes a request across three departments using enumerated choices."},
+    {"file": "request_three_department_multichoice.xml", "id": "request_three_dept_multichoice", "description": "Routes a request across three departments using multiple choices."},
+    {"file": "request_variable_arc_weights.xml", "id": "request_variable", "description": "Demonstrates variable arc weights in a request workflow."}
+  ]
+}

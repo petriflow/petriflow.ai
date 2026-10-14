@@ -1,0 +1,16 @@
+{
+  "processes": [
+    {"file": "01_sequence.xml", "id": "01_sequence", "description": "Workflow pattern in which tasks execute one after another."},
+    {"file": "02_parallel_split.xml", "id": "02_parallel_split", "description": "Workflow pattern that splits execution into parallel branches."},
+    {"file": "03_synchronization.xml", "id": "03_synchronization", "description": "Workflow pattern that synchronizes parallel branches."},
+    {"file": "04_exclusive_choice.xml", "id": "04_exclusive_choice", "description": "Workflow pattern that selects one of alternative branches."},
+    {"file": "05_simple_merge.xml", "id": "05_simple_merge", "description": "Workflow pattern that merges alternative branches."},
+    {"file": "10_arbitrary_cycles.xml", "id": "10_arbitrary_cycles", "description": "Workflow pattern demonstrating arbitrary cycles."},
+    {"file": "17_interleaved_parallel_routing.xml", "id": "17_interleaved_parallel_routing", "description": "Workflow pattern for interleaved execution of parallel branches."},
+    {"file": "18_milestone.xml", "id": "18_milestone", "description": "Workflow pattern triggered when a milestone condition is reached."},
+    {"file": "21_structured_loop_repeat.xml", "id": "21_structured_loop_repeat", "description": "Structured loop pattern using a repeat (post-test) condition."},
+    {"file": "21_structured_loop_while.xml", "id": "21_structured_loop_while", "description": "Structured loop pattern using a while (pre-test) condition."},
+    {"file": "39_critical_section.xml", "id": "39_critical_section", "description": "Workflow pattern that protects a critical section from concurrent execution."},
+    {"file": "40_interleaved_routing.xml", "id": "40_interleaved_routing", "description": "Workflow pattern demonstrating interleaved routing."}
+  ]
+}

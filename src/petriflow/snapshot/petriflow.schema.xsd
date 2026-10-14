@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
 <xs:schema elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           version="1.1.0">
+           version="1.0.9">
   <!-- ===== DOCUMENT ELEMENTS ===== -->
   <xs:complexType name="transaction">
     <xs:sequence>

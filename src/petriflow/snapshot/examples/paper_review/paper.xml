@@ -1,0 +1,1521 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>paper</id>
+	<initials>ppr</initials>
+	<title name="model_title">Paper</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseEvents>
+		<event type="create">
+			<id>paper_create</id>
+			<actions phase="post">
+				<action id="8">
+					<![CDATA[
+					corrensponding_author: f.corrensponding_author,
+					email: f.email,
+					surname: f.surname,
+					name: f.name;
+					def user = userService.loggedOrSystem
+					change name value { return user.name; }
+					change surname value { return user.surname; }
+					change email value { return user.email; }
+					change corrensponding_author value { return [user.id]; }
+					changeCaseProperty "title" about { "Paper of " + user.name + " " + user.surname; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<role>
+		<id>pc_chair</id>
+		<title>PC Chair</title>
+	</role>
+	<role>
+		<id>pc_member</id>
+		<title>PC Member</title>
+	</role>
+	<role>
+		<id>reviewers</id>
+		<title name="role_reviewers_title">Reviewers</title>
+	</role>
+	<role>
+		<id>system</id>
+		<title name="role_system_title">System</title>
+	</role>
+	<data type="text">
+		<id>abstract</id>
+		<title name="data_abstract_title">Abstract</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="number">
+		<id>accept</id>
+		<title>Accept</title>
+		<init>0</init>
+	</data>
+	<data type="text">
+		<id>affiliation</id>
+		<title name="data_affiliation_title">Affiliation</title>
+	</data>
+	<data type="taskRef">
+		<id>all_reviews</id>
+		<title/>
+	</data>
+	<data type="number">
+		<id>corection</id>
+		<title>Correction</title>
+		<init>0</init>
+	</data>
+	<data type="userList">
+		<id>corrensponding_author</id>
+		<title>Corresponding author</title>
+	</data>
+	<data type="number">
+		<id>currentReviewed</id>
+		<title/>
+		<init>0</init>
+	</data>
+	<data type="date">
+		<id>date_0</id>
+		<title>Deadline for final version</title>
+	</data>
+	<data type="enumeration">
+		<id>decision</id>
+		<title name="data_rejection_title">Decision</title>
+		<options>
+			<option key="Accept" name="data_rejection_option_Accept">Accept</option>
+			<option key="Reject" name="data_rejection_option_Reject">Reject</option>
+		</options>
+	</data>
+	<data type="enumeration">
+		<id>decision2</id>
+		<title>Decision</title>
+		<options>
+			<option key="Publish">Publish</option>
+			<option key="Reject final version">Reject final version</option>
+			<option key="Return final version">Return final version</option>
+		</options>
+	</data>
+	<data type="i18n">
+		<id>divider</id>
+		<title/>
+		<component>
+			<name>divider</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>email</id>
+		<title name="data_email_title">Email</title>
+	</data>
+	<data type="enumeration">
+		<id>enumeration_0</id>
+		<title>Status</title>
+		<options>
+			<option key="Submitted">Submitted</option>
+			<option key="Accepted">Accepted</option>
+			<option key="Rejected">Rejected</option>
+			<option key="Final version submitted">Final version submitted</option>
+			<option key="Published">Published</option>
+		</options>
+	</data>
+	<data type="file">
+		<id>finalPaper</id>
+		<title name="data_finalPaper_title">Final paper</title>
+		<component>
+			<name>preview</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>infoAboutRejection</id>
+		<title>Info about rejection</title>
+		<init>Thank you for your submission. Based on the reviews attached below, your paper has been rejected by the program committee. We hope that the feedback from the reviews will help you to rework your submission.</init>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>infoAboutRejection2</id>
+		<title>Info about rejection</title>
+	</data>
+	<data type="text">
+		<id>name</id>
+		<title name="data_name_title">Name</title>
+	</data>
+	<data type="text">
+		<id>note</id>
+		<title>Reason for correction</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="taskRef">
+		<id>paper</id>
+		<title/>
+		<init>t11</init>
+	</data>
+	<data type="text">
+		<id>reason</id>
+		<title name="data_reason_title">Reason for rejection</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="number">
+		<id>reject</id>
+		<title>Reject</title>
+		<init>0</init>
+	</data>
+	<data type="multichoice_map">
+		<id>reviewers</id>
+		<title name="data_reviewers_title">Reviewers</title>
+		<desc name="data_reviewers_description">Apply minimum and maximum constraints</desc>
+	</data>
+	<data type="file">
+		<id>subbmitedPaper</id>
+		<title name="data_subbmitedPaper_title">Submitted paper</title>
+	</data>
+	<data type="text">
+		<id>surname</id>
+		<title name="data_surname_title">Surname</title>
+	</data>
+	<data type="text">
+		<id>text_1</id>
+		<title>Authors</title>
+		<component>
+			<name>textarea</name>
+		</component>
+	</data>
+	<data type="text">
+		<id>text_2</id>
+		<title/>
+	</data>
+	<data type="text">
+		<id>text_3</id>
+		<title>Info about acceptance</title>
+		<init>Thank you for your submission. Based on the reviews attached below, your paper has been accepted by the program committee. We hope that the feedback from the reviews will help you to revise your submission. Please submit final revised version of your submission, no later than:</init>
+	</data>
+	<data type="text">
+		<id>title</id>
+		<title name="data_title_title">Title</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>368</x>
+		<y>208</y>
+		<label name="task_t1_title">Paper submission</label>
+		<assignPolicy>auto</assignPolicy>
+		<userRef>
+			<id>corrensponding_author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>paper</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t1_finish</id>
+			<actions phase="pre">
+				<action id="9">
+					<![CDATA[
+					t11: t.t11,
+					enumeration_0: f.enumeration_0;
+					change enumeration_0 value { "Submitted" }
+					make enumeration_0, visible on t11 when { true }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t10</id>
+		<x>1968</x>
+		<y>208</y>
+		<label name="task_t10_title">View</label>
+		<dataGroup>
+			<id>t10_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>paper</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>finalPaper</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t11</id>
+		<x>208</x>
+		<y>48</y>
+		<label name="task_t11_title">Paper</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t11_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>surname</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>email</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>affiliation</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>subbmitedPaper</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>abstract</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_0</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t12</id>
+		<x>1232</x>
+		<y>336</y>
+		<label name="task_t12_title">Info about rejection</label>
+		<userRef>
+			<id>corrensponding_author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t12_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>infoAboutRejection</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>all_reviews</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t13</id>
+		<x>1776</x>
+		<y>336</y>
+		<label name="task_t13_title">Final version rejected</label>
+		<userRef>
+			<id>corrensponding_author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t13_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>reason</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t14</id>
+		<x>1104</x>
+		<y>112</y>
+		<label>All reviews</label>
+		<roleRef>
+			<id>pc_member</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t14_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>all_reviews</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t15</id>
+		<x>624</x>
+		<y>112</y>
+		<label>Submission info</label>
+		<roleRef>
+			<id>pc_member</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<userRef>
+			<id>corrensponding_author</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t15_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>paper</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>finalPaper</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t18</id>
+		<x>1424</x>
+		<y>304</y>
+		<label>Info about acceptance</label>
+		<userRef>
+			<id>corrensponding_author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t18_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_3</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>date_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>divider</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>all_reviews</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>624</x>
+		<y>208</y>
+		<label name="task_t2_title">Reviewer assignment</label>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>pc_chair</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>reviewers</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>paper</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t2_assign</id>
+			<actions phase="post">
+				<action id="1">
+					<![CDATA[
+					reviewers: f.reviewers;
+					def mapOptions = [:]
+					findUsersByRole(useCase.getPetriNet().identifier, "reviewers").each{
+					    mapOptions.put(it.stringId.toString(), it.email.toString())
+					}
+					change reviewers options { mapOptions }
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action id="2">
+					<![CDATA[
+					surname: f.surname,
+					name: f.name,
+					all_reviews: f.all_reviews,
+					reviewers: f.reviewers;
+					def reviewersTasks = []
+					reviewers.value.each{ reviewerValue ->
+					    def reviewer = findUserById(reviewerValue)
+					    def reviewCase = createCase(workspace + "review", "Review of user " + reviewer.name + " " + reviewer.surname)
+					    reviewersTasks.add(
+					        reviewCase.tasks.find{it.transition=="t4"}?.task
+					    )
+					    //reviewCase.getDataField("reviewer").setValue( new com.netgrif.application.engine.petrinet.domain.dataset.UserListFieldValue([reviewer].collect { new com.netgrif.application.engine.petrinet.domain.dataset.UserFieldValue(it) }) )
+					    reviewCase.getDataField("paperCase").setValue(useCase.stringId)
+					    reviewCase.getDataField("name").setValue(reviewer.name)
+					    reviewCase.getDataField("surname").setValue(reviewer.surname)
+					    reviewCase.getDataField("paperTaskRef").setValue([useCase.tasks.find{it.transition=="t11"}?.task])
+					    workflowService.save(reviewCase)
+					    setData("t4", reviewCase, ["reviewer": ["value": [reviewerValue], "type": "userList"]])
+					}
+					change all_reviews value { reviewersTasks }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>848</x>
+		<y>208</y>
+		<label name="task_t3_title">Reviews</label>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>pc_chair</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<view>true</view>
+				<cancel>true</cancel>
+				<assign>true</assign>
+				<delegate>true</delegate>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>all_reviews</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>1104</x>
+		<y>208</y>
+		<label name="task_t4_title">Approval</label>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>pc_chair</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>decision</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>list</name>
+				</component>
+				<event type="set">
+					<id>decision_set</id>
+					<actions phase="post">
+						<action id="7">
+							<![CDATA[
+							reject: f.reject,
+							accept: f.accept,
+							decision: f.decision,
+							t4: t.t4;
+							if (decision.value == "Reject") {
+							    change accept value { 0 }
+							    change reject value { 1 }
+							} else if (decision.value == "Accept") {
+							    change accept value { 1 }
+							    change reject value { 0 }
+							}
+							]]>
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>date_0</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>all_reviews</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="11">
+					<![CDATA[
+					enumeration_0: f.enumeration_0,
+					accept: f.accept;
+					if (accept.value == 1) {
+					    change enumeration_0 value { "Accepted" }
+					}else {
+					    change enumeration_0 value { "Rejected" }
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t8</id>
+		<x>1424</x>
+		<y>208</y>
+		<label name="task_t8_title">Submit final version</label>
+		<assignPolicy>auto</assignPolicy>
+		<userRef>
+			<id>corrensponding_author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>t8_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>note</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>finalPaper</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>preview</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>abstract</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t8_finish</id>
+			<actions phase="pre">
+				<action id="12">
+					<![CDATA[
+					enumeration_0: f.enumeration_0,
+					corection: f.corection,
+					reject: f.reject,
+					accept: f.accept;
+					change enumeration_0 value { "Final version submitted" }
+					change accept value { 0 }
+					change reject value { 0 }
+					change corection value { 0 }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t9</id>
+		<x>1648</x>
+		<y>208</y>
+		<label name="task_t9_title">Publishing</label>
+		<assignPolicy>auto</assignPolicy>
+		<roleRef>
+			<id>pc_chair</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t9_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>decision2</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="set">
+					<id>decision2_set</id>
+					<actions phase="post">
+						<action id="5">
+							<![CDATA[
+							reason: f.reason,
+							t9: t.t9,
+							note: f.note,
+							corection: f.corection,
+							reject: f.reject,
+							accept: f.accept,
+							decision2: f.decision2;
+							if (decision2.value == "Return final version") {
+							    change corection value { 1 }
+							    change reject value { 0 }
+							    change accept value { 0 }
+							    make note, editable on t9 when { true }
+							    make note, required on t9 when { true }
+							    make reason, hidden on t9 when { true }
+							} else if (decision2.value == "Reject final version") {
+							    change corection value { 0 }
+							    change reject value { 1 }
+							    change accept value { 0 }
+							    make note, hidden on t9 when { true }
+							    make reason, editable on t9 when { true }
+							    make reason, required on t9 when { true }
+							} else if (decision2.value == "Publish") {
+							    change corection value { 0 }
+							    change reject value { 0 }
+							    change accept value { 1 }
+							    make note, hidden on t9 when { true }
+							    make reason, hidden on t9 when { true }
+							} else {
+							    change corection value { 0 }
+							    change reject value { 0 }
+							    change accept value { 0 }
+							    make note, hidden on t9 when { true }
+							    make reason, hidden on t9 when { true }
+							}
+							]]>
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+			<dataRef>
+				<id>reason</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>note</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>textarea</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>divider</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>paper</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>finalPaper</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>7</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>all_reviews</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>8</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t9_finish</id>
+			<actions phase="pre">
+				<action id="13">
+					<![CDATA[
+					t13: t.t13,
+					reason: f.reason,
+					t8: t.t8,
+					note: f.note,
+					enumeration_0: f.enumeration_0,
+					decision2: f.decision2;
+					if (decision2.value == "Return final version") {
+					    change enumeration_0 value { "Accepted" }
+					    make note, visible on t8 when { true }
+					} else if (decision2.value == "Reject final version") {
+					    change enumeration_0 value { "Rejected" }
+					    make reason, visible on t13 when { true }
+					} else {
+					    change enumeration_0 value { "Published" }
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>272</x>
+		<y>208</y>
+		<label>init</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p11</id>
+		<x>1872</x>
+		<y>208</y>
+		<label>finished</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p12</id>
+		<x>1648</x>
+		<y>336</y>
+		<label>rejected</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p13</id>
+		<x>848</x>
+		<y>112</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p14</id>
+		<x>368</x>
+		<y>112</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p15</id>
+		<x>1296</x>
+		<y>304</y>
+		<label>accepted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>496</x>
+		<y>208</y>
+		<label>submitted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>752</x>
+		<y>208</y>
+		<label>assigned</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>976</x>
+		<y>208</y>
+		<label>reviewed</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>1296</x>
+		<y>208</y>
+		<label>accepted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>1104</x>
+		<y>336</y>
+		<label>rejected</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p8</id>
+		<x>1552</x>
+		<y>208</y>
+		<label>submittedFinal</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>accept</reference>
+	</arc>
+	<arc>
+		<id>a16</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>reject</reference>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a22</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a23</id>
+		<type>regular</type>
+		<sourceId>t8</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>p8</sourceId>
+		<destinationId>t9</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a29</id>
+		<type>regular</type>
+		<sourceId>t9</sourceId>
+		<destinationId>p11</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>accept</reference>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a31</id>
+		<type>read</type>
+		<sourceId>p11</sourceId>
+		<destinationId>t10</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a33</id>
+		<type>read</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t12</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a35</id>
+		<type>regular</type>
+		<sourceId>t9</sourceId>
+		<destinationId>p12</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>reject</reference>
+	</arc>
+	<arc>
+		<id>a37</id>
+		<type>read</type>
+		<sourceId>p12</sourceId>
+		<destinationId>t13</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a42</id>
+		<type>regular</type>
+		<sourceId>t9</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>corection</reference>
+		<breakpoint>
+			<x>1648</x>
+			<y>112</y>
+		</breakpoint>
+		<breakpoint>
+			<x>1296</x>
+			<y>112</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a48</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p13</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a52</id>
+		<type>read</type>
+		<sourceId>p13</sourceId>
+		<destinationId>t14</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a55</id>
+		<type>regular</type>
+		<sourceId>t1</sourceId>
+		<destinationId>p14</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a58</id>
+		<type>read</type>
+		<sourceId>p14</sourceId>
+		<destinationId>t15</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a60</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p15</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>accept</reference>
+	</arc>
+	<arc>
+		<id>a62</id>
+		<type>read</type>
+		<sourceId>p15</sourceId>
+		<destinationId>t18</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

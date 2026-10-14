@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>import_municipalities_2</id>
+	<initials>IM2</initials>
+	<title>Import municipalities</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type="file">
+		<id>file_0</id>
+		<title>CSV file</title>
+	</data>
+	<data type="text">
+		<id>text_0</id>
+		<title>Result</title>
+		<values>area</values>
+		<init>Result:
+		</init>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>3</id>
+		<x>180</x>
+		<y>100</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Upload file</label>
+		<icon>cloud_upload</icon>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>file_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>3_finish</id>
+			<actions phase="pre">
+				<action>
+result: f.text_0,
+subor: f.file_0;
+
+def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
+def regions = [:]
+def districts = [:]
+new File(subor.value.path as String).splitEachLine(",") { cells ->
+    try {
+        def region_name = cells[0]
+        def district_name = cells[1]
+        def municipality_name = cells[2]
+
+        def region = regions[region_name]
+		if (region == null) {
+			region = createCase("${groupId}_region_2" as String, region_name)
+			regions[region_name] = region
+		}
+        def district = districts[district_name]
+        if (district == null) {
+            district = createCase("${groupId}_district_2" as String, district_name)
+			districts[district_name] = district
+            def add_district_task = assignTask("1", region)
+            setData(add_district_task, [
+                "text_0": ["value":district.stringId, "type":"text"],
+                "text_1": ["value":district.title, "type":"text"]
+            ])
+            finishTask(add_district_task)
+        }
+        def municipality = createCase("${groupId}_municipality_2" as String, municipality_name)
+        def add_municipality_task = assignTask("1", district)
+        setData(add_municipality_task, [
+            "text_0": ["value":municipality.stringId, "type":"text"],
+            "text_1": ["value":municipality.title, "type":"text"]
+        ])
+        finishTask(add_municipality_task)
+		change result value { "${result.value}${cells}: imported successfully\n" as String }
+    } catch (Exception e) {
+        change result value { "${result.value}${cells}:${e.message}\n" as String }
+    }
+}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>4</id>
+		<x>340</x>
+		<y>100</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Result</label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>3</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>100</x>
+		<y>100</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>2</id>
+		<x>260</x>
+		<y>100</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>5</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>6</id>
+		<type>regular</type>
+		<sourceId>3</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>7</id>
+		<type>read</type>
+		<sourceId>2</sourceId>
+		<destinationId>4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

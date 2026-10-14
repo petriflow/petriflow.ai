@@ -1,0 +1,5 @@
+{
+  "processes": [
+    {"file": "real_estate.xml", "id": "real_estate", "description": "Example process for managing real estate."}
+  ]
+}

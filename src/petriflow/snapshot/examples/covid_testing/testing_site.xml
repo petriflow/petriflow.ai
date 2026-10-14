@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>testing_site_2</id>
+	<initials>OD2</initials>
+	<title>Testing site</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+<!--	<role>-->
+<!--		<id>administrator</id>-->
+<!--		<title>Administrator</title>-->
+<!--	</role>-->
+	<!-- DATA -->
+	<data type="text">
+		<id>text_0</id>
+		<title>Address</title>
+	</data>
+	<data type="enumeration_map">
+		<id>text_1</id>
+		<title>Region</title>
+		<action trigger="set">
+			region_field: f.text_1,
+			district:  f.text_2;
+
+			def region = findCase { it._id.eq(new org.bson.types.ObjectId(region_field.value)) }
+			def data = getData("2", region)
+			change district options {
+				data["enumeration_1"].options
+			}
+		</action>
+		<view>
+			<autocomplete/>
+		</view>
+	</data>
+	<data type="enumeration_map">
+		<id>text_2</id>
+		<title>District</title>
+		<action trigger="set">
+district_field: f.text_2,
+municipality:  f.text_3;
+
+def district = findCase { it._id.eq(new org.bson.types.ObjectId(district_field.value)) }
+def data = getData("2", district)
+change municipality options {
+	data["enumeration_1"].options
+}
+		</action>
+	</data>
+	<data type="enumeration_map">
+		<id>text_3</id>
+		<title>Municipality</title>
+	</data>
+	<data type="text">
+		<id>text_4</id>
+		<title>Deletion reason</title>
+		<values>area</values>
+	</data>
+	<data type="enumeration">
+		<id>enumeration_0</id>
+		<title>Testing site</title>
+		<desc>Select the testing site to merge with</desc>
+		<values>option1</values>
+		<values>option2</values>
+		<values>option3</values>
+		<init>option1</init>
+	</data>
+	<data type="text">
+		<id>text_5</id>
+		<title>Name</title>
+	</data>
+	<data type="text">
+		<id>text_6</id>
+		<title>Description</title>
+		<values>area</values>
+	</data>
+	<data type="enumeration_map">
+		<id>enumeration_1</id>
+		<title>Appointments</title>
+		<view>
+			<list/>
+		</view>
+	</data>
+	<data type="taskRef">
+		<id>taskRef_0</id>
+		<title>New appointment</title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>2</id>
+		<x>340</x>
+		<y>180</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>New testing site</label>
+		<assignPolicy>auto</assignPolicy>
+<!--		<roleRef>-->
+<!--			<id>administrator</id>-->
+<!--			<logic>-->
+<!--				<perform>true</perform>-->
+<!--			</logic>-->
+<!--		</roleRef>-->
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_2</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_3</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>null</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_5</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_6</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>DataGroup_1</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>2_assign</id>
+			<actions phase="pre">
+				<action>
+region:  f.text_1;
+
+def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
+def regions = findCases { it.processIdentifier.eq("${groupId}_region_2" as String) }
+change region options {
+	regions.collectEntries {
+		[(it.stringId): it.title]
+	}
+}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>5</id>
+		<x>460</x>
+		<y>100</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Testing site details</label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_3</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_2</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_1</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>3</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>6</id>
+		<x>460</x>
+		<y>340</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Edit</label>
+<!--		<roleRef>-->
+<!--			<id>administrator</id>-->
+<!--			<logic>-->
+<!--				<perform>true</perform>-->
+<!--			</logic>-->
+<!--		</roleRef>-->
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_3</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>7</id>
+		<x>580</x>
+		<y>180</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Delete</label>
+<!--		<roleRef>-->
+<!--			<id>administrator</id>-->
+<!--			<logic>-->
+<!--				<perform>true</perform>-->
+<!--			</logic>-->
+<!--		</roleRef>-->
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_4</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>21</id>
+		<x>580</x>
+		<y>340</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Add appointment</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					appointment_ref: f.taskRef_0;
+
+					def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
+					def appointment = createCase("${groupId}_appointment_2")
+					def task_builder = assignTask("2", appointment)
+					change appointment_ref value {
+						[task_builder.stringId]
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					appointments: f.enumeration_1,
+					appointment_ref: f.taskRef_0;
+
+					def task_builder = findTask(appointment_ref.value[0])
+					def data = getData(task_builder)
+					setData(task_builder, [
+						"testing_site": [
+					                "value": useCase.stringId as String,
+									"type": "text"
+					        ]
+					])
+					finishTask(task_builder)
+
+					def appointment_name = "${data["date_0"].value}, ${data["enumeration_0"].value} - ${data["enumeration_1"].value}" as String
+					change appointments options {
+						appointments.options + [(task_builder.caseId):appointment_name]
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>220</x>
+		<y>180</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>3</id>
+		<x>460</x>
+		<y>180</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>4</id>
+		<x>460</x>
+		<y>260</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>9</id>
+		<x>700</x>
+		<y>180</y>
+		<label>Deleted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>10</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>11</id>
+		<type>regular</type>
+		<sourceId>2</sourceId>
+		<destinationId>3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>12</id>
+		<type>regular</type>
+		<sourceId>2</sourceId>
+		<destinationId>4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>13</id>
+		<type>read</type>
+		<sourceId>3</sourceId>
+		<destinationId>5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>14</id>
+		<type>regular</type>
+		<sourceId>4</sourceId>
+		<destinationId>6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>15</id>
+		<type>regular</type>
+		<sourceId>6</sourceId>
+		<destinationId>4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>16</id>
+		<type>regular</type>
+		<sourceId>3</sourceId>
+		<destinationId>7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>17</id>
+		<type>regular</type>
+		<sourceId>4</sourceId>
+		<destinationId>7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>20</id>
+		<type>regular</type>
+		<sourceId>7</sourceId>
+		<destinationId>9</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>22</id>
+		<type>regular</type>
+		<sourceId>4</sourceId>
+		<destinationId>21</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>23</id>
+		<type>regular</type>
+		<sourceId>21</sourceId>
+		<destinationId>4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

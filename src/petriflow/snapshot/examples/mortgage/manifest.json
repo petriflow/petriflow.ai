@@ -1,0 +1,5 @@
+{
+  "processes": [
+    {"file": "mortgage.xml", "id": "mortgage", "description": "Demonstrates a mortgage application process."}
+  ]
+}

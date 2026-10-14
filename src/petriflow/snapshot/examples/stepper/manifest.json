@@ -1,0 +1,5 @@
+{
+  "processes": [
+    {"file": "stepper.xml", "id": "stepper", "description": "Demonstrates the stepper user interface in a process."}
+  ]
+}

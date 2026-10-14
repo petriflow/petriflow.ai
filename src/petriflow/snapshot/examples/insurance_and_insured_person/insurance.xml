@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>insurance</id>
+	<initials>POI</initials>
+	<title>Insurance</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type="taskRef">
+		<id>taskRef_0</id>
+		<title>set label</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<init>value</init>
+	</data>
+	<data type="button">
+		<id>button_0</id>
+		<title>Add insured person</title>
+		<action trigger="set">taskref: f.taskRef_0;
+def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
+def insured_person = createCase("${groupId}_insured_person")
+change taskref value {
+    if (taskref.value) {
+        return taskref.value + [insured_person.tasks.first().task]
+    }
+    return [insured_person.tasks.first().task]
+}</action>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>209</x>
+		<y>73</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label></label>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>

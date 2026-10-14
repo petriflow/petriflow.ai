@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>municipality_2</id>
+    <initials>OB2</initials>
+    <title>Municipality</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="text">
+        <id>text_0</id>
+        <title>District</title>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <!-- ARCS -->
+    <transition>
+        <id>2</id>
+        <x>221</x>
+        <y>101</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Municipality</label>
+        <dataGroup>
+            <id>DataGroup_0</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>5</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

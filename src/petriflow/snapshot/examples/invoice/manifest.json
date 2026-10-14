@@ -1,0 +1,6 @@
+{
+  "processes": [
+    {"file": "invoice.xml", "id": "invoice", "description": "Processes an invoice and its approval decision."},
+    {"file": "order.xml", "id": "order", "description": "Represents an order linked to an invoice."}
+  ]
+}

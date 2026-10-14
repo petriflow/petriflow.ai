@@ -1,0 +1,7 @@
+{
+  "processes": [
+    {"file": "committee.xml", "id": "committee", "description": "Models the committee involved in a student thesis process."},
+    {"file": "student.xml", "id": "student", "description": "Captures student information for a thesis process."},
+    {"file": "thesis.xml", "id": "thesis", "description": "Represents a thesis submitted for evaluation."}
+  ]
+}

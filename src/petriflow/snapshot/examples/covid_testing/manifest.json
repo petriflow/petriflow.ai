@@ -1,0 +1,13 @@
+{
+  "processes": [
+    {"file": "address.xml", "id": "address_2", "description": "Stores an address used by COVID-19 testing processes."},
+    {"file": "import_municipalities.xml", "id": "import_municipalities_2", "description": "Imports municipality data for COVID-19 testing."},
+    {"file": "region.xml", "id": "region_2", "description": "Stores a region used to organize testing locations."},
+    {"file": "municipality.xml", "id": "municipality_2", "description": "Stores a municipality used by COVID-19 testing processes."},
+    {"file": "testing_site.xml", "id": "testing_site_2", "description": "Represents a COVID-19 sample collection site."},
+    {"file": "district.xml", "id": "district_2", "description": "Stores a district used to organize testing locations."},
+    {"file": "person.xml", "id": "person_2", "description": "Stores a person record for COVID-19 testing."},
+    {"file": "appointment.xml", "id": "appointment_2", "description": "Defines an available COVID-19 testing appointment."},
+    {"file": "examination.xml", "id": "examination_2", "description": "Coordinates selection and results of a COVID-19 test."}
+  ]
+}

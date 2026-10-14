@@ -1,0 +1,5 @@
+{
+  "processes": [
+    {"file": "internationalization_example.xml", "id": "i18n_example", "description": "Demonstrates internationalized process labels and translations."}
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "processes": [
+    {"file": "paper.xml", "id": "paper", "description": "Represents a paper submitted for review."},
+    {"file": "review.xml", "id": "review", "description": "Manages the review of a submitted paper."}
+  ]
+}

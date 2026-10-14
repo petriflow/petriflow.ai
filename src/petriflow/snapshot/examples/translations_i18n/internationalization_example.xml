@@ -1,0 +1,120 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+    <id>i18n_example</id>
+    <version>1.0.0</version>
+    <initials>I18</initials>
+    <title name="title">Internationalization example</title>
+    <icon>translate</icon>
+    <defaultRole>true</defaultRole>
+    <anonymousRole>true</anonymousRole>
+    <transitionRole>false</transitionRole>
+    <data type="text">
+        <id>text_9</id>
+        <title name="name">First name</title>
+    </data>
+    <data type="text">
+        <id>text_10</id>
+        <title name="surname">Last name</title>
+    </data>
+    <data type="date">
+        <id>date_0</id>
+        <title name="birth_date">Date of birth</title>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_map_4</id>
+        <title name="gender">Gender</title>
+        <options>
+            <option key="male" name="male">Male</option>
+            <option key="female" name="female">Female</option>
+            <option key="other" name="other">Other</option>
+        </options>
+    </data>
+    <i18n locale="en">
+        <i18nString name="title">I18n example</i18nString>
+        <i18nString name="name">Name</i18nString>
+        <i18nString name="surname">Surname</i18nString>
+        <i18nString name="birth_date">Date of birth</i18nString>
+        <i18nString name="gender">Gender</i18nString>
+        <i18nString name="male">Male</i18nString>
+        <i18nString name="female">Female</i18nString>
+        <i18nString name="other">Other</i18nString>
+        <i18nString name="form">Form</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="title">Internationalization example</i18nString>
+        <i18nString name="name">First name</i18nString>
+        <i18nString name="surname">Name</i18nString>
+        <i18nString name="birth_date">Date of birth</i18nString>
+        <i18nString name="gender">Gender</i18nString>
+        <i18nString name="male">Male</i18nString>
+        <i18nString name="female">Female</i18nString>
+        <i18nString name="other">Other</i18nString>
+        <i18nString name="form">Form</i18nString>
+    </i18n>
+    <transition>
+        <id>t1</id>
+        <x>220</x>
+        <y>140</y>
+        <label name="form">Form</label>
+        <dataGroup>
+            <id>t1_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>text_9</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_10</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>date_0</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_map_4</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

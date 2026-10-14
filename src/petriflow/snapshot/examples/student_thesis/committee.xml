@@ -1,0 +1,372 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>committee</id>
+	<initials>CMT</initials>
+	<title>Committee</title>
+	<defaultRole>false</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<data type="userList">
+		<id>author</id>
+		<title/>
+	</data>
+	<data type="taskRef">
+		<id>chairman</id>
+		<title>Chairman of Committee</title>
+		<init>t1</init>
+	</data>
+	<data type="text">
+		<id>chairman_email</id>
+		<title>Chairman's email</title>
+	</data>
+	<data type="text">
+		<id>chairman_name</id>
+		<title>Chairman's name</title>
+		<placeholder>Chairman's name</placeholder>
+		<desc>Enter first name</desc>
+	</data>
+	<data type="text">
+		<id>chairman_surname</id>
+		<title>Chairman's surname</title>
+		<placeholder>Chairman's surname</placeholder>
+		<desc>Enter last name</desc>
+	</data>
+	<data type="multichoice_map">
+		<id>submitted_theses</id>
+		<title>Submitted theses</title>
+		<options>
+			<option key="option1">Option 1</option>
+			<option key="option2">Option 2</option>
+			<option key="option3">Option 3</option>
+		</options>
+	</data>
+	<data type="taskRef">
+		<id>theses_defence</id>
+		<title>Thesis defense</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>208</x>
+		<y>48</y>
+		<label>Chairman</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>chairman_name</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>chairman_surname</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>chairman_email</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>144</x>
+		<y>144</y>
+		<label>Init</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<trigger type="auto"/>
+		<event type="finish">
+			<id>t2_finish</id>
+			<actions phase="pre">
+				<action id="action_0">
+					<![CDATA[
+					name: f.chairman_name,
+					                surname: f.chairman_surname,
+					                email: f.chairman_email,
+					                author: f.author;
+					                change name value {userService.loggedOrSystem.name}
+					                change surname value {userService.loggedOrSystem.surname}
+					                change email value {userService.loggedOrSystem.email}
+					                change author value {
+					                        [userService.getLoggedOrSystem().id]
+					                    }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>304</x>
+		<y>144</y>
+		<label> Selection of theses for the committee</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<userRef>
+			<id>author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>chairman</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>submitted_theses</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>2</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<event type="get">
+					<id>get_event_0</id>
+					<actions phase="pre">
+						<action id="2">
+							<![CDATA[
+							theses: f.submitted_theses;
+							                    def group_prefix = useCase.processIdentifier - useCase.processIdentifier.split("/").last();
+							                    def submitted_theses = findCases { it.processIdentifier.eq(group_prefix + "thesis").and(it.activePlaces.get("p6").eq(1))}.collectEntries { 
+							                        [(it.stringId): "Thesis name: " + it.getFieldValue("thesis_name")  + " Student: " + it.getFieldValue("student_name") + " " + it.getFieldValue("student_surname")] 
+							                    }
+							                    change theses options {
+							                        submitted_theses
+							                    }
+							]]>
+						</action>
+					</actions>
+				</event>
+				<event type="set">
+					<id>set_event_1</id>
+					<actions phase="post">
+						<action id="action_1">
+							<![CDATA[
+							defence: f.theses_defence,
+							                    theses: f.this;
+							                    change defence value {
+							                    findTasks {it.caseId.in(theses.value).and(it.transitionId.eq("t8"))}?.collect{it.stringId}
+							                    }
+							]]>
+						</action>
+					</actions>
+				</event>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>528</x>
+		<y>144</y>
+		<label>Thesis defense</label>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<userRef>
+			<id>author</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</userRef>
+		<dataGroup>
+			<id>DataGroup_0</id>
+			<dataRef>
+				<id>chairman</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>theses_defence</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t4_assign</id>
+			<actions phase="post">
+				<action id="action_3">
+					<![CDATA[
+					submission: f.theses_defence;
+					                submission.value.each{id -> assignTask(findTask({it._id.eq(id)}))                
+					                }
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t4_cancel</id>
+			<actions phase="pre">
+				<action id="action_4">
+					<![CDATA[
+					submission: f.theses_defence;
+					                submission.value.each{id -> cancelTask(findTask({it._id.eq(id)}))                
+					                }
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="action_5">
+					<![CDATA[
+					submission: f.theses_defence;
+					                submission.value.each{id -> finishTask(findTask({it._id.eq(id)}))
+					                }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>48</x>
+		<y>144</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>208</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>400</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>688</x>
+		<y>144</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

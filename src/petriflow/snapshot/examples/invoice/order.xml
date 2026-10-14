@@ -1,0 +1,654 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
+	<id>order</id>
+	<initials>ORD</initials>
+	<title>Order</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<caseEvents>
+		<event type="create">
+			<id>order_create</id>
+			<actions phase="post">
+				<action id="2">
+					<![CDATA[
+					order_id: f.order_id,
+					processId_invoice: f.processId_invoice,
+					children_invoice_cases: f.children_invoice_cases;
+					change processId_invoice value { workspace + "invoice"; }
+					change children_invoice_cases allowedNets { [processId_invoice.value]; }
+					change order_id value { useCase.stringId; }
+					]]>
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<data type="number">
+		<id>accept</id>
+		<title>Accept</title>
+		<init>0</init>
+	</data>
+	<data type="number">
+		<id>back</id>
+		<title>Back</title>
+		<init>0</init>
+	</data>
+	<data type="caseRef">
+		<id>children_invoice_cases</id>
+		<title>Invoice cases</title>
+	</data>
+	<data type="enumeration_map">
+		<id>decision</id>
+		<title>Decision</title>
+		<options>
+			<option key="accept">Accept</option>
+			<option key="reject">Reject</option>
+			<option key="back">Back</option>
+		</options>
+	</data>
+	<data type="i18n">
+		<id>divider1</id>
+		<title>Children invoices</title>
+		<init>Children invoices</init>
+	</data>
+	<data type="taskRef">
+		<id>invoice_approvals</id>
+		<title>Invoices to approve</title>
+	</data>
+	<data type="text">
+		<id>new_invoice_id</id>
+		<title>New invoice id</title>
+		<event type="set">
+			<id>new_invoice_id_set</id>
+			<actions phase="post">
+				<action id="1">
+					<![CDATA[
+					children_invoice_cases: f.children_invoice_cases,
+					new_invoice_id: f.new_invoice_id;
+					if (new_invoice_id.value !in children_invoice_cases.value) {
+					change children_invoice_cases value { children_invoice_cases.value +  new_invoice_id.value}}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="text">
+		<id>order_id</id>
+		<title>Order ID</title>
+	</data>
+	<data type="text">
+		<id>processId_invoice</id>
+		<title>Process ID Invoice</title>
+	</data>
+	<data type="number">
+		<id>reject</id>
+		<title>Reject</title>
+		<init>0</init>
+	</data>
+	<data type="text">
+		<id>subject</id>
+		<title>Subject</title>
+	</data>
+	<data type="text">
+		<id>supplier</id>
+		<title>Supplier</title>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>1040</x>
+		<y>176</y>
+		<label>Bulk Approval</label>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>8</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>order_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>subject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supplier</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>new_invoice_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>6</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>divider1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>8</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>divider</name>
+				</component>
+			</dataRef>
+			<dataRef>
+				<id>invoice_approvals</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>8</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t1_assign</id>
+			<actions phase="pre">
+				<action id="action2">
+					<![CDATA[
+					invoice_approvals: f.invoice_approvals,
+					children_invoice_cases: f.children_invoice_cases;
+					// find approve task of invoices that are enabled to fire (have no user assigned)
+					// and collect their IDs and store them in taskRef invoice_approvals
+					change invoice_approvals value { 
+					    findTasks{(it.caseId.in(children_invoice_cases.value)).and(it.transitionId.eq("t2").and(it.userId.isNull()))}?.collect{it.stringId}
+					}
+					// for each ID in the list find the task with that ID and assing that task
+					invoice_approvals.value.each{ id_in_tasklist ->
+					def invoice_to_approve = findTask({it._id.eq(id_in_tasklist)});
+						assignTask(invoice_to_approve)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t1_finish</id>
+			<actions phase="pre">
+				<action id="action1">
+					<![CDATA[
+					invoice_approvals: f.invoice_approvals,
+					children_invoice_cases: f.children_invoice_cases;
+					//remember IDs of approve tasks of invoices to approve
+					def list_of_tasks_ids = invoice_approvals.value; 
+					// set taskRef with list of ISs approve tasks of invoices to empty list
+					change invoice_approvals value { []; } 
+					// for each ID in remembered list find the task for ID and finish that task
+					list_of_tasks_ids.each{ id_in_tasklist ->
+					def invoice_to_approve = findTask({it._id.eq(id_in_tasklist)});
+						finishTask(invoice_to_approve)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t1_cancel</id>
+			<actions phase="pre">
+				<action id="action3">
+					<![CDATA[
+					invoice_approvals: f.invoice_approvals;
+					// for each ID in the list find the task with that ID and cancel that task
+					invoice_approvals.value.each{ id_in_tasklist ->
+					def invoice_to_approve = findTask({it._id.eq(id_in_tasklist)});
+						cancelTask(invoice_to_approve)
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>176</x>
+		<y>176</y>
+		<label>Request Order Approval</label>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>order_id</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>subject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supplier</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>464</x>
+		<y>176</y>
+		<label>Approve order</label>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>order_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>subject</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supplier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>decision</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t3_finish</id>
+			<actions phase="pre">
+				<action id="3">
+					<![CDATA[
+					back: f.back,
+					reject: f.reject,
+					accept: f.accept,
+					decision: f.decision;
+					if (decision.value == "accept") {
+						change accept value { 1; }
+					    change reject value { 0; }
+					    change back value { 0; }
+					}
+					if (decision.value == "reject") {
+						change accept value { 0; }
+					    change reject value { 1; }
+					    change back value { 0; }
+					}
+					if (decision.value == "back") {
+						change accept value { 0; }
+					    change reject value { 0; }
+					    change back value { 1; }
+					}
+					]]>
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>784</x>
+		<y>176</y>
+		<label>Send Order to Supplier</label>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>6</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>order_id</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>subject</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supplier</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>4</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>368</x>
+		<y>272</y>
+		<label>Read Order Detail</label>
+		<dataGroup>
+			<id>t5_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>order_id</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>subject</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>supplier</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>decision</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>p2</id>
+		<x>48</x>
+		<y>176</y>
+		<label>start</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>336</x>
+		<y>176</y>
+		<label>waiting for approval</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>656</x>
+		<y>176</y>
+		<label>accepted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>912</x>
+		<y>176</y>
+		<label>sent</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p6</id>
+		<x>560</x>
+		<y>272</y>
+		<label>rejected</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>272</x>
+		<y>272</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>back</reference>
+		<breakpoint>
+			<x>400</x>
+			<y>112</y>
+		</breakpoint>
+		<breakpoint>
+			<x>112</x>
+			<y>112</y>
+		</breakpoint>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p6</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>reject</reference>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>read</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>t2</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>accept</reference>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>read</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

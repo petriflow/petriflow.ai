@@ -1,0 +1,478 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>stepper</id>
+	<version>1.0.0</version>
+	<initials>STP</initials>
+	<title>Stepper Example</title>
+	<icon>home</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>true</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>system</title>
+	</role>
+	<data type="text">
+		<id>text_11</id>
+		<title>Name</title>
+	</data>
+	<data type="text">
+		<id>text_12</id>
+		<title>Surname</title>
+	</data>
+	<data type="date">
+		<id>date_1</id>
+		<title>Date of birth</title>
+	</data>
+	<data type="text">
+		<id>text_13</id>
+		<title>Street</title>
+	</data>
+	<data type="text">
+		<id>text_14</id>
+		<title>House number</title>
+	</data>
+	<data type="text">
+		<id>text_15</id>
+		<title>ZIP code</title>
+	</data>
+	<data type="text">
+		<id>text_16</id>
+		<title>City</title>
+	</data>
+	<data type="number">
+		<id>number_3</id>
+		<title>Home Price</title>
+	</data>
+	<data type="enumeration_map">
+		<id>enumeration_map_5</id>
+		<title>Loan Term</title>
+		<options>
+			<option key="30">30 years</option>
+			<option key="20">20 years</option>
+			<option key="10">10 years</option>
+		</options>
+	</data>
+	<data type="enumeration_map">
+		<id>enumeration_map_6</id>
+		<title />
+		<options>
+			<option key="key1">Personal Information</option>
+			<option key="key2">Address</option>
+			<option key="key3">Mortgage Information</option>
+		</options>
+		<init>key1</init>
+	</data>
+	<data type="button">
+		<id>button_5</id>
+		<title />
+		<placeholder>Back</placeholder>
+		<event type="set">
+			<id>button_5_set</id>
+			<actions phase="post">
+				<action id="vrpv31zbo6">
+					<!-- @formatter:off -->
+					btn_next: f.button_6,
+btn_back: f.button_5,
+stepper: f.enumeration_map_6,
+form: t.t5,
+taskRef: f.taskRef_2;
+
+if (stepper.value == "key2") {
+    change taskRef value {
+        [useCase.tasks.find{it.transition=="t1"}.task]
+    }
+    change stepper value {
+        "key1"
+    }
+    make btn_back,hidden on form when {true}
+} else if (stepper.value == "key3") {
+    change taskRef value {
+        [useCase.tasks.find{it.transition=="t2"}.task]
+    }
+    change stepper value {
+        "key2"
+    }
+    make btn_next,editable on form when {true} 
+}
+					<!-- @formatter:on -->
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="button">
+		<id>button_6</id>
+		<title />
+		<placeholder>Next</placeholder>
+		<event type="set">
+			<id>button_6_set</id>
+			<actions phase="post">
+				<action id="607mpf8lmv">
+					<!-- @formatter:off -->
+					btn_next: f.button_6,
+btn_back: f.button_5,
+stepper: f.enumeration_map_6,
+form: t.t5,
+taskRef: f.taskRef_2;
+
+if (stepper.value == "key1") {
+change taskRef value {
+        [useCase.tasks.find{it.transition=="t2"}.task]
+    }
+    change stepper value {
+        "key2"
+    }
+    make btn_back,editable on form when {true}
+} else if (stepper.value == "key2") {
+    change taskRef value {
+        [useCase.tasks.find{it.transition=="t3"}.task]
+    }
+    change stepper value {
+        "key3"
+    }
+    make btn_next,hidden on form when {true}
+}
+					<!-- @formatter:on -->
+				</action>
+			</actions>
+		</event>
+	</data>
+	<data type="taskRef">
+		<id>taskRef_2</id>
+		<title />
+		<init>t1</init>
+	</data>
+	<transition>
+		<id>t1</id>
+		<x>220</x>
+		<y>100</y>
+		<label>Personal Information</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t1_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_12</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>date_1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_11</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>220</x>
+		<y>180</y>
+		<label>Address</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>text_13</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_14</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_15</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>text_16</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>220</x>
+		<y>260</y>
+		<label>Mortgage Information</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>t3_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>number_3</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>enumeration_map_5</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>460</x>
+		<y>180</y>
+		<label>Form</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>t5_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>enumeration_map_6</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>stepper</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>t5_1</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>t5_2</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>button_5</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>button_6</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+				<component>
+					<name>flat</name>
+				</component>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t5_finish</id>
+			<actions phase="post">
+				<action id="tnn2mczor5">
+					<!-- @formatter:off -->
+					taskRef_2: f.taskRef_2;
+change taskRef_2 value {
+    [useCase.tasks.find{it.transition=="t1"}.task,useCase.tasks.find{it.transition=="t2"}.task,useCase.tasks.find{it.transition=="t3"}.task]
+}
+					<!-- @formatter:on -->
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t6</id>
+		<x>620</x>
+		<y>180</y>
+		<label>Status</label>
+		<dataGroup>
+			<id>t6_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>380</x>
+		<y>180</y>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>540</x>
+		<y>180</y>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
