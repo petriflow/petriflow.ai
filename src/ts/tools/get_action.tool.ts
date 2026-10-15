@@ -31,7 +31,7 @@ export const outputSchema = {
 };
 
 export const metadata = {
-  name: "get-action",
+  name: "get_action",
   description: "Get complete definition of an action",
   annotation: {
     title: "Get complete definition of an action",

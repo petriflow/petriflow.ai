@@ -15,7 +15,7 @@ export const outputSchema = {
 };
 
 export const metadata = {
-  name: "list-examples",
+  name: "list_examples",
   description: "List all examples in Petriflow language",
   annotation: {
     title: "List examples of Petriflow language",

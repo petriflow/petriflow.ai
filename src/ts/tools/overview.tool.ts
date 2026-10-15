@@ -7,7 +7,7 @@ export const schema = {
 };
 
 export const metadata = {
-  name: "get-overview",
+  name: "get_overview",
   description: "Show overview of Petriflow language",
   annotation: {
     title: "Overview of Petriflow language",

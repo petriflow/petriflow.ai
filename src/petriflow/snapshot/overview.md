@@ -7,30 +7,30 @@ data values. Read this first to get the mental model; look up exact syntax in th
 
 ## Building blocks
 
-| Concept             | Meaning                                                                                                                  |
-|---------------------|--------------------------------------------------------------------------------------------------------------------------|
-| Place               | A state or condition. Holds tokens. `tokens` sets the initial marking.                                                   |
-| Transition          | A unit of work. Within a case, an enabled transition is a **task** that users or the system run.                         |
-| Arc                 | Connects a place to a transition or a transition to a place, never the same kind of node. Has a weight (`multiplicity`). |
-| Data field          | A variable of the process. Every case has its own value, shared by all tasks of that case.                               |
-| dataRef / dataGroup | Places a field on a task form with a behaviour (`editable`, `visible`, `required`, ...).                                 |
-| Role / roleRef      | A named group of users. `roleRef` grants permissions on a task or on the whole case.                                     |
-| actorRef            | Grants permissions to the users stored in an `actor` / `actorList` field of the specific case.                           |
-| Event               | A lifecycle point of a process, case, task, or data field. Each has a `pre` and a `post` phase.                          |
-| Action              | Groovy code attached to an event phase. It reads and changes data, behaviour, and other cases and tasks.                 |
-| Function            | A reusable Groovy closure (`process`, `global` scope) callable from actions.                                             |
-| i18n                | Translations of titles, labels, and options.                                                                             |
+| Concept             | Meaning                                                                                                                                    |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| Place               | A state or condition. Holds tokens. `tokens` sets the initial marking.                                                                     |
+| Transition          | A unit of work. Within a case, an enabled transition is a **task** that users or the system execute.                                       |
+| Arc                 | Connects a place to a transition or a transition to a place, never the same kind of node. Has a static or dynamic weight (`multiplicity`). |
+| Data field          | A variable of the process. Every case has its own value, shared by all tasks of that case.                                                 |
+| dataRef / dataGroup | Places a field on a task form with a behaviour (`editable`, `visible`, `required`, ...).                                                   |
+| Role / roleRef      | A named group of users. `roleRef` grants permissions on a task or on the whole case.                                                       |
+| actorRef            | Grants permissions to the users stored in an `actor` / `actorList` field of the specific case.                                             |
+| Event               | A lifecycle point of a process, case, task, or data field. Each has a `pre` and a `post` phase.                                            |
+| Action              | Groovy code attached to an event phase. It calls events on data fields and tasks of this or other cases.                                   |
+| Function            | A reusable Groovy closure (`process`, `namespace`, or `global` scope) callable from actions.                                               |
+| i18n                | Translations of titles, labels, and options.                                                                                               |
 
 ## Execution model
 
 **Enabling.** A transition is enabled when every input arc is satisfied:
 
-| Arc type    | Enables when                                                     | Effect when the task runs                                 |
-|-------------|------------------------------------------------------------------|-----------------------------------------------------------|
-| `regular`   | place has at least *weight* tokens                               | consumes *weight* tokens; on an output arc, produces them |
-| `read`      | place has at least *weight* tokens                               | nothing is consumed: the condition stays true             |
-| `inhibitor` | place has fewer than *weight* tokens (weight 1 = place is empty) | nothing is consumed                                       |
-| `reset`     | always                                                           | removes all tokens from the place                         |
+| Arc type    | Enables when                                                     | Effect when the task runs                                                                      |
+|-------------|------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `regular`   | place has at least *weight* tokens                               | consumes *weight* tokens; on an output arc, produces them                                      |
+| `read`      | place has at least *weight* tokens                               | nothing is consumed (condition does not have stay true if there are other arcs from the place) |
+| `inhibitor` | place has fewer than *weight* tokens (weight 1 = place is empty) | nothing is consumed                                                                            |
+| `reset`     | always                                                           | removes all tokens from the place                                                              |
 
 A `reference` on an arc makes its weight dynamic. It points to a `number` field or a place, and the weight is read when
 the arc is executed. A weight of 0 moves no tokens. This is how data drives routing.
@@ -38,9 +38,11 @@ the arc is executed. A weight of 0 moves no tokens. This is how data drives rout
 **Task lifecycle.** An enabled transition appears as a task to users who may perform it.
 
 1. **assign** — pre-assign actions → **input tokens are consumed** → post-assign actions. The task now belongs to one
-   user. Other tasks that needed the same tokens disappear.
+   user. Other tasks that needed the same tokens disappear (this does not apply if two tasks tests only via read arcs to
+   the same place).
 2. The user fills in the form. Every value change fires the field's `set` event; reading fires `get`.
-3. **finish** — required fields are checked → pre-finish actions → **output tokens are produced** → newly enabled tasks
+3. **finish** — required fields are checked and validated → pre-finish actions → **output tokens are produced** → newly
+   enabled tasks
    are created → post-finish actions.
 4. **cancel** (instead of finish) — pre-cancel actions → consumed tokens are returned → post-cancel actions.
 5. **delegate** — hands the assigned task to another user.
@@ -80,6 +82,7 @@ switched on by `<defaultRole>` and `<anonymousRole>`, and **both default to `tru
 - case: `create`, `delete`
 - task: `assign`, `finish`, `cancel`, `delegate`
 - data field: `set`, `get`
+- data reference (`dataRef`):  `set`, `get` (triggered only on given task form)
 
 An action starts with a header that binds the fields (`f.`) and transitions (`t.`) it uses, followed by Groovy code
 that calls the action DSL:

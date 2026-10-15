@@ -22,7 +22,7 @@ export const outputSchema = {
 };
 
 export const metadata = {
-  name: "validate-process",
+  name: "validate_process",
   description: "Validate a Petriflow process XML against its schema and semantic rules",
   annotation: {
     title: "Validate a Petriflow process XML",

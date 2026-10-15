@@ -20,5 +20,5 @@ export const rules: ValidationRule[] = [
   arcConnectivityRule,
   arcDirectionRule,
   placeTokensRule,
-  actionValidationRule
+  //actionValidationRule
 ];

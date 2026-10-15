@@ -11,7 +11,7 @@ export const outputSchema = {
 }
 
 export const metadata = {
-  name: "list-versions",
+  name: "list_versions",
   description: "List all versions of Petriflow language",
   annotation: {
     title: "Get XSD schema of Petriflow language",

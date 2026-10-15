@@ -9,7 +9,7 @@ export const schema = {
 };
 
 export const metadata = {
-  name: "get-example",
+  name: "get_example",
   description: "Get the content of an example process",
   annotation: {
     title: "Get the content of an example process",

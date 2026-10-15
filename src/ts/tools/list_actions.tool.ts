@@ -15,7 +15,7 @@ export const outputSchema = {
 };
 
 export const metadata = {
-  name: "list-actions",
+  name: "list_actions",
   description: "Get list of available actions functions",
   annotation: {
     title: "Get list of available actions functions",

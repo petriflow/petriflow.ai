@@ -7,7 +7,7 @@ export const schema = {
 };
 
 export const metadata = {
-  name: "get-schema",
+  name: "get_schema",
   description: "Get complete XSD schema of Petriflow language",
   annotation: {
     title: "Get XSD schema of Petriflow language",
