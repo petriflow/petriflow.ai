@@ -70,6 +70,13 @@ each with a behaviour for that task: `forbidden`, `hidden`, `visible`, `editable
 - references: `taskRef` (embeds other tasks' forms), `caseRef`, `processRef`
 - filters: `caseFilter`, `taskFilter`, `processFilter`
 
+**Indexed fields (`immediate="true"`).** Only fields declared with the `immediate="true"` attribute on `<data>` have
+their value copied into the Elasticsearch case index (`dataSet.<fieldId>`). Everything that searches or lists cases by
+a field value depends on it: Elasticsearch queries such as `findCasesElastic("... AND dataSet.<fieldId>...")` in actions,
+the filter query of a menu item, and the field columns (headers `<processId>-<fieldId>`) of a case list. A field
+without `immediate="true"` is stored in the case, but queries on it find nothing and its list column has no value. Mark
+the fields you search by or show in case lists.
+
 **Roles and permissions.** Task permissions are `perform` (shorthand for assign, finish, cancel, and view), `assign`,
 `finish`, `cancel`, `view`, and `delegate`. Case permissions (`caseLogic`) are `create`, `view`, and `delete`. Every
 process has two built-in roles that are never declared: `default` (any logged-in user) and `anonymous`. They are
@@ -288,6 +295,8 @@ routes the token through variable arcs.
 - **Ids must be valid Java identifiers.** This applies to every element id (places, transitions, arcs, fields,
   roles, ...) and to action ids, so `id="1"` is not allowed. Reserved Java and Groovy words (`new`, `class`, `def`, ...)
   are not allowed either.
+- **Fields you search or list need `immediate="true"`.** Without it the Elasticsearch case index has no value for the
+  field, so queries on `dataSet.<fieldId>` and menu item filters return no cases and case list columns stay empty.
 - **Set `<defaultRole>` and `<anonymousRole>` explicitly.** Both default to `true`, and a task without a `roleRef` is
   open to every enabled built-in role, including anonymous users.
 
