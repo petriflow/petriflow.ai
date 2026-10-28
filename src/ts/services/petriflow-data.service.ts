@@ -35,6 +35,14 @@ export interface ListedAction {
   description: string;
 }
 
+export interface ListedComponent {
+  name: string;
+  names: string[];
+  fieldTypes: string[];
+  description: string;
+  whenToUse: string;
+}
+
 export interface ListedExample {
   name: string;
   app: string;
@@ -100,6 +108,29 @@ export class PetriflowDataService {
       throw new Error(`Action ${name} not found`);
     }
     return {...action, name};
+  }
+
+  listComponents(version: string): ListedComponent[] {
+    const components = this.readJsonRecord(version, "components-definitions.json");
+    return Object.keys(components).map((name) => {
+      const component = components[name] as Record<string, any>;
+      return {
+        name,
+        names: component.names ?? [],
+        fieldTypes: component.fieldTypes ?? [],
+        description: component.description,
+        whenToUse: component.whenToUse,
+      };
+    });
+  }
+
+  getComponent(version: string, name: string): Record<string, any> {
+    const components = this.readJsonRecord(version, "components-definitions.json");
+    const component = components[name];
+    if (!component || typeof component !== "object") {
+      throw new Error(`Component ${name} not found`);
+    }
+    return {...component, name};
   }
 
   listExamples(version: string): ListedExample[] {

@@ -1,0 +1,410 @@
+{
+    "button-style": {
+        "names": ["default", "raised", "stroked", "flat", "icon", "fab", "minifab"],
+        "fieldTypes": ["button"],
+        "description": "Visual style of a button field. The name selects the Angular Material button variant; without a component the plain text button is rendered.",
+        "whenToUse": "Use for any button field whose look matters. 'icon', 'fab' and 'minifab' render the field placeholder as a Material icon name, so set <placeholder> to an icon such as 'south' or 'add'. Use 'raised', 'stroked' or 'flat' for text buttons. Add dialogTitle and dialogText to ask for confirmation before the button's set event runs.",
+        "params": [
+            {"name": "dialogTitle", "type": "string", "required": false, "description": "Title of the confirmation dialog. The dialog is shown only when both dialogTitle and dialogText are set."},
+            {"name": "dialogText", "type": "string", "required": false, "description": "Text of the confirmation dialog. The click is processed only after the user confirms."},
+            {"name": "align", "type": "string", "required": false, "description": "Horizontal alignment of the button in its cell: start, center or end."},
+            {"name": "stretch", "type": "boolean", "required": false, "description": "Value 'true' stretches the button over the full width of its cell."}
+        ],
+        "examples": [
+            "<component><name>raised</name><property key=\"dialogTitle\">Delete</property><property key=\"dialogText\">Really delete the record?</property><property key=\"align\">end</property></component>",
+            "<component><name>icon</name><property key=\"stretch\">true</property></component>"
+        ]
+    },
+    "enumeration-autocomplete": {
+        "names": ["autocomplete"],
+        "fieldTypes": ["enumeration", "enumeration_map"],
+        "description": "Single choice rendered as a text input with a filtered list of the field's choices or options.",
+        "whenToUse": "Use for an enumeration with many choices, where scrolling a select is impractical. The options are fixed in the process; for options computed at runtime use 'autocomplete_dynamic'.",
+        "params": [
+            {"name": "filter", "type": "string", "required": false, "description": "How typed text is matched: 'prefix' (option starts with the text) or 'substring' (option contains the text)."}
+        ],
+        "examples": [
+            "<component><name>autocomplete</name><property key=\"filter\">substring</property></component>"
+        ]
+    },
+    "enumeration-autocomplete_dynamic": {
+        "names": ["autocomplete_dynamic"],
+        "fieldTypes": ["enumeration_map", "enumeration"],
+        "description": "Autocomplete single choice whose options are loaded dynamically, typically by a get event action that changes the field's options.",
+        "whenToUse": "Use when the list of options depends on data and is computed in an action (for example the list of cases found by findCases) rather than listed statically in the process. Fill the options in a 'get' event with change <field> options { ... }.",
+        "params": [],
+        "examples": [
+            "<component><name>autocomplete_dynamic</name></component>"
+        ]
+    },
+    "enumeration-list": {
+        "names": ["list"],
+        "fieldTypes": ["enumeration", "enumeration_map"],
+        "description": "Single choice rendered as a list of radio buttons.",
+        "whenToUse": "Use for a short enumeration (about 2 to 6 choices) where all choices should be visible at once.",
+        "params": [],
+        "examples": [
+            "<component><name>list</name></component>"
+        ]
+    },
+    "enumeration-stepper": {
+        "names": ["stepper"],
+        "fieldTypes": ["enumeration", "enumeration_map"],
+        "description": "Single choice rendered as a stepper where each choice is one step.",
+        "whenToUse": "Use to show progress through an ordered sequence of states, for example the phases of an approval. Keep the choices in the order of the steps.",
+        "params": [
+            {"name": "arrowStepper", "type": "boolean", "required": false, "description": "Value 'true' renders the steps as arrows instead of circles."}
+        ],
+        "examples": [
+            "<component><name>stepper</name><property key=\"arrowStepper\">true</property></component>"
+        ]
+    },
+    "enumeration-icon": {
+        "names": ["icon"],
+        "fieldTypes": ["enumeration", "enumeration_map"],
+        "description": "Single choice rendered as a row or column of icons. Each choice is shown as the icon assigned to its key.",
+        "whenToUse": "Use for choices that read better as icons (rating, status, direction). Define the icons in <option_icons> inside <properties>, one <icon key=...> per choice key.",
+        "params": [
+            {"name": "horizontal", "type": "boolean", "required": false, "description": "Value 'true' lays the icons out in a row instead of a column."},
+            {"name": "arrow", "type": "boolean", "required": false, "description": "Value 'true' shows arrows between the icons."},
+            {"name": "divider", "type": "boolean", "required": false, "description": "Value 'true' shows dividers between the icons."}
+        ],
+        "examples": [
+            "<component><name>icon</name><properties><property key=\"horizontal\">true</property><option_icons><icon key=\"low\">sentiment_satisfied</icon><icon key=\"high\">sentiment_dissatisfied</icon></option_icons></properties></component>"
+        ]
+    },
+    "enumeration-caseref": {
+        "names": ["caseref"],
+        "fieldTypes": ["enumeration", "enumeration_map"],
+        "description": "Single choice among the cases referenced by a case ref field, shown in a case view.",
+        "whenToUse": "Use when the user must pick one case, for example an invoice from the cases of another process. The set of cases is defined with allowedNets, or with filter and filterQuery.",
+        "params": [
+            {"name": "allowedNets", "type": "string", "required": false, "description": "Comma separated process identifiers whose cases are offered."},
+            {"name": "filter", "type": "boolean", "required": false, "description": "Value 'true' makes the component use filterQuery."},
+            {"name": "filterQuery", "type": "json", "required": false, "description": "Case search request body as JSON string. Used only when filter is 'true'. Invalid JSON is ignored with a console warning."},
+            {"name": "headers", "type": "string", "required": false, "description": "Comma separated ids of the data fields shown as columns."},
+            {"name": "clickable", "type": "boolean", "required": false, "description": "Whether rows can be clicked. Defaults to true; 'false' disables it."},
+            {"name": "createCase", "type": "boolean", "required": false, "description": "Value 'true' shows a control for creating a new case."},
+            {"name": "search", "type": "boolean", "required": false, "description": "Value 'true' shows a search box."},
+            {"name": "singleTask", "type": "boolean", "required": false, "description": "Value 'true' opens a single task of the clicked case. Defaults to false."},
+            {"name": "singleTaskQuery", "type": "json", "required": false, "description": "Task query selecting which task to open when singleTask is true."}
+        ],
+        "examples": [
+            "<component><name>caseref</name><property key=\"allowedNets\">invoice</property><property key=\"headers\">number,customer</property></component>"
+        ]
+    },
+    "multichoice-list": {
+        "names": ["list"],
+        "fieldTypes": ["multichoice", "multichoice_map"],
+        "description": "Multiple choice rendered as a list of checkboxes.",
+        "whenToUse": "Use for a short multichoice where all choices should be visible at once.",
+        "params": [],
+        "examples": [
+            "<component><name>list</name></component>"
+        ]
+    },
+    "multichoice-autocomplete": {
+        "names": ["autocomplete"],
+        "fieldTypes": ["multichoice", "multichoice_map"],
+        "description": "Multiple choice rendered as a text input with a filtered list of choices; selected values are shown as chips.",
+        "whenToUse": "Use for a multichoice with many choices.",
+        "params": [
+            {"name": "filter", "type": "string", "required": false, "description": "How typed text is matched: 'prefix' or 'substring'."}
+        ],
+        "examples": [
+            "<component><name>autocomplete</name><property key=\"filter\">prefix</property></component>"
+        ]
+    },
+    "multichoice-caseref": {
+        "names": ["caseref"],
+        "fieldTypes": ["multichoice", "multichoice_map"],
+        "description": "Multiple choice among the cases referenced by a case ref field, shown in a case view.",
+        "whenToUse": "Use when the user must pick several cases. Configuration is the same as for enumeration caseref.",
+        "params": [
+            {"name": "allowedNets", "type": "string", "required": false, "description": "Comma separated process identifiers whose cases are offered."},
+            {"name": "filter", "type": "boolean", "required": false, "description": "Value 'true' makes the component use filterQuery."},
+            {"name": "filterQuery", "type": "json", "required": false, "description": "Case search request body as JSON string. Used only when filter is 'true'."},
+            {"name": "headers", "type": "string", "required": false, "description": "Comma separated ids of the data fields shown as columns."},
+            {"name": "clickable", "type": "boolean", "required": false, "description": "Whether rows can be clicked. Defaults to true."},
+            {"name": "createCase", "type": "boolean", "required": false, "description": "Value 'true' shows a control for creating a new case."},
+            {"name": "search", "type": "boolean", "required": false, "description": "Value 'true' shows a search box."},
+            {"name": "singleTask", "type": "boolean", "required": false, "description": "Value 'true' opens a single task of the clicked case. Defaults to false."},
+            {"name": "singleTaskQuery", "type": "json", "required": false, "description": "Task query selecting which task to open when singleTask is true."}
+        ],
+        "examples": [
+            "<component><name>caseref</name><property key=\"allowedNets\">order</property></component>"
+        ]
+    },
+    "number-currency": {
+        "names": ["currency"],
+        "fieldTypes": ["number"],
+        "description": "Number formatted as a currency amount with a currency symbol.",
+        "whenToUse": "Use for monetary amounts. Set all three properties: code, fractionSize and locale. Do not use for plain decimals; use 'decimal'.",
+        "params": [
+            {"name": "code", "type": "string", "required": true, "description": "ISO 4217 currency code, for example EUR. The symbol is derived from it."},
+            {"name": "fractionSize", "type": "number", "required": true, "description": "Number of decimal places, shown as both minimum and maximum."},
+            {"name": "locale", "type": "string", "required": true, "description": "Locale used for formatting, for example sk or en-US."}
+        ],
+        "examples": [
+            "<component><name>currency</name><property key=\"code\">EUR</property><property key=\"fractionSize\">2</property><property key=\"locale\">sk</property></component>"
+        ]
+    },
+    "number-decimal": {
+        "names": ["decimal"],
+        "fieldTypes": ["number"],
+        "description": "Number formatted with a fixed range of integer and fraction digits.",
+        "whenToUse": "Use when the displayed precision matters (percentages, measurements) and no currency symbol is wanted.",
+        "params": [
+            {"name": "digitsInfo", "type": "string", "required": true, "description": "Angular DecimalPipe format '{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}', for example 1.2-2."},
+            {"name": "locale", "type": "string", "required": false, "description": "Locale used for formatting, for example sk."}
+        ],
+        "examples": [
+            "<component><name>decimal</name><property key=\"digitsInfo\">1.2-2</property><property key=\"locale\">sk</property></component>"
+        ]
+    },
+    "text-textarea": {
+        "names": ["textarea"],
+        "fieldTypes": ["text"],
+        "description": "Multi-line plain text input.",
+        "whenToUse": "Use for free text longer than one line (descriptions, comments, notes). It is the most common component in Petriflow processes.",
+        "params": [],
+        "examples": [
+            "<component><name>textarea</name></component>"
+        ]
+    },
+    "text-richtextarea": {
+        "names": ["richtextarea"],
+        "fieldTypes": ["text"],
+        "description": "Markdown editor (EasyMDE). The value is stored as Markdown text and rendered as formatted Markdown when the field is not editable.",
+        "whenToUse": "Use when the user writes formatted text in Markdown syntax (headings, lists, links). For a WYSIWYG editor that stores HTML use 'htmltextarea'.",
+        "params": [],
+        "examples": [
+            "<component><name>richtextarea</name></component>"
+        ]
+    },
+    "text-htmltextarea": {
+        "names": ["htmltextarea"],
+        "fieldTypes": ["text"],
+        "description": "WYSIWYG HTML editor (Quill) with a toolbar for bold, italic, lists, headings, code blocks and similar. The value is stored as HTML and shown formatted when the field is not editable.",
+        "whenToUse": "Use for formatted text edited visually, and for read-only formatted output such as messages or reports set by an action as HTML. For Markdown input use 'richtextarea'.",
+        "params": [],
+        "examples": [
+            "<component><name>htmltextarea</name></component>"
+        ]
+    },
+    "text-password": {
+        "names": ["password"],
+        "fieldTypes": ["text"],
+        "description": "Text input that masks the typed characters. The frontend also treats the value specially when sending it to the engine.",
+        "whenToUse": "Use for passwords and similar secrets entered by the user.",
+        "params": [],
+        "examples": [
+            "<component><name>password</name></component>"
+        ]
+    },
+    "text-signature": {
+        "names": ["signature"],
+        "fieldTypes": ["text"],
+        "description": "Signature pad where the user draws a signature; the value is stored in the text field.",
+        "whenToUse": "Use for handwritten signature capture in forms and contracts.",
+        "params": [],
+        "examples": [
+            "<component><name>signature</name></component>"
+        ]
+    },
+    "text-dashboard_line_chart": {
+        "names": ["dashboard_line_chart"],
+        "fieldTypes": ["text"],
+        "description": "Line chart card. The chart is configured by the field value, not by properties. While the field is editable a plain text area is shown, when it is not editable the chart is shown.",
+        "whenToUse": "Use in dashboards to plot an aggregation over cases or tasks. Set the field value to a JSON string: {\"query\": ..., \"title\": ..., \"xAxisLabel\": ..., \"yAxisLabel\": ..., \"resourceType\": ...}. resourceType defaults to CASE.",
+        "params": [],
+        "examples": [
+            "<component><name>dashboard_line_chart</name></component>"
+        ]
+    },
+    "text-dashboard_bar_chart": {
+        "names": ["dashboard_bar_chart"],
+        "fieldTypes": ["text"],
+        "description": "Bar chart card. Configured by the field value (JSON string), same format as the line chart.",
+        "whenToUse": "Use in dashboards to compare counts by category. Field value: {\"query\": ..., \"title\": ..., \"xAxisLabel\": ..., \"yAxisLabel\": ..., \"resourceType\": ...}.",
+        "params": [],
+        "examples": [
+            "<component><name>dashboard_bar_chart</name></component>"
+        ]
+    },
+    "text-dashboard_pie_chart": {
+        "names": ["dashboard_pie_chart"],
+        "fieldTypes": ["text"],
+        "description": "Pie chart card. Configured by the field value (JSON string).",
+        "whenToUse": "Use in dashboards to show shares of a whole. Field value: {\"query\": ..., \"title\": ..., \"resourceType\": ...}; no axis labels.",
+        "params": [],
+        "examples": [
+            "<component><name>dashboard_pie_chart</name></component>"
+        ]
+    },
+    "text-dashboard_iframe": {
+        "names": ["dashboard_iframe"],
+        "fieldTypes": ["text"],
+        "description": "Embeds an external page in an iframe card. The field value is the URL.",
+        "whenToUse": "Use in dashboards to embed an external page or report. Set the field value to the URL.",
+        "params": [],
+        "examples": [
+            "<component><name>dashboard_iframe</name></component>"
+        ]
+    },
+    "text-dashboard_portal": {
+        "names": ["dashboard_portal"],
+        "fieldTypes": ["text"],
+        "description": "Renders a registered frontend component as a dashboard card. The field value is the name of that component, for example 'filter-tab-view'.",
+        "whenToUse": "Use in dashboards to place a custom frontend component registered in the application.",
+        "params": [],
+        "examples": [
+            "<component><name>dashboard_portal</name></component>"
+        ]
+    },
+    "file-default": {
+        "names": ["default"],
+        "fieldTypes": ["file"],
+        "description": "Standard file upload field. Size and type limits are set through properties.",
+        "whenToUse": "Use for uploading a single file. Set maxSize and allowTypes to restrict uploads.",
+        "params": [
+            {"name": "maxSize", "type": "number", "required": false, "description": "Maximum file size in bytes. The value is passed to the field unchanged."},
+            {"name": "allowTypes", "type": "string", "required": false, "description": "Comma separated allowed MIME types or extensions."},
+            {"name": "maxSizeMessage", "type": "string", "required": false, "description": "Message (or translation key) shown when the file is larger than maxSize."}
+        ],
+        "examples": [
+            "<component><name>default</name><property key=\"maxSize\">5242880</property><property key=\"allowTypes\">image/png,image/jpeg</property></component>"
+        ]
+    },
+    "file-preview": {
+        "names": ["preview", "preview_button"],
+        "fieldTypes": ["file"],
+        "description": "File field that displays a preview of the uploaded file. 'preview_button' shows the preview via a button.",
+        "whenToUse": "Use for images and documents that should be visible in the form after upload. The border properties style the preview frame.",
+        "params": [
+            {"name": "borderEnabled", "type": "boolean", "required": false, "description": "Value 'true' draws a border around the preview. Default false."},
+            {"name": "borderWidth", "type": "number", "required": false, "description": "Border width in px. Default 0."},
+            {"name": "borderStyle", "type": "string", "required": false, "description": "CSS border style, for example solid or none. Default none."},
+            {"name": "borderColor", "type": "string", "required": false, "description": "CSS border color. Default black."},
+            {"name": "borderLGBTQ", "type": "boolean", "required": false, "description": "Value 'true' uses a rainbow border."},
+            {"name": "maxSize", "type": "number", "required": false, "description": "Maximum file size."},
+            {"name": "allowTypes", "type": "string", "required": false, "description": "Comma separated allowed MIME types or extensions."},
+            {"name": "maxSizeMessage", "type": "string", "required": false, "description": "Message or translation key shown when the file is too large."}
+        ],
+        "examples": [
+            "<component><name>preview</name><property key=\"borderEnabled\">true</property><property key=\"borderWidth\">1</property><property key=\"borderStyle\">solid</property><property key=\"borderColor\">black</property></component>"
+        ]
+    },
+    "file-list-default": {
+        "names": ["default"],
+        "fieldTypes": ["fileList"],
+        "description": "Standard multiple file upload field.",
+        "whenToUse": "Use for uploading several files at once. Limits are the same as for the file field.",
+        "params": [
+            {"name": "maxSize", "type": "number", "required": false, "description": "Maximum size of one file."},
+            {"name": "allowTypes", "type": "string", "required": false, "description": "Comma separated allowed MIME types or extensions."},
+            {"name": "maxSizeMessage", "type": "string", "required": false, "description": "Message or translation key shown when a file is too large."}
+        ],
+        "examples": [
+            "<component><name>default</name><property key=\"allowTypes\">application/pdf</property></component>"
+        ]
+    },
+    "filter-filter-tab-view": {
+        "names": ["filter-tab-view"],
+        "fieldTypes": ["filter", "caseFilter", "taskFilter", "processFilter"],
+        "description": "Filter field that is shown as a tabbed view over the filter's results (used by menu item and dashboard processes).",
+        "whenToUse": "Use only in processes that build navigation or dashboards from filters, as the engine's built-in menu item and filter processes do.",
+        "params": [],
+        "examples": [
+            "<component><name>filter-tab-view</name></component>"
+        ]
+    },
+    "i18n-divider": {
+        "names": ["divider"],
+        "fieldTypes": ["i18n"],
+        "description": "Horizontal divider with a translated title, used as a section heading in a form.",
+        "whenToUse": "Use to separate sections of a form. It is read-only and holds no user data.",
+        "params": [
+            {"name": "dividerColor", "type": "string", "required": false, "description": "CSS color of the divider line. Defaults to the theme primary color."},
+            {"name": "dividerLGBTQ", "type": "boolean", "required": false, "description": "Value 'true' draws the divider line in rainbow colors."},
+            {"name": "fontSize", "type": "number", "required": false, "description": "Title font size in px."}
+        ],
+        "examples": [
+            "<component><name>divider</name><property key=\"dividerColor\">#1565c0</property><property key=\"fontSize\">18</property></component>"
+        ]
+    },
+    "i18n-text": {
+        "names": ["text"],
+        "fieldTypes": ["i18n"],
+        "description": "Translated text. By default a read-only input is rendered; with plainText=true the text is shown as plain text that can be styled.",
+        "whenToUse": "Use for explanatory text or notices in a form that must be translated. Set plainText to 'true' when you want the text to look like a paragraph and use the styling properties.",
+        "params": [
+            {"name": "plainText", "type": "boolean", "required": false, "description": "Value 'true' renders the text as plain text instead of a disabled input. The styling properties below apply in this mode."},
+            {"name": "boldText", "type": "boolean", "required": false, "description": "Value 'true' renders the text in bold."},
+            {"name": "textColor", "type": "string", "required": false, "description": "CSS color of the text."},
+            {"name": "fontSize", "type": "number", "required": false, "description": "Font size in px."}
+        ],
+        "examples": [
+            "<component><name>text</name><property key=\"plainText\">true</property><property key=\"boldText\">true</property><property key=\"textColor\">red</property></component>"
+        ]
+    },
+    "task-ref-task-list": {
+        "names": ["task-list"],
+        "fieldTypes": ["taskRef"],
+        "description": "Task ref field shown as a list of the referenced tasks, which can be opened and executed inline.",
+        "whenToUse": "Use to embed tasks of other cases in the current form, for example the tasks of child cases. By default the tasks listed in the field value are shown; with filter and filterQuery the tasks come from a query.",
+        "params": [
+            {"name": "allowedNets", "type": "string", "required": false, "description": "Comma separated process identifiers whose tasks are allowed."},
+            {"name": "filter", "type": "boolean", "required": false, "description": "Value 'true' makes the component use filterQuery instead of the field value."},
+            {"name": "filterQuery", "type": "json", "required": false, "description": "Task search request body as JSON string. Used only when filter is 'true'."},
+            {"name": "headers", "type": "string", "required": false, "description": "Comma separated ids of the data fields shown as columns."},
+            {"name": "clickable", "type": "boolean", "required": false, "description": "Whether tasks can be opened by clicking. Defaults to true."}
+        ],
+        "examples": [
+            "<component><name>task-list</name><property key=\"filter\">true</property><property key=\"filterQuery\">{\"transitionId\": \"t1\"}</property></component>"
+        ]
+    },
+    "task-ref-dashboard": {
+        "names": ["dashboard"],
+        "fieldTypes": ["taskRef"],
+        "description": "Task ref field rendered as a grid dashboard whose tiles are tasks of 'dashboard_tile' cases.",
+        "whenToUse": "Use for dashboards. The same process needs number fields with ids 'rows' and 'cols' (grid size); each tile is a case of the 'dashboard_tile' process with x, y, rows, cols and parent_dashboard_id. Without rows and cols the dashboard is not rendered.",
+        "params": [],
+        "examples": [
+            "<component><name>dashboard</name></component>"
+        ]
+    },
+    "case-ref-default": {
+        "names": ["default"],
+        "fieldTypes": ["caseRef"],
+        "description": "Case ref field shown as a case view listing the referenced cases.",
+        "whenToUse": "Use to show cases related to the current one. Configure the source of cases with allowedNets, or with filter and filterQuery.",
+        "params": [
+            {"name": "allowedNets", "type": "string", "required": false, "description": "Comma separated process identifiers whose cases are allowed."},
+            {"name": "filter", "type": "boolean", "required": false, "description": "Value 'true' makes the component use filterQuery."},
+            {"name": "filterQuery", "type": "json", "required": false, "description": "Case search request body as JSON string. Used only when filter is 'true'."},
+            {"name": "headers", "type": "string", "required": false, "description": "Comma separated ids of the data fields shown as columns."},
+            {"name": "clickable", "type": "boolean", "required": false, "description": "Whether rows can be clicked. Defaults to true."},
+            {"name": "createCase", "type": "boolean", "required": false, "description": "Value 'true' shows a control for creating a new case."},
+            {"name": "search", "type": "boolean", "required": false, "description": "Value 'true' shows a search box."},
+            {"name": "singleTask", "type": "boolean", "required": false, "description": "Value 'true' opens a single task of the clicked case. Defaults to false."},
+            {"name": "singleTaskQuery", "type": "json", "required": false, "description": "Task query selecting which task to open when singleTask is true."}
+        ],
+        "examples": [
+            "<component><name>default</name><property key=\"allowedNets\">invoice</property><property key=\"createCase\">true</property></component>"
+        ]
+    },
+    "string-collection-default": {
+        "names": ["default"],
+        "fieldTypes": ["stringCollection"],
+        "description": "Chip input for a list of strings.",
+        "whenToUse": "Use for lists of free strings such as tags or e-mail addresses. Enter always separates values; comma and semicolon can be added as separators.",
+        "params": [
+            {"name": "comma", "type": "boolean", "required": false, "description": "Value 'true' also splits values on comma."},
+            {"name": "semicolon", "type": "boolean", "required": false, "description": "Value 'true' also splits values on semicolon."}
+        ],
+        "examples": [
+            "<component><name>default</name><property key=\"comma\">true</property><property key=\"semicolon\">true</property></component>"
+        ]
+    }
+}

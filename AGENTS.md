@@ -50,6 +50,10 @@ Return convention:
   the version list and latest stable version, and synchronizes missing published releases.
 - Release assets are named `petriflow-vX.Y.Z.zip`. The archive root contains `petriflow.schema.xsd`, `overview.md`,
   `actions-definitions.json`, `elements/`, and `examples/`.
+- `components-definitions.json` (field components, keyed by definition id with `names`, `fieldTypes`, `whenToUse`,
+  `params`) currently exists only in `src/petriflow/snapshot/`. It is hand-written from `netgrif/components` v7.0.3
+  (`data-fields.module.ts` registry plus `component.properties` reads), is not required by release validation, and
+  `list_components`/`get_component` fail with "not found for version" on releases that lack it.
 - `PETRIFLOW_MODE` defaults to `REMOTE`. Synchronization runs before listening in REMOTE and can be retried through
   `POST /admin/petriflow/sync`; LOCAL returns HTTP 409 from that endpoint. Deployment infrastructure is responsible for
   endpoint authentication.

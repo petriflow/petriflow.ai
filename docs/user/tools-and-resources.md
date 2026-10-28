@@ -14,6 +14,8 @@ content; raw schema, overview, element, and example tools return text.
 | `get-element`      | `version`, `name`    | Element XSD as text.                                                   |
 | `list-actions`     | `version`            | Action names, signatures, and descriptions.                            |
 | `get-action`       | `version`, `name`    | Full action definition.                                                |
+| `list-components`  | `version`            | Component ids, `<name>` values, field types, description, when to use. |
+| `get-component`    | `version`, `name`    | Full component definition with properties and examples.                |
 | `list-examples`    | `version`            | Example names and descriptions taken from their XML titles.            |
 | `get-example`      | `version`, `example` | Example process XML as text.                                           |
 | `validate-process` | `version`, `xml`     | `{ valid, issues }` after XML, XSD, and semantic checks.               |
@@ -36,6 +38,8 @@ resources are JSON text; XSD and XML resources are returned as text with an appr
 | `petriflow://versions/{version}/elements/{name}`    | Element XSD.            |
 | `petriflow://versions/{version}/actions`            | Action list.            |
 | `petriflow://versions/{version}/actions/{name}`     | Action definition JSON. |
+| `petriflow://versions/{version}/components`         | Component list.         |
+| `petriflow://versions/{version}/components/{name}`  | Component definition JSON. |
 | `petriflow://versions/{version}/examples`           | Example list.           |
 | `petriflow://versions/{version}/examples/{example}` | Example process XML.    |
 

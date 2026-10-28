@@ -28,7 +28,7 @@ without contacting GitHub. The LOCAL snapshot is stored in `src/petriflow/snapsh
 
 1. Call `list-versions` and choose a version (or `latest`).
 2. Inspect the language with `get-overview` and `get-schema`.
-3. Use `list-elements` / `get-element`, `list-actions` / `get-action`, and `list-examples` / `get-example` as needed.
+3. Use `list-elements` / `get-element`, `list-actions` / `get-action`, `list-components` / `get-component`, and `list-examples` / `get-example` as needed.
 4. Validate a process with `validate-process`, or compile-check a Groovy action with `validate-action`.
 
 See [Tools and resources](tools-and-resources.md) for inputs and outputs.

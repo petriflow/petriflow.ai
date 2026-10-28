@@ -305,6 +305,8 @@ routes the token through variable arcs.
 - **Schema** — the complete XSD; the authority for element names and order.
 - **Element definitions** — the XSD of individual elements (`transition`, `data`, `arc`, `role`, events, ...).
 - **Action definitions** — the action DSL and the available functions, with signatures and examples.
+- **Component definitions** — the field components selectable with `<component><name>` (textarea, currency, stepper, ...),
+  with when to use each one and its `<property>` configuration.
 - **Examples** — complete annotated applications, plus a catalogue of classic workflow patterns (sequence, parallel
   split, synchronization, exclusive choice, merge, loops, milestone, critical section, ...).
 - **Validator** — checks a process document against the schema and semantic rules, including that actions compile.

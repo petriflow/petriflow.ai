@@ -23,6 +23,15 @@ function withData(run: (service: PetriflowDataService) => void): void {
         },
         chain: {dslChain: {then: {signature: "then()", description: "Chain"}}},
       }),
+      "components-definitions.json": JSON.stringify({
+        "number-currency": {
+          names: ["currency"],
+          fieldTypes: ["number"],
+          description: "Currency",
+          whenToUse: "Money",
+          params: [{name: "code", type: "string", required: true, description: "Currency code"}],
+        },
+      }),
       "elements/place.xsd": "<place />",
       "elements/role.xsd": "<role />",
       "examples/sample/manifest.json": JSON.stringify({
@@ -59,6 +68,17 @@ test("reads schema, overview, elements, actions, and examples from release stora
     expect(service.getAction("1.2.3", "send")).toEqual({
       name: "send", signature: "send()", description: "Send",
     });
+    expect(service.listComponents("1.2.3")).toEqual([
+      {
+        name: "number-currency", names: ["currency"], fieldTypes: ["number"],
+        description: "Currency", whenToUse: "Money",
+      },
+    ]);
+    expect(service.getComponent("1.2.3", "number-currency")).toMatchObject({
+      name: "number-currency",
+      params: [{name: "code", type: "string", required: true, description: "Currency code"}],
+    });
+    expect(() => service.getComponent("1.2.3", "missing")).toThrow(/not found/i);
     expect(service.listExamples("1.2.3")).toEqual([
       {name: "sample-process", app: "sample", description: "Sample process"},
     ]);
