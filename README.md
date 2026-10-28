@@ -53,6 +53,8 @@ Current tools:
 | `get-overview`     | Show the Petriflow language overview                                                |
 | `list-actions`     | List available action functions                                                     |
 | `get-action`       | Get the definition of one action                                                    |
+| `list-components`  | List field components (`<component><name>`) with when to use each                   |
+| `get-component`    | Get the definition and configuration properties of one component                    |
 | `list-elements`    | List Petriflow elements                                                             |
 | `get-element`      | Get the XSD schema of one element                                                   |
 | `list-examples`    | List example processes                                                              |
