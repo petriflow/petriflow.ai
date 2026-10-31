@@ -81,7 +81,7 @@ REMOTE mode and returns HTTP 409 in LOCAL mode. Installed releases are immutable
 `validate-process` runs a pipeline in `src/ts/services/validation.service.ts`:
 
 1. XML well-formedness
-2. XSD schema validation (via the native `libxmljs2` module)
+2. XSD schema validation (via the native `libxmljs5` module)
 3. registered semantic rules
 
 Semantic rules live in `src/ts/services/rules/*.rule.ts` and are registered in `src/ts/services/rules/index.ts`. Each
@@ -95,14 +95,47 @@ unused functions.
 `validate-action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See
 `src/groovy/README.md` for details.
 
-> `libxmljs2` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`). The
+> `libxmljs5` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`). The
 > `action-validation` rule additionally requires a JVM + Groovy at runtime.
+
+### Configuring validation rules and tools
+
+All semantic validation rules and MCP tools are enabled by default. Disable selected features at server startup with
+comma-separated names:
+
+```bash
+PETRIFLOW_DISABLED_RULES=action-validation
+PETRIFLOW_DISABLED_TOOLS=get_overview,validate_action
+```
+
+Rule names match their rule `name`; tool names match XMCP `metadata.name`. Empty or unset variables enable everything.
+Unknown names produce startup warnings and are ignored. Restart the server after changing either variable. XML
+well-formedness and XSD validation remain enabled regardless of the semantic-rule flags.
 
 ## Building for Production
 
 ```bash
 pnpm build
 ```
+
+## GitHub Actions releases
+
+Pull requests and pushes to `main` run typechecking, tests, and a production build. To publish a release, make sure
+`package.json` contains the intended version and push the matching `vX.Y.Z` tag (for example, `v1.0.0`). The release
+workflow rejects tags that do not match the package version, smoke-tests the Docker image, publishes it to Docker Hub,
+and creates a GitHub Release with generated notes and a runtime bundle. Stable versions also update the Docker `latest`
+tag; prereleases do not.
+
+Configure these repository settings before the first release:
+
+- Repository variable `DOCKERHUB_IMAGE`, set to `netgrif/petriflow-mcp` (or the desired Docker Hub image path).
+- Repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` with credentials that can publish to that image.
+- A branch protection rule requiring `CI / Typecheck, test, and build` on `main`.
+- A tag ruleset for `v*` that limits release-tag creation to trusted maintainers.
+
+The attached `.tar.gz` includes `dist/` and production `node_modules`. It targets Node.js 26 on Alpine Linux (musl) and
+requires `libxml2`; action validation additionally requires Java 21 and Groovy 4.0.33. The Docker image is the
+recommended deployment artifact because it includes the runtime environment.
 
 ## Running the Server
 

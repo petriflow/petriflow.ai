@@ -1,4 +1,4 @@
-import type {Document} from "libxmljs2";
+import type {Document} from "libxmljs5";
 
 /**
  * Reads the trimmed text content of a node's first child element with the given

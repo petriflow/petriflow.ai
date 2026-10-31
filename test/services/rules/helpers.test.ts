@@ -1,4 +1,4 @@
-import {parseXml} from "libxmljs2";
+import {parseXml} from "libxmljs5";
 import {expect, test} from "vitest";
 import {
   childText,

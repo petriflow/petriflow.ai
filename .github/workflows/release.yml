@@ -1,0 +1,171 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Verify and publish release
+    runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.9.1
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install native build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential libxml2-dev python3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Validate release tag and Docker Hub image
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(node -e 'const version = require("./package.json").version; if (require("semver").valid(version) !== version || version.includes("+")) { console.error(`Invalid Docker-compatible package.json version: ${version}`); process.exit(1); } process.stdout.write(version);')"
+
+          if [[ "$GITHUB_REF_NAME" != "v${VERSION}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version ${VERSION}." >&2
+            exit 1
+          fi
+
+          if [[ -z "${DOCKERHUB_IMAGE}" ]]; then
+            echo "Set the DOCKERHUB_IMAGE repository variable (for example, netgrif/petriflow-mcp)." >&2
+            exit 1
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        env:
+          IMAGE_TAG: ${{ steps.release.outputs.version }}
+        run: docker build --pull --tag "${DOCKERHUB_IMAGE}:${IMAGE_TAG}" .
+
+      - name: Smoke-test Docker image
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          CONTAINER_NAME=petriflow-release-smoke
+          cleanup() {
+            docker rm --force "$CONTAINER_NAME" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker run --detach --name "$CONTAINER_NAME" \
+            --publish 127.0.0.1:3000:3000 \
+            --env PETRIFLOW_MODE=LOCAL \
+            "${DOCKERHUB_IMAGE}:${IMAGE_TAG}"
+
+          healthy=false
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/health; then
+              healthy=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [[ "$healthy" != true ]]; then
+            docker logs "$CONTAINER_NAME"
+            echo "Container did not become healthy." >&2
+            exit 1
+          fi
+
+      - name: Package application runtime bundle
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ steps.release.outputs.version }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          BUNDLE_DIR="${RUNNER_TEMP}/petriflow-mcp-bundle"
+          BUNDLE_FILE="petriflow-mcp-v${VERSION}-linux-alpine-node26.tar.gz"
+          CONTAINER_ID="$(docker create "${DOCKERHUB_IMAGE}:${IMAGE_TAG}")"
+          trap 'docker rm "$CONTAINER_ID" >/dev/null' EXIT
+
+          mkdir -p "$BUNDLE_DIR"
+          docker cp "${CONTAINER_ID}:/app/dist" "$BUNDLE_DIR/"
+          docker cp "${CONTAINER_ID}:/app/node_modules" "$BUNDLE_DIR/"
+          cp package.json LICENSE.txt "$BUNDLE_DIR/"
+          cat > "$BUNDLE_DIR/README.txt" <<'BUNDLE_README'
+          Petriflow MCP application runtime bundle
+
+          This bundle contains the built application and production Node.js dependencies.
+          It targets Node.js 26 on Alpine Linux (musl), with libxml2 available at runtime.
+          Action validation additionally requires Java 21 and Groovy 4.0.33 on PATH.
+
+          Run from this directory with:
+            node --enable-source-maps dist/server.cjs
+
+          Configure HOST, PORT, and PETRIFLOW_MODE as needed. LOCAL mode uses the bundled
+          snapshot; REMOTE mode synchronizes Petriflow releases from GitHub.
+          BUNDLE_README
+
+          tar --create --gzip --file "$BUNDLE_FILE" --directory "$BUNDLE_DIR" .
+          echo "bundle_file=${BUNDLE_FILE}" >> "$GITHUB_OUTPUT"
+        id: bundle
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish Docker image
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          docker push "${DOCKERHUB_IMAGE}:${IMAGE_TAG}"
+
+          if [[ "$IMAGE_TAG" != *-* ]]; then
+            docker tag "${DOCKERHUB_IMAGE}:${IMAGE_TAG}" "${DOCKERHUB_IMAGE}:latest"
+            docker push "${DOCKERHUB_IMAGE}:latest"
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          BUNDLE_FILE: ${{ steps.bundle.outputs.bundle_file }}
+        run: gh release create "$RELEASE_TAG" "$BUNDLE_FILE" --verify-tag --generate-notes

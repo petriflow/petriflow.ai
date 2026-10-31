@@ -1,6 +1,7 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
 import petriflowDataService from "../services/petriflow-data.service";
+import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const schema = {
   version: z.string().describe("Version of the schema"),
@@ -30,7 +31,7 @@ export const outputSchema = {
   action: actionDefinitionSchema
 };
 
-export const metadata = {
+export const metadata = withToolFeatureFlag({
   name: "get_action",
   description: "Get complete definition of an action",
   annotation: {
@@ -40,7 +41,7 @@ export const metadata = {
     idempotentHint: true,
     openWorldHint: false
   }
-};
+});
 
 export default async function getAction({name, version}: InferSchema<typeof schema>) {
   const action = petriflowDataService.getAction(version, name);

@@ -2,7 +2,7 @@
 
 ## Setup and commands
 
-Use Node.js 22.12.0 or newer and pnpm.
+Use Node.js 26.x and pnpm.
 
 ```bash
 pnpm install
@@ -28,10 +28,10 @@ and add it to `docs/_sidebar.md`.
 - Keep GitHub tests offline by injecting a fetcher and using ZIP fixtures.
 - Use temporary filesystem locations for storage/cache tests.
 - Use fake child processes for Groovy daemon protocol tests; the unit suite must not require a Groovy installation.
-- Test XML rules directly with small `libxmljs2` documents. The `action-validation` rule should mock the daemon service
+- Test XML rules directly with small `libxmljs5` documents. The `action-validation` rule should mock the daemon service
   while testing rule decisions.
 
 ## Native/runtime requirements
 
-`libxmljs2` requires native build tools and libxml2 headers. The Groovy validation path additionally requires JVM 21 and
+`libxmljs5` requires native build tools and libxml2 headers. The Groovy validation path additionally requires JVM 21 and
 Groovy 4.0.x. See the [administrator installation guide](../admin/installation-and-config.md).

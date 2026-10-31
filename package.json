@@ -1,6 +1,6 @@
 {
   "name": "petriflow.ai",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server for Petriflow, exposing Petriflow tools, prompts, and resources to MCP-compatible AI clients.",
   "private": true,
   "license": "Apache-2.0",
@@ -14,7 +14,7 @@
     "url": "https://github.com/netgrif/petriflow.ai/issues"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": "^26.0.0"
   },
   "scripts": {
     "build": "xmcp build && node build.mjs",
@@ -28,7 +28,7 @@
     "@xmldom/xmldom": "^0.9.12",
     "fastify": "^5.12.5",
     "fflate": "^0.8.3",
-    "libxmljs2": "^0.37.0",
+    "libxmljs5": "^1.4.0",
     "pino": "^10.3.1",
     "semver": "^7.8.5",
     "zod": "^4.0.0"

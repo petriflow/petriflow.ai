@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
-# Pin the same Node/Alpine manifest for native-addon build and runtime.
-# Update this digest together with the Node patch version.
-ARG NODE_IMAGE=node:22.23.3-alpine3.24
+# Follow the Node 26 LTS patch line while keeping the Alpine release consistent.
+ARG NODE_IMAGE=node:26-alpine
 
 # Install runtime libraries once so both stages start with the same libxml2/JVM packages.
 FROM ${NODE_IMAGE} AS runtime-base
@@ -12,12 +11,12 @@ RUN apk add --no-cache ca-certificates libxml2 openjdk21
 # ---- build ----
 FROM runtime-base AS build
 
-# libxmljs2 is native: compile it against the same Node ABI and Alpine base used at runtime.
+# libxmljs5 is native: compile it against the same Node ABI and Alpine base used at runtime.
 RUN apk add --no-cache g++ libxml2-dev make python3
 
 RUN corepack enable
 
-# Include workspace config before install: it allows the libxmljs2 build script.
+# Include workspace config before install: it allows the libxmljs5 build script.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 

@@ -1,4 +1,4 @@
-import {parseXml} from "libxmljs2";
+import {parseXml} from "libxmljs5";
 import {beforeEach, expect, test, vi} from "vitest";
 import {actionValidationRule} from "../../../src/ts/services/rules/action-validation.rule";
 

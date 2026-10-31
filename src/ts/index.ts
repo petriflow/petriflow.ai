@@ -5,8 +5,9 @@ import path from "node:path";
 import {existsSync} from "node:fs";
 import cache from "./services/cache.service";
 import {setLogger} from "./services/logger.service";
+import {featureFlags, knownToolNames} from "./services/feature-flags.service";
 import validationService from "./services/validation.service";
-import {rules} from "./services/rules";
+import {getEnabledRules, rules} from "./services/rules";
 import releaseSyncService from "./services/release-sync.service";
 import petriflowSnapshotService from "./services/petriflow-snapshot.service";
 import petriflowVersionService from "./services/petriflow-version.service";
@@ -20,7 +21,16 @@ const app = Fastify({
   }
 });
 setLogger(app.log);
-validationService.registerRules(rules);
+
+const unknownDisabledFeatures = [
+  ...featureFlags.unknownRuleNames(rules.map(rule => rule.name)).map(name => `rule:${name}`),
+  ...featureFlags.unknownToolNames(knownToolNames).map(name => `tool:${name}`)
+];
+if (unknownDisabledFeatures.length > 0) {
+  app.log.warn({features: unknownDisabledFeatures}, "Ignoring unknown disabled feature names");
+}
+
+validationService.registerRules(getEnabledRules());
 const port = Number(process.env.PORT ?? 3000);
 const host = getServerHost();
 const petriflowMode = getPetriflowMode();

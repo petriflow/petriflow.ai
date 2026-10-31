@@ -12,7 +12,7 @@ MCP server for Petriflow, built on [xmcp](https://xmcp.dev) + Fastify. Tools are
 - `pnpm test` — run Vitest once (`vitest run`)
 - `pnpm start` — run the already-built server (`node dist/server.cjs`)
 
-Package manager is pnpm (Node >= 22.12.0). `pnpm-workspace.yaml` allows esbuild postinstall builds.
+Package manager is pnpm (Node 26.x). `pnpm-workspace.yaml` allows esbuild postinstall builds.
 
 ## Tests
 
@@ -90,6 +90,8 @@ Return convention:
 - `src/ts/services/petriflow-snapshot.service.ts` — validates and installs the checked-in snapshot in LOCAL mode.
 - `src/ts/services/petriflow-version.service.ts` — mode-selected version catalog for listing, latest resolution, and
   version validation.
+- `src/ts/services/feature-flags.service.ts` — parses startup disabled-name lists; rules use `name` and tools use XMCP
+  `metadata.name`.
 - `src/ts/services/petriflow-runtime.service.ts` — selects local snapshot initialization or remote synchronization
   before listening.
 - `src/ts/services/singleton-registry.service.ts` — registry on
@@ -105,7 +107,7 @@ Return convention:
 - `src/ts/services/schema.service.ts` — `getSchemaXsd(version)` delegates to `PetriflowDataService` (used by
   `get-schema` tool and `ValidationService`).
 - `src/ts/services/validation.service.ts` — `ValidationService` singleton (default export). `validate(xml, version)`
-  runs: well-formedness → XSD validation (`libxmljs2`) → registered semantic rules. Rules are registered at startup in
+  runs: well-formedness → XSD validation (`libxmljs5`) → registered semantic rules. Rules are registered at startup in
   `src/ts/index.ts`.
 - `src/ts/services/action-validation.service.ts` — action/function compilation through a persistent Groovy subprocess.
   Pure reference helpers can be tested directly; daemon tests should use a fake child process rather than require
@@ -126,35 +128,48 @@ Return convention:
 - Semantic rules live in `src/ts/services/rules/*.rule.ts`, each exporting a `ValidationRule`
   (`{ name, description, validate(doc, ctx) }`).
 - Register new rules in `src/ts/services/rules/index.ts` (`rules` array); they are wired into the service on startup.
+- `src/ts/index.ts` registers only rules enabled by the feature-flag service; XML parsing and XSD validation are not
+  feature-flagged.
 - `src/ts/services/rules/helpers.ts` has shared DOM/XPath helpers (`childText`, `findRootChildren`, `isJavaIdentifier`,
   `JAVA_RESERVED_WORDS`, `GROOVY_RESERVED_WORDS`, `parseInteger`).
-- `validate(doc, ctx)` receives a libxmljs2 `Document`; use `doc.find(xpath)` / element `.attr()` / `.text()`.
+- `validate(doc, ctx)` receives a libxmljs5 `Document`; use `doc.find(xpath)` / element `.attr()` / `.text()`.
 - `validate` may return a `Promise<ValidationIssue[]>` (the service `await`s every rule); `action-validation.rule.ts` is
   async (it drives the Groovy daemon).
 
-## Native module: libxmljs2 (non-obvious)
+## Native module: libxmljs5 (non-obvious)
 
-- XML/XSD validation uses `libxmljs2`, a **native addon** (not pure JS). It must NOT be bundled:
-  - `build.mjs` lists `external: ['libxmljs2']`.
-  - Locally it needs to be compiled — pnpm build is enabled via `allowBuilds.libxmljs2 = true` in `pnpm-workspace.yaml`
+- XML/XSD validation uses `libxmljs5`, a **native addon** (not pure JS). It must NOT be bundled:
+  - `build.mjs` lists `external: ['libxmljs5']`.
+  - Locally it needs to be compiled — pnpm build is enabled via `allowBuilds.libxmljs5 = true` in `pnpm-workspace.yaml`
     (and it needs `python3 make g++ libxml2-dev` to build from source; see `Dockerfile` build stage).
-- The `.node` binary is required at runtime and is loaded via `require("libxmljs2")`, so the runtime image must contain
+- The `.node` binary is required at runtime and is loaded via `require("libxmljs5")`, so the runtime image must contain
   `node_modules` (see `Dockerfile`).
+
+## Feature flags
+
+- `PETRIFLOW_DISABLED_RULES` and `PETRIFLOW_DISABLED_TOOLS` are comma-separated startup lists. Empty or unset lists
+  leave all features enabled; unknown names are warned about and ignored.
+- Every discovered tool's `metadata` must use `withToolFeatureFlag(...)`. When adding or renaming a tool, update
+  `knownToolNames` in `src/ts/services/feature-flags.service.ts` to keep unknown-name validation accurate.
 
 ## Docker
 
 - The Docker build uses Corepack/pnpm with `pnpm-lock.yaml` and `pnpm-workspace.yaml`; preserve `--frozen-lockfile` and
   copy the workspace config before install so native build permissions apply.
-- Builder and runtime share the digest-pinned Node 22.23.3/Alpine 3.24 image so `libxmljs2` is built for the runtime
-  ABI. Update the digest together with the tag.
+- Builder and runtime share the `node:26-alpine3.24` image so `libxmljs5` is built for the runtime ABI. The image tag
+  follows Node 26 patch releases while keeping the Alpine release line fixed.
 - Groovy 4.0.33 is downloaded from Apache and SHA-256 verified. Update its version and checksum together.
 - The application defaults to `HOST=127.0.0.1`; the container sets `HOST=0.0.0.0` for published ports.
 - Runtime writes `dist/cache.json` and `dist/storage`; the image makes `dist` writable by `node` and declares
   `/app/dist/storage` as a volume. Deployments should use a named volume there.
-- The Node base image and application lockfile are pinned, but `apk add` still resolves packages from Alpine
-  repositories at build time. For byte-for-byte image reproducibility, also pin/snapshot those OS packages; update them
-  regularly for security fixes.
+- The `node:26-alpine3.24` image tag follows Node 26 patch releases while keeping the Alpine line fixed, and the pnpm
+  lockfile pins the application dependency graph. `apk add` still resolves packages from Alpine repositories at build
+  time; for byte-for-byte image reproducibility, also pin/snapshot those OS packages and update them regularly for
+  security fixes.
 
 ## Notes
 
-- `.github/workflows/build.yml` is fully commented out (inactive).
+- `.github/workflows/ci.yml` runs typecheck, tests, and build for pull requests and pushes to `main`.
+- `.github/workflows/release.yml` validates `vX.Y.Z` tags against `package.json`, then publishes a GitHub Release and
+  Docker Hub image. Releases require the `DOCKERHUB_IMAGE` repository variable and the `DOCKERHUB_USERNAME` and
+  `DOCKERHUB_TOKEN` repository secrets.

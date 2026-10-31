@@ -1,6 +1,7 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
 import petriflowDataService from "../services/petriflow-data.service";
+import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const schema = {
   version: z.string().describe("Version of the schema"),
@@ -25,7 +26,7 @@ export const outputSchema = {
   }),
 };
 
-export const metadata = {
+export const metadata = withToolFeatureFlag({
   name: "get_component",
   description: "Get complete definition of a field component, including when to use it and its configuration properties",
   annotation: {
@@ -35,7 +36,7 @@ export const metadata = {
     idempotentHint: true,
     openWorldHint: false
   }
-};
+});
 
 export default async function getComponent({name, version}: InferSchema<typeof schema>) {
   const component = petriflowDataService.getComponent(version, name);

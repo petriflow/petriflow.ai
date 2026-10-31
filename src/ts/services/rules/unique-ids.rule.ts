@@ -4,7 +4,7 @@ import type {ValidationRule, ValidationIssue} from "../validation.service";
  * Verifies that every <transition> and <place> id is unique within
  * the document. Demonstrates how to add a semantic rule on top of schema validation.
  *
- * The `doc` argument is a libxmljs2 `Document`; use `doc.find(xpath)` to run
+ * The `doc` argument is a libxmljs5 `Document`; use `doc.find(xpath)` to run
  * XPath queries against the parsed process. Each `<id>` is read via `.text()`.
  */
 export const uniqueIdsRule: ValidationRule = {

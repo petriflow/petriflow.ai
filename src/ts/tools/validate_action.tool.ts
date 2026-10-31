@@ -2,7 +2,8 @@ import {z} from "zod";
 import {InferSchema} from "xmcp";
 import {getLogger} from "../services/logger.service";
 import actionValidationService from "../services/action-validation.service";
-/**
+import {withToolFeatureFlag} from "../services/feature-flags.service";
+
 export const schema = {
   definition: z.string().describe("The Petriflow action definition (Groovy code) to validate"),
 };
@@ -18,7 +19,7 @@ export const outputSchema = {
   })).describe("List of validation issues"),
 };
 
-export const metadata = {
+export const metadata = withToolFeatureFlag({
   name: "validate_action",
   description: "Validate a Petriflow action definition (Groovy code) by compiling it against the Petriflow DSL",
   annotation: {
@@ -28,7 +29,7 @@ export const metadata = {
     idempotentHint: true,
     openWorldHint: false
   }
-};
+});
 
 export default async function validateAction({definition}: InferSchema<typeof schema>) {
   const result = await actionValidationService.validate(definition);
@@ -36,4 +37,3 @@ export default async function validateAction({definition}: InferSchema<typeof sc
   getLogger().info(`Action validation result: ${result.valid ? "valid" : "invalid"} (${result.issues.length} issue(s))`);
   return {structuredContent: result};
 }
-**/

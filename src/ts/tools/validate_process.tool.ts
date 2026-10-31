@@ -3,6 +3,7 @@ import {InferSchema} from "xmcp";
 import {getLatestVersion} from "../services/utils";
 import {getLogger} from "../services/logger.service";
 import validationService from "../services/validation.service";
+import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const schema = {
   version: z.string().describe("Version of the Petriflow language. Use 'latest' to resolve the cached latest version"),
@@ -21,7 +22,7 @@ export const outputSchema = {
   })).describe("List of validation issues"),
 };
 
-export const metadata = {
+export const metadata = withToolFeatureFlag({
   name: "validate_process",
   description: "Validate a Petriflow process XML against its schema and semantic rules",
   annotation: {
@@ -31,7 +32,7 @@ export const metadata = {
     idempotentHint: true,
     openWorldHint: false
   }
-};
+});
 
 export default async function validateProcess({version, xml}: InferSchema<typeof schema>) {
   if (version === "latest") {

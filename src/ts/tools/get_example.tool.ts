@@ -1,6 +1,7 @@
 import {z} from "zod";
 import {InferSchema} from "xmcp";
 import petriflowDataService from "../services/petriflow-data.service";
+import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const schema = {
   version: z.string().describe("Version of the example"),
@@ -8,7 +9,7 @@ export const schema = {
   example: z.string().describe("Name of the example"),
 };
 
-export const metadata = {
+export const metadata = withToolFeatureFlag({
   name: "get_example",
   description: "Get the content of an example process",
   annotation: {
@@ -18,7 +19,7 @@ export const metadata = {
     idempotentHint: true,
     openWorldHint: false
   }
-};
+});
 
 export default async function getExample({version, app, example}: InferSchema<typeof schema>) {
   return petriflowDataService.getExample(version, app, example);

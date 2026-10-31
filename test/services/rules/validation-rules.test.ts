@@ -1,4 +1,4 @@
-import {parseXml} from "libxmljs2";
+import {parseXml} from "libxmljs5";
 import {describe, expect, test} from "vitest";
 import type {ValidationRule} from "../../../src/ts/services/validation.service";
 import {arcConnectivityRule} from "../../../src/ts/services/rules/arc-connectivity.rule";

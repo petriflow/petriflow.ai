@@ -1,5 +1,6 @@
 import {z} from "zod";
 import petriflowVersionService from "../services/petriflow-version.service";
+import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const outputSchema = {
   versions: z.array(z.object({
@@ -10,7 +11,7 @@ export const outputSchema = {
   }))
 }
 
-export const metadata = {
+export const metadata = withToolFeatureFlag({
   name: "list_versions",
   description: "List all versions of Petriflow language",
   annotation: {
@@ -20,7 +21,7 @@ export const metadata = {
     idempotentHint: true,
     openWorldHint: true
   }
-};
+});
 
 export default async function getVersions() {
   return {structuredContent: {versions: petriflowVersionService.listVersions()}};

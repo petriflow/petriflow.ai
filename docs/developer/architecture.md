@@ -54,6 +54,6 @@ complete validated install.
   exports are therefore not process singletons; default services use the `globalThis`/`Symbol.for` registry. Keep
   registry keys stable and namespaced. The registry is per Node.js realm, not across workers or processes.
 - Logger consumers use `getLogger()` so `setLogger(app.log)` is visible across those module graphs.
-- `libxmljs2` is a native addon and remains external to the bundle.
+- `libxmljs5` is a native addon and remains external to the bundle.
 - `__dirname` in the built server resolves under `dist`; this is also why the current default release storage is
   `dist/storage`.

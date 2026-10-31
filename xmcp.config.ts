@@ -26,7 +26,7 @@ const config: XmcpConfig = {
 
       return {
         ...config,
-        externals: [...externals, {libxmljs2: "commonjs libxmljs2"}]
+        externals: [...externals, {libxmljs5: "commonjs libxmljs5"}]
       };
     }
   };

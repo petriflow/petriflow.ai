@@ -1,6 +1,6 @@
 allowBuilds:
   esbuild: true
-  libxmljs2: true
+  libxmljs5: true
 minimumReleaseAgeExclude:
   - '@xmcp-dev/compiler@1.6.0'
   - xmcp@1.6.0

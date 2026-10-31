@@ -1,4 +1,4 @@
-import {parseXml} from "libxmljs2";
+import {parseXml} from "libxmljs5";
 import {getSchemaXsd} from "./schema.service";
 import {getLogger} from "./logger.service";
 import {getSingleton} from "./singleton-registry.service";
