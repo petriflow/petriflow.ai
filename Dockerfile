@@ -14,10 +14,19 @@ FROM runtime-base AS build
 # libxmljs5 is native: compile it against the same Node ABI and Alpine base used at runtime.
 RUN apk add --no-cache g++ libxml2-dev make python3
 
-RUN corepack enable
-
 # Include workspace config before install: it allows the libxmljs5 build script.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+ENV PNPM_HOME=/pnpm
+ENV PNPM_NO_MODIFY_PATH=1
+ENV PATH="${PNPM_HOME}/bin:${PATH}"
+ENV SHELL=/bin/sh
+
+# Install the exact pnpm version declared by package.json without Corepack.
+RUN pnpm_version="$(node -p 'require("./package.json").packageManager.split("@")[1].split("+")[0]')" \
+    && wget -qO- https://get.pnpm.io/install.sh \
+      | env PNPM_VERSION="$pnpm_version" sh -
+
 RUN pnpm install --frozen-lockfile
 
 COPY . .

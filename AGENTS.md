@@ -154,8 +154,9 @@ Return convention:
 
 ## Docker
 
-- The Docker build uses Corepack/pnpm with `pnpm-lock.yaml` and `pnpm-workspace.yaml`; preserve `--frozen-lockfile` and
-  copy the workspace config before install so native build permissions apply.
+- The Docker build bootstraps pnpm from the official standalone installer using the version in `package.json`'s
+  `packageManager` field. Preserve `--frozen-lockfile` and copy `pnpm-workspace.yaml` before install so native build
+  permissions apply.
 - Builder and runtime share the `node:26-alpine3.24` image so `libxmljs5` is built for the runtime ABI. The image tag
   follows Node 26 patch releases while keeping the Alpine release line fixed.
 - Groovy 4.0.33 is downloaded from Apache and SHA-256 verified. Update its version and checksum together.

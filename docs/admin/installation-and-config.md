@@ -40,7 +40,7 @@ The application does not authenticate the sync endpoint. Protect it at the deplo
 
 ## Docker status
 
-The Dockerfile uses Corepack and the repository's pnpm lockfile with `--frozen-lockfile`. It uses the Node 26/Alpine 3.24 image tag for build and runtime, verifies the Groovy 4.0.33 archive checksum, and sets `HOST=0.0.0.0` so published container ports work.
+The Dockerfile installs pnpm with the official standalone installer, using the version declared in `package.json`, and uses the repository lockfile with `--frozen-lockfile`. It uses the Node 26/Alpine 3.24 image tag for build and runtime, verifies the Groovy 4.0.33 archive checksum, and sets `HOST=0.0.0.0` so published container ports work.
 
 The runtime image declares `/app/dist/storage` as a volume. Configure a named volume at that path to preserve synchronized releases when containers are replaced. The server also writes the recreatable version cache to `/app/dist/cache.json`.
 
