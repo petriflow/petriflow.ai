@@ -44,14 +44,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build
+        run: pnpm build
+
       - name: Typecheck
         run: pnpm typecheck
 
       - name: Test
         run: pnpm test
-
-      - name: Build
-        run: pnpm build
 
       - name: Validate release tag and Docker Hub image
         id: release
