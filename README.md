@@ -133,9 +133,10 @@ Configure these repository settings before the first release:
 - A branch protection rule requiring `CI / Typecheck, test, and build` on `main`.
 - A tag ruleset for `v*` that limits release-tag creation to trusted maintainers.
 
-The attached `.tar.gz` includes `dist/` and production `node_modules`. It targets Node.js 26 on Alpine Linux (musl) and
-requires `libxml2`; action validation additionally requires Java 21 and Groovy 4.0.33. The Docker image is the
-recommended deployment artifact because it includes the runtime environment.
+The attached `.tar.gz` mirrors the application files and production `node_modules` from the image's `/app` directory.
+Run it from the extracted bundle directory with `node --enable-source-maps server.cjs`. It targets Node.js 26 on Alpine
+Linux (musl) and requires `libxml2`; action validation additionally requires Java 21 and Groovy 4.0.33. The Docker
+image is the recommended deployment artifact because it includes the runtime environment.
 
 ## Running the Server
 

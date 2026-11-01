@@ -123,8 +123,7 @@ jobs:
           trap 'docker rm "$CONTAINER_ID" >/dev/null' EXIT
 
           mkdir -p "$BUNDLE_DIR"
-          docker cp "${CONTAINER_ID}:/app/dist" "$BUNDLE_DIR/"
-          docker cp "${CONTAINER_ID}:/app/node_modules" "$BUNDLE_DIR/"
+          docker cp "${CONTAINER_ID}:/app/." "$BUNDLE_DIR/"
           cp package.json LICENSE.txt "$BUNDLE_DIR/"
           cat > "$BUNDLE_DIR/README.txt" <<'BUNDLE_README'
           Petriflow MCP application runtime bundle
@@ -134,7 +133,7 @@ jobs:
           Action validation additionally requires Java 21 and Groovy 4.0.33 on PATH.
 
           Run from this directory with:
-            node --enable-source-maps dist/server.cjs
+            node --enable-source-maps server.cjs
 
           Configure HOST, PORT, and PETRIFLOW_MODE as needed. LOCAL mode uses the bundled
           snapshot; REMOTE mode synchronizes Petriflow releases from GitHub.
