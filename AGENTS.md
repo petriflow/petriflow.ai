@@ -67,7 +67,7 @@ Return convention:
   Installed releases are immutable: synchronization does not overwrite or delete them.
 - `cache.service.ts` is only for cache data (including release version metadata); release files belong in
   `storage.service.ts`.
-- Tools and resources resolve `"latest"` through the active version catalog. `list-versions` no longer needs to be
+- Tools and resources resolve `"latest"` through the active version catalog. `list_versions` no longer needs to be
   called first.
 - In LOCAL, `src/petriflow/snapshot/` is the explicit checked-in snapshot source; `build.mjs` copies it to
   `dist/petriflow/snapshot/` and startup installs only that version. Do not add implicit fallback behavior: REMOTE never
@@ -110,7 +110,7 @@ Return convention:
   call `getLogger()` rather than capturing a module-local logger binding.
 - `src/ts/services/utils.ts` — latest-version helper.
 - `src/ts/services/schema.service.ts` — `getSchemaXsd(version)` delegates to `PetriflowDataService` (used by
-  `get-schema` tool and `ValidationService`).
+  `get_schema` tool and `ValidationService`).
 - `src/ts/services/validation.service.ts` — `ValidationService` singleton (default export). `validate(xml, version)`
   runs: well-formedness → XSD validation (`libxmljs5`) → registered semantic rules. Rules are registered at startup in
   `src/ts/index.ts`.
@@ -166,8 +166,9 @@ Return convention:
   follows Node 26 patch releases while keeping the Alpine release line fixed.
 - Groovy 4.0.33 is downloaded from Apache and SHA-256 verified. Update its version and checksum together.
 - The application defaults to `HOST=127.0.0.1`; the container sets `HOST=0.0.0.0` for published ports.
-- Runtime writes `dist/cache.json` and `dist/storage`; the image makes `dist` writable by `node` and declares
-  `/app/dist/storage` as a volume. Deployments should use a named volume there.
+- Runtime writes `cache.json` and `storage/` next to the built server: `dist/` locally and `/app/` in the image. The
+  image makes `/app` writable by `node` and declares `/app/storage` as a volume. Deployments should use a named volume
+  there.
 - The `node:26-alpine3.24` image tag follows Node 26 patch releases while keeping the Alpine line fixed, and the pnpm
   lockfile pins the application dependency graph. `apk add` still resolves packages from Alpine repositories at build
   time; for byte-for-byte image reproducibility, also pin/snapshot those OS packages and update them regularly for

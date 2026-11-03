@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="MCP server exposing Petriflow tools and resources to MCP-compatible AI clients."/>
   <title>Petriflow MCP Server</title>
+  <link rel="icon" href="assets/favicon.ico"/>
   <style>
     :root {
       color-scheme: light dark;
@@ -332,9 +334,9 @@
     <p>
       This server implements the <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context
       Protocol</a>
-      for <a href="https://github.com/netgrif/petriflow" target="_blank" rel="noopener">Petriflow</a>, letting
+      for <a href="https://github.com/petriflow/petriflow" target="_blank" rel="noopener">Petriflow</a>, letting
       MCP-compatible
-      AI tools explore the Petriflow language (schema, elements, actions, examples) and validate processes
+      AI tools explore the Petriflow language (schema, elements, actions, components, examples) and validate processes
       &mdash;
       all over a single HTTP endpoint. It's built with <a href="https://xmcp.dev" target="_blank"
                                                           rel="noopener">xmcp</a> + Fastify.
@@ -351,7 +353,7 @@
         <dt>MCP endpoint</dt>
         <dd class="mcp-url">http://localhost:3000/mcp</dd>
         <dt>Transport</dt>
-        <dd>Streamable HTTP (stateless)</dd>
+        <dd>Streamable HTTP</dd>
         <dt>Health check</dt>
         <dd>GET <span class="health-url">http://localhost:3000/health</span></dd>
       </dl>
@@ -472,64 +474,69 @@
         </thead>
         <tbody>
         <tr>
-          <td><code>list-versions</code></td>
+          <td><code>list_versions</code></td>
           <td>List available Petriflow versions (flags the latest stable one)</td>
-          <td><code>version</code>: string</td>
+          <td>none</td>
         </tr>
         <tr>
-          <td><code>get-schema</code></td>
+          <td><code>get_schema</code></td>
           <td>Get the complete XSD schema of the Petriflow language</td>
           <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>get-overview</code></td>
+          <td><code>get_overview</code></td>
           <td>Show the Petriflow language overview</td>
           <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>list-actions</code></td>
+          <td><code>list_actions</code></td>
           <td>List available action functions</td>
           <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>get-action</code></td>
+          <td><code>get_action</code></td>
           <td>Get the definition of one action</td>
           <td><code>version</code>, <code>name</code>: string</td>
         </tr>
         <tr>
-          <td><code>list-components</code></td>
+          <td><code>list_components</code></td>
           <td>List field components with when to use each</td>
           <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>get-component</code></td>
+          <td><code>get_component</code></td>
           <td>Get the definition and properties of one component</td>
           <td><code>version</code>, <code>name</code>: string</td>
         </tr>
         <tr>
-          <td><code>list-elements</code></td>
+          <td><code>list_elements</code></td>
           <td>List Petriflow elements</td>
           <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>get-element</code></td>
+          <td><code>get_element</code></td>
           <td>Get the XSD schema of one Petriflow element</td>
           <td><code>version</code>, <code>name</code>: string</td>
         </tr>
         <tr>
-          <td><code>list-examples</code></td>
+          <td><code>list_examples</code></td>
           <td>List example processes</td>
           <td><code>version</code>: string</td>
         </tr>
         <tr>
-          <td><code>get-example</code></td>
+          <td><code>get_example</code></td>
           <td>Get the content of one example process</td>
-          <td><code>version</code>, <code>example</code>: string</td>
+          <td><code>version</code>, <code>app</code>, <code>example</code>: string</td>
         </tr>
         <tr>
-          <td><code>validate-process</code></td>
+          <td><code>validate_process</code></td>
           <td>Validate a process XML against its schema and semantic rules</td>
           <td><code>version</code>, <code>xml</code>: string</td>
+        </tr>
+        <tr>
+          <td><code>validate_action</code></td>
+          <td>Validate a Petriflow action definition by compiling its Groovy against the DSL</td>
+          <td><code>definition</code>: string</td>
         </tr>
         </tbody>
       </table>
@@ -539,7 +546,7 @@
   <footer>
     <span>Licensed under Apache-2.0</span>
     <span class="links">
-      <a href="https://github.com/netgrif/petriflow.ai" target="_blank" rel="noopener">Source on GitHub</a>
+      <a href="https://github.com/petriflow/petriflow.ai" target="_blank" rel="noopener">Source on GitHub</a>
       <a href="https://petriflow.org" target="_blank" rel="noopener">Petriflow</a>
       <a href="https://xmcp.dev/docs" target="_blank" rel="noopener">xmcp docs</a>
       <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP docs</a>

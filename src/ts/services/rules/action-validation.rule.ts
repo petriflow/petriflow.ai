@@ -13,7 +13,7 @@ import {getLogger} from "../logger.service";
  *   - injects process `<function>` definitions so bare (non-DSL) calls resolve;
  *   - validates the `<function>` bodies themselves.
  *
- * This is the "semantic rule" counterpart to the standalone `validate-action`
+ * This is the "semantic rule" counterpart to the standalone `validate_action`
  * tool. It runs asynchronously (the Groovy daemon is a JVM subprocess).
  */
 export const actionValidationRule: ValidationRule = {

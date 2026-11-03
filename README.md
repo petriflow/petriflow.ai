@@ -1,13 +1,13 @@
 # petriflow.ai
 
-An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/netgrif/petriflow), built
+An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/petriflow/petriflow), built
 with [xmcp](https://xmcp.dev) + Fastify. It exposes Petriflow tools to MCP-compatible AI clients over HTTP.
 
 See the [project documentation](docs/README.md) for user, server administration, and developer guides.
 
 ## Getting Started
 
-Requires Node.js >= 22.12.0 and pnpm.
+Requires Node.js 26 and pnpm 12.16.1.
 
 ```bash
 pnpm install
@@ -48,25 +48,26 @@ Current tools:
 
 | Tool               | Purpose                                                                             |
 |--------------------|-------------------------------------------------------------------------------------|
-| `list-versions`    | List available Petriflow versions (flags the latest)                                |
-| `get-schema`       | Get the full XSD schema for a version                                               |
-| `get-overview`     | Show the Petriflow language overview                                                |
-| `list-actions`     | List available action functions                                                     |
-| `get-action`       | Get the definition of one action                                                    |
-| `list-components`  | List field components (`<component><name>`) with when to use each                   |
-| `get-component`    | Get the definition and configuration properties of one component                    |
-| `list-elements`    | List Petriflow elements                                                             |
-| `get-element`      | Get the XSD schema of one element                                                   |
-| `list-examples`    | List example processes                                                              |
-| `get-example`      | Get the content of one example process                                              |
-| `validate-process` | Validate a process XML against its schema and semantic rules                        |
-| `validate-action`  | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
+| `list_versions`    | List available Petriflow versions (flags the latest)                                |
+| `get_schema`       | Get the full XSD schema for a version                                               |
+| `get_overview`     | Show the Petriflow language overview                                                |
+| `list_actions`     | List available action functions                                                     |
+| `get_action`       | Get the definition of one action                                                    |
+| `list_components`  | List field components (`<component><name>`) with when to use each                   |
+| `get_component`    | Get the definition and configuration properties of one component                    |
+| `list_elements`    | List Petriflow elements                                                             |
+| `get_element`      | Get the XSD schema of one element                                                   |
+| `list_examples`    | List example processes                                                              |
+| `get_example`      | Get the content of one example process                                              |
+| `validate_process` | Validate a process XML against its schema and semantic rules                        |
+| `validate_action`  | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
 
 Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
 
 ### Resources and release synchronization
 
-Resources mirror the version, schema, overview, element, action, and example data exposed by the tools. Versioned
+Resources mirror the version, schema, overview, element, action, component, and example data exposed by the tools.
+Versioned
 resource templates use URIs such as `petriflow://versions/{version}/schema` and complete versions from the active
 catalog, including `latest`.
 
@@ -79,12 +80,12 @@ overwritten.
 
 REMOTE is opt-in while `petriflow/petriflow` releases do not publish ZIP assets yet: until they do, a REMOTE server
 finds versions but cannot install their data. A release archive may also include `components-definitions.json`; it is
-optional and validated when present. For a version that omits it, `list-components` returns an empty list and
-`get-component` reports that components are not available.
+optional and validated when present. For a version that omits it, `list_components` returns an empty list and
+`get_component` reports that components are not available.
 
 ## Validation
 
-`validate-process` runs a pipeline in `src/ts/services/validation.service.ts`:
+`validate_process` runs a pipeline in `src/ts/services/validation.service.ts`:
 
 1. XML well-formedness
 2. XSD schema validation (via the native `libxmljs5` module)
@@ -98,7 +99,7 @@ The `action-validation` rule compiles every `<action>` and every `<function>` in
 (via the Groovy daemon), checks that `f.*`/`t.*` references resolve to declared fields/transitions, and warns about
 unused functions.
 
-`validate-action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See
+`validate_action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See
 `src/groovy/README.md` for details.
 
 > `libxmljs5` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`). The
@@ -152,7 +153,7 @@ pnpm start            # node dist/server.cjs
 
 ## Learn More
 
-- [Petriflow](https://github.com/netgrif/petriflow)
+- [Petriflow](https://github.com/petriflow/petriflow)
 - [xmcp Documentation](https://xmcp.dev/docs)
 - [Model Context Protocol](https://modelcontextprotocol.io)
 

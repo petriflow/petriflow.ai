@@ -1,6 +1,6 @@
 # Groovy Action Validation
 
-This directory contains the Groovy side of the `validate-action` MCP tool. It
+This directory contains the Groovy side of the `validate_action` MCP tool. It
 validates a single Petriflow action (a Groovy code snippet) by compiling it —
 **compile-only, never executed** — against the Petriflow DSL.
 
@@ -180,8 +180,8 @@ compiling. The closure parameter names are preserved; parameter *types* are
   parameters access properties dynamically (e.g. `u.fullName`); these are allowed
   (typed `Object`), so typos in those properties are not caught. DSL method-name
   typos are still caught.
-- **Field existence** — `validate-action` (standalone) does not check field
-  existence; the `validate-process` rule does (it has the process's `<data>` and
+- **Field existence** — `validate_action` (standalone) does not check field
+  existence; the `action-validation` rule does (it has the process's `<data>` and
   `<transition>` declarations).
 
 ## Requirements

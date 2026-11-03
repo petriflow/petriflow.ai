@@ -108,7 +108,7 @@ test.skipIf(!process.env.PETRIFLOW_TEST_SERVER_PATH)(
         jsonrpc: "2.0",
         id: 2,
         method: "tools/call",
-        params: {name: "list-versions", arguments: {}},
+        params: {name: "list_versions", arguments: {}},
       }, sessionId));
       if (toolResponse.error) throw new Error(toolResponse.error.message);
       expect(toolResponse.result?.structuredContent?.versions).toEqual([
