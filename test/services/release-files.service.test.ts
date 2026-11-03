@@ -91,6 +91,35 @@ test("rejects a component without a description or when to use guidance", () => 
     .toThrow(/button-style.*whenToUse/i);
 });
 
+test("rejects component params entries that the component output schema cannot serve", () => {
+  const missingFields = releaseFiles({
+    "components-definitions.json": componentsFile({
+      "button-style": component({params: [{name: "align"}]}),
+    }),
+  });
+  const nonBooleanRequired = releaseFiles({
+    "components-definitions.json": componentsFile({
+      "button-style": component({
+        params: [{name: "align", type: "string", description: "Alignment", required: "yes"}],
+      }),
+    }),
+  });
+
+  expect(() => validateReleaseFiles(missingFields, "petriflow-v1.0.0.zip"))
+    .toThrow(/button-style.*params\[0\].*type/i);
+  expect(() => validateReleaseFiles(nonBooleanRequired, "petriflow-v1.0.0.zip"))
+    .toThrow(/button-style.*params\[0\].*required/i);
+});
+
+test("rejects a non-boolean deprecated flag", () => {
+  const files = releaseFiles({
+    "components-definitions.json": componentsFile({"button-style": component({deprecated: "yes"})}),
+  });
+
+  expect(() => validateReleaseFiles(files, "petriflow-v1.0.0.zip"))
+    .toThrow(/button-style.*deprecated.*boolean/i);
+});
+
 test("accepts the checked-in snapshot component definitions", () => {
   const content = fs.readFileSync(path.resolve("src/petriflow/snapshot/components-definitions.json"), "utf8");
 

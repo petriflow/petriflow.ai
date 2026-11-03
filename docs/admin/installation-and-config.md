@@ -32,9 +32,9 @@ The bundled LOCAL snapshot source is `src/petriflow/snapshot/`; `pnpm build` cop
 The current snapshot is SemVer `1.0.9`; its version and release date are recorded in `manifest.json`. To refresh it,
 replace the files with a complete, verified Petriflow release dataset and update `manifest.json` with its SemVer and
 published date (or leave the date empty when the source does not provide one). The snapshot must contain
-`petriflow.schema.xsd`, `overview.md`,
-`actions-definitions.json`, at least one `elements/*.xsd`, and at least one `examples/*.xml`. The build and server never
-download snapshot data. A missing or invalid snapshot prevents startup in LOCAL mode.
+`petriflow.schema.xsd`, `overview.md`, `actions-definitions.json`, at least one `elements/*.xsd`, and at least one
+`examples/*.xml`, and may contain `components-definitions.json`. The build and server never download snapshot data. A
+missing or invalid snapshot prevents startup in LOCAL mode.
 
 The application does not authenticate the sync endpoint. Protect it at the deployment ingress or reverse proxy.
 

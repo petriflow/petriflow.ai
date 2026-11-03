@@ -70,12 +70,31 @@ export function validateComponentsDefinitions(files: Record<string, string>, sou
     if (typeof component.whenToUse !== "string" || !component.whenToUse.trim()) {
       return invalid(`component ${name} whenToUse must be a non-empty string`);
     }
-    if (component.params !== undefined && !Array.isArray(component.params)) {
-      return invalid(`component ${name} params must be an array`);
+    if (component.params !== undefined) {
+      if (!Array.isArray(component.params)) {
+        return invalid(`component ${name} params must be an array`);
+      }
+      for (const [index, param] of component.params.entries()) {
+        if (!param || typeof param !== "object" || Array.isArray(param)) {
+          return invalid(`component ${name} params[${index}] must be a JSON object`);
+        }
+        const entry = param as Record<string, unknown>;
+        for (const field of ["name", "type", "description"] as const) {
+          if (typeof entry[field] !== "string" || !(entry[field] as string).trim()) {
+            return invalid(`component ${name} params[${index}] ${field} must be a non-empty string`);
+          }
+        }
+        if (typeof entry.required !== "boolean") {
+          return invalid(`component ${name} params[${index}] required must be a boolean`);
+        }
+      }
     }
     if (component.examples !== undefined &&
       !(Array.isArray(component.examples) && component.examples.every((example) => typeof example === "string"))) {
       return invalid(`component ${name} examples must be an array of strings`);
+    }
+    if (component.deprecated !== undefined && typeof component.deprecated !== "boolean") {
+      return invalid(`component ${name} deprecated must be a boolean`);
     }
   }
 }

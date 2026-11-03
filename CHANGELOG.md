@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial project scaffold based on `create-xmcp-app`.
-- Release archives may publish `components-definitions.json`; it is validated when present and served by
-  `list-components` and `get-component`.
+- `components-definitions.json` in release archives is now validated when present and optional when absent, so
+  `list-components` and `get-component` serve it for versions that publish it.
+- The LOCAL snapshot install warns when its version is already stored instead of silently keeping the stored files.
 
 ### Changed
 
 - `PETRIFLOW_MODE` now defaults to `LOCAL`, using the bundled snapshot without contacting GitHub. `REMOTE` is opt-in
-  while `petriflow/petriflow` releases do not publish `petriflow-vX.Y.Z.zip` assets.
+  while `petriflow/petriflow` releases do not publish `petriflow-vX.Y.Z.zip` assets. Set `PETRIFLOW_MODE=REMOTE` to
+  keep the previous default behavior; `POST /admin/petriflow/sync` now returns HTTP 409 unless REMOTE is set.
 - `list-components` returns an empty list and `get-component` reports that components are not available for versions
   whose archive does not publish component definitions, instead of failing with a missing-file error.
 

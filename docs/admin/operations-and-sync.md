@@ -31,9 +31,15 @@ REMOTE server lists versions but cannot install their data.
 
 An incomplete ZIP is not made available. The archive root must contain `petriflow.schema.xsd`, `overview.md`,
 `actions-definitions.json`, at least one `elements/*.xsd`, and at least one `examples/*.xml`. The action definitions
-must be valid JSON. An archive may also contain `components-definitions.json`; it is optional, must be a well-formed
-object-valued JSON document when present, and is served only for the versions that publish it. Releases are immutable:
-successful installs are not overwritten or removed by synchronization.
+must be valid JSON.
+
+An archive may also contain `components-definitions.json`, which is optional and served only for the versions that
+publish it. When present it must be a JSON object keyed by component id, and every component requires non-empty `names`
+and `fieldTypes` string arrays plus non-empty `description` and `whenToUse` strings. `params` is optional; each entry
+needs non-empty `name`, `type`, and `description` strings and a boolean `required`. `examples` is an optional array of
+strings and `deprecated` an optional boolean. A malformed file fails the whole install.
+
+Releases are immutable: successful installs are not overwritten or removed by synchronization.
 
 ## Storage and rebuild warning
 

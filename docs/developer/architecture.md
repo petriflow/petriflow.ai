@@ -3,11 +3,15 @@
 ## Runtime flow
 
 ```text
-Startup or POST /admin/petriflow/sync
-  -> ReleaseSyncService fetches GitHub release metadata
-  -> missing petriflow-vX.Y.Z.zip assets are downloaded and validated
-  -> StorageService atomically installs each version
-  -> CacheService retains version-list/latest metadata
+Startup
+  -> LOCAL (default): PetriflowSnapshotService validates and installs the bundled snapshot
+  -> REMOTE: ReleaseSyncService fetches GitHub release metadata
+     -> missing petriflow-vX.Y.Z.zip assets are downloaded and validated
+     -> StorageService atomically installs each version
+     -> CacheService retains version-list/latest metadata
+
+POST /admin/petriflow/sync (REMOTE only)
+  -> ReleaseSyncService retries missing or failed releases
 
 MCP tool or resource read
   -> PetriflowDataService reads the requested version from StorageService

@@ -50,10 +50,12 @@ Return convention:
   the version list and latest stable version, and synchronizes missing published releases.
 - Release assets are named `petriflow-vX.Y.Z.zip`. The archive root contains `petriflow.schema.xsd`, `overview.md`,
   `actions-definitions.json`, `elements/`, and `examples/`, and may contain `components-definitions.json`.
-- `components-definitions.json` (field components, keyed by definition id with `names`, `fieldTypes`, `whenToUse`,
-  `params`) is hand-written from `netgrif/components` v7.0.3 (`data-fields.module.ts` registry plus
-  `component.properties` reads) and currently maintained only in `src/petriflow/snapshot/`. It is optional in release
-  archives: `validateComponentsDefinitions` checks its shape when a release publishes it and ignores its absence.
+- `components-definitions.json` (field components, keyed by definition id) is hand-written from `netgrif/components`
+  v7.0.3 (`data-fields.module.ts` registry plus `component.properties` reads) and currently maintained only in
+  `src/petriflow/snapshot/`. Each definition requires non-empty `names` and `fieldTypes` string arrays, non-empty
+  `description` and `whenToUse` strings, and optional `params` (entries with non-empty `name`, `type`, `description`
+  and a boolean `required`), `examples` (string array), and boolean `deprecated`. It is optional in release archives:
+  `validateComponentsDefinitions` checks its shape when a release publishes it and ignores its absence.
   `list_components` returns an empty list and `get_component` reports "components are not available for version" for
   versions that omit it.
 - `PETRIFLOW_MODE` defaults to `LOCAL` while `petriflow/petriflow` releases do not publish `petriflow-vX.Y.Z.zip` assets;

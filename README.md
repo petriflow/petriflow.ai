@@ -71,14 +71,16 @@ resource templates use URIs such as `petriflow://versions/{version}/schema` and 
 catalog, including `latest`.
 
 In `LOCAL` mode (the default), the server installs the single checked-in snapshot from `src/petriflow/snapshot/` and
-makes no GitHub requests. The snapshot includes `manifest.json` and the same schema, overview, actions, elements, and
-examples files as a release archive. In `REMOTE` mode, startup checks releases from `petriflow/petriflow` and installs
-missing assets named `petriflow-vX.Y.Z.zip`; `POST /admin/petriflow/sync` is available in REMOTE mode and returns
-HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or overwritten.
+makes no GitHub requests. The snapshot includes `manifest.json` and the same schema, overview, actions, components,
+elements, and examples files as a release archive. In `REMOTE` mode, startup checks releases from
+`petriflow/petriflow` and installs missing assets named `petriflow-vX.Y.Z.zip`; `POST /admin/petriflow/sync` is
+available in REMOTE mode and returns HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or
+overwritten.
 
 REMOTE is opt-in while `petriflow/petriflow` releases do not publish ZIP assets yet: until they do, a REMOTE server
 finds versions but cannot install their data. A release archive may also include `components-definitions.json`; it is
-optional, validated when present, and `list-components`/`get-component` return no components for versions that omit it.
+optional and validated when present. For a version that omits it, `list-components` returns an empty list and
+`get-component` reports that components are not available.
 
 ## Validation
 
