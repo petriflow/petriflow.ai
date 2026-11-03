@@ -49,12 +49,15 @@ Return convention:
 - `src/ts/services/release-sync.service.ts` fetches paginated GitHub release metadata for `petriflow/petriflow`, caches
   the version list and latest stable version, and synchronizes missing published releases.
 - Release assets are named `petriflow-vX.Y.Z.zip`. The archive root contains `petriflow.schema.xsd`, `overview.md`,
-  `actions-definitions.json`, `elements/`, and `examples/`.
+  `actions-definitions.json`, `elements/`, and `examples/`, and may contain `components-definitions.json`.
 - `components-definitions.json` (field components, keyed by definition id with `names`, `fieldTypes`, `whenToUse`,
-  `params`) currently exists only in `src/petriflow/snapshot/`. It is hand-written from `netgrif/components` v7.0.3
-  (`data-fields.module.ts` registry plus `component.properties` reads), is not required by release validation, and
-  `list_components`/`get_component` fail with "not found for version" on releases that lack it.
-- `PETRIFLOW_MODE` defaults to `REMOTE`. Synchronization runs before listening in REMOTE and can be retried through
+  `params`) is hand-written from `netgrif/components` v7.0.3 (`data-fields.module.ts` registry plus
+  `component.properties` reads) and currently maintained only in `src/petriflow/snapshot/`. It is optional in release
+  archives: `validateComponentsDefinitions` checks its shape when a release publishes it and ignores its absence.
+  `list_components` returns an empty list and `get_component` reports "components are not available for version" for
+  versions that omit it.
+- `PETRIFLOW_MODE` defaults to `LOCAL` while `petriflow/petriflow` releases do not publish `petriflow-vX.Y.Z.zip` assets;
+  REMOTE is opt-in. Synchronization runs before listening in REMOTE and can be retried through
   `POST /admin/petriflow/sync`; LOCAL returns HTTP 409 from that endpoint. Deployment infrastructure is responsible for
   endpoint authentication.
 - `storage.service.ts` persists extracted release files under a versioned directory rooted at

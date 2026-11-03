@@ -43,6 +43,10 @@ resources are JSON text; XSD and XML resources are returned as text with an appr
 | `petriflow://versions/{version}/examples`           | Example list.           |
 | `petriflow://versions/{version}/examples/{example}` | Example process XML.    |
 
+`list-components` and `get-component` serve `components-definitions.json`, which is optional in release archives. For a
+version that does not publish it, `list-components` returns an empty list and `get-component` reports that components
+are not available.
+
 The dynamic `{version}` parameter offers completion suggestions from the active version catalog, including `latest`.
 REMOTE uses synchronized release metadata; LOCAL suggests only the bundled snapshot version. Completion suggests values; it
 does not download data or replace validation when reading a resource.

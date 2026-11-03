@@ -26,7 +26,7 @@ pnpm start
 | `PORT`      |  `3000` | Fastify listening port. |
 | `HOST`      | `127.0.0.1` | Bind address. The Docker image sets `0.0.0.0` so published container ports are reachable. |
 | `LOG_LEVEL` |  `info` | Fastify/Pino log level. |
-| `PETRIFLOW_MODE` | `REMOTE` | `REMOTE` synchronizes releases from GitHub; `LOCAL` uses the bundled snapshot and does not contact GitHub. |
+| `PETRIFLOW_MODE` | `LOCAL` | `LOCAL` uses the bundled snapshot and does not contact GitHub; `REMOTE` synchronizes releases from GitHub. |
 
 The bundled LOCAL snapshot source is `src/petriflow/snapshot/`; `pnpm build` copies it to `dist/petriflow/snapshot/`.
 The current snapshot is SemVer `1.0.9`; its version and release date are recorded in `manifest.json`. To refresh it,

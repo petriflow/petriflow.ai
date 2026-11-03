@@ -12,8 +12,8 @@ Choose a guide:
 | Developers            | [Architecture](developer/architecture.md)                          |
 
 The server exposes tools for Petriflow versions, schemas, elements, actions, examples, and validation. The same data is
-available through MCP resources and resource templates. Versioned content comes from synchronized Petriflow GitHub
-release ZIP assets in REMOTE mode or from the bundled single-version snapshot in LOCAL mode.
+available through MCP resources and resource templates. Versioned content comes from the bundled single-version snapshot
+in LOCAL mode (the default) or from synchronized Petriflow GitHub release ZIP assets in REMOTE mode.
 
 ## Documentation site
 

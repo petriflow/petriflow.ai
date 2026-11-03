@@ -17,19 +17,23 @@ Example successful response:
 
 ## Startup behavior
 
-With `PETRIFLOW_MODE=REMOTE` (the default), before accepting requests the server fetches published releases from
-`petriflow/petriflow`, updates cached version metadata, and downloads missing version assets. If GitHub or an asset is
-unavailable, startup logs the failure and continues with locally stored versions. The sync endpoint can retry failed or
-newly published versions.
+With `PETRIFLOW_MODE=LOCAL` (the default), startup validates and installs the bundled snapshot from
+`src/petriflow/snapshot/` (copied to `dist/petriflow/snapshot/` by the build). It exposes only the snapshot's SemVer,
+with `latest` resolving to that version, and makes no GitHub requests. `POST /admin/petriflow/sync` returns HTTP 409
+without syncing. A missing or invalid snapshot stops startup; it is not replaced by a remote sync or an older stored
+release.
 
-With `PETRIFLOW_MODE=LOCAL`, startup validates and installs the bundled snapshot from `src/petriflow/snapshot/` (copied
-to `dist/petriflow/snapshot/` by the build). It exposes only the snapshot's SemVer, with `latest` resolving to that
-version, and makes no GitHub requests. `POST /admin/petriflow/sync` returns HTTP 409 without syncing. A missing or invalid
-snapshot stops startup; it is not replaced by a remote sync or an older stored release.
+With `PETRIFLOW_MODE=REMOTE`, before accepting requests the server fetches published releases from `petriflow/petriflow`,
+updates cached version metadata, and downloads missing version assets. If GitHub or an asset is unavailable, startup logs
+the failure and continues with locally stored versions. The sync endpoint can retry failed or newly published versions.
+REMOTE is opt-in while `petriflow/petriflow` releases do not publish `petriflow-vX.Y.Z.zip` assets yet; until they do, a
+REMOTE server lists versions but cannot install their data.
 
 An incomplete ZIP is not made available. The archive root must contain `petriflow.schema.xsd`, `overview.md`,
 `actions-definitions.json`, at least one `elements/*.xsd`, and at least one `examples/*.xml`. The action definitions
-must be valid JSON. Releases are immutable: successful installs are not overwritten or removed by synchronization.
+must be valid JSON. An archive may also contain `components-definitions.json`; it is optional, must be a well-formed
+object-valued JSON document when present, and is served only for the versions that publish it. Releases are immutable:
+successful installs are not overwritten or removed by synchronization.
 
 ## Storage and rebuild warning
 
@@ -47,7 +51,7 @@ only its one bundled snapshot and rejects other versions even when they exist in
 
 - **Release asset not found:** verify that the GitHub release includes the exact asset name `petriflow-vX.Y.Z.zip`.
 - **Invalid ZIP / missing file:** verify the required archive paths and that `actions-definitions.json` is an
-  object-valued JSON document.
+  object-valued JSON document. `components-definitions.json` is optional, but a malformed copy fails the install.
 - **GitHub API/network error:** stored versions remain available; restore connectivity and retry the endpoint.
 - **HTTP 503 from sync:** inspect `failedVersions` in the response and server logs. A retry skips already installed
   versions and retries the failed ones.

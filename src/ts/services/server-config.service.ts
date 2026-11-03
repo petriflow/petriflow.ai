@@ -5,10 +5,13 @@ export function getServerHost(env: {HOST?: string} = process.env): string {
 
 export type PetriflowMode = "LOCAL" | "REMOTE";
 
-/** Select whether Petriflow data comes from the bundled snapshot or release synchronization. */
+/**
+ * Select whether Petriflow data comes from the bundled snapshot or release synchronization.
+ * LOCAL is the default while the upstream release archives are not published yet.
+ */
 export function getPetriflowMode(env: {PETRIFLOW_MODE?: string} = process.env): PetriflowMode {
   const mode = env.PETRIFLOW_MODE?.trim().toUpperCase();
-  if (!mode) return "REMOTE";
+  if (!mode) return "LOCAL";
   if (mode === "LOCAL" || mode === "REMOTE") return mode;
   throw new Error("PETRIFLOW_MODE must be LOCAL or REMOTE");
 }

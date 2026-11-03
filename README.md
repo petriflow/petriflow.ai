@@ -15,9 +15,9 @@ pnpm dev        # build then run
 ```
 
 This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with `PORT` or the bind
-address with `HOST`; the default host is loopback (`127.0.0.1`). Set `PETRIFLOW_MODE=LOCAL` to use the bundled Petriflow
-snapshot without GitHub, or leave it unset (`REMOTE`) to synchronize releases. The Docker image sets `HOST=0.0.0.0` for
-container port publishing.
+address with `HOST`; the default host is loopback (`127.0.0.1`). The server uses the bundled Petriflow snapshot by
+default (`LOCAL`) and makes no GitHub requests; set `PETRIFLOW_MODE=REMOTE` to synchronize releases instead. The Docker
+image sets `HOST=0.0.0.0` for container port publishing.
 
 ## Commands
 
@@ -70,11 +70,15 @@ Resources mirror the version, schema, overview, element, action, and example dat
 resource templates use URIs such as `petriflow://versions/{version}/schema` and complete versions from the active
 catalog, including `latest`.
 
-In `REMOTE` mode (the default), startup checks releases from `petriflow/petriflow` and installs missing assets named
-`petriflow-vX.Y.Z.zip`. In `LOCAL` mode, the server installs the single checked-in snapshot from
-`src/petriflow/snapshot/` and makes no GitHub requests. The snapshot includes `manifest.json` and the same schema,
-overview, actions, elements, and examples files as a release archive. `POST /admin/petriflow/sync` remains available in
-REMOTE mode and returns HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or overwritten.
+In `LOCAL` mode (the default), the server installs the single checked-in snapshot from `src/petriflow/snapshot/` and
+makes no GitHub requests. The snapshot includes `manifest.json` and the same schema, overview, actions, elements, and
+examples files as a release archive. In `REMOTE` mode, startup checks releases from `petriflow/petriflow` and installs
+missing assets named `petriflow-vX.Y.Z.zip`; `POST /admin/petriflow/sync` is available in REMOTE mode and returns
+HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or overwritten.
+
+REMOTE is opt-in while `petriflow/petriflow` releases do not publish ZIP assets yet: until they do, a REMOTE server
+finds versions but cannot install their data. A release archive may also include `components-definitions.json`; it is
+optional, validated when present, and `list-components`/`get-component` return no components for versions that omit it.
 
 ## Validation
 

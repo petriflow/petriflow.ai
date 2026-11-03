@@ -39,11 +39,11 @@ validate-process
 
 ## Release data contract
 
-In REMOTE mode each published language version is represented by a GitHub release asset named
-`petriflow-vX.Y.Z.zip`. Its archive root contains the schema, overview, action definitions, element XSDs, and process
-examples. In LOCAL mode the server installs the one checked-in snapshot from `src/petriflow/snapshot/`; it is an explicit
-data source, not a REMOTE fallback. Installed version directories are immutable and are only marked available after a
-complete validated install.
+In LOCAL mode (the default) the server installs the one checked-in snapshot from `src/petriflow/snapshot/`; it is an
+explicit data source, not a REMOTE fallback. In REMOTE mode each published language version is represented by a GitHub
+release asset named `petriflow-vX.Y.Z.zip`. Its archive root contains the schema, overview, action definitions, element
+XSDs, and process examples, and may also contain the optional `components-definitions.json`, which is validated when
+present. Installed version directories are immutable and are only marked available after a complete validated install.
 
 ## Build/runtime details
 

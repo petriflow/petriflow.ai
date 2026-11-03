@@ -4,10 +4,18 @@
 
 In `REMOTE` mode, `list-versions` reflects GitHub release metadata. Data tools and resources additionally require the
 matching release asset `petriflow-vX.Y.Z.zip` to have been downloaded and installed. Ask the server administrator to
-inspect startup logs or retry `POST /admin/petriflow/sync`.
+inspect startup logs or retry `POST /admin/petriflow/sync`. While `petriflow/petriflow` releases do not publish ZIP
+assets, a REMOTE server lists versions without data; run with `PETRIFLOW_MODE=LOCAL` (the default) to use the bundled
+snapshot.
 
 In `LOCAL` mode, only the bundled snapshot version is available. Older versions are rejected even if the storage
 directory contains them; the server does not silently substitute files from another version.
+
+## No field components are returned
+
+`components-definitions.json` is optional in release archives. `list-components` returns an empty list for a version
+whose archive does not include it, and `get-component` reports that components are not available for that version. The
+bundled LOCAL snapshot always includes the file.
 
 ## `latest` cannot be resolved
 

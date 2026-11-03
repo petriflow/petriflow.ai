@@ -23,6 +23,63 @@ export function validateReleasePaths(paths: string[], sourceName: string): void 
   }
 }
 
+function isNonEmptyStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.length > 0 &&
+    value.every((entry) => typeof entry === "string" && entry.trim().length > 0);
+}
+
+/**
+ * Validates component definitions when a release publishes them. Older releases do not ship
+ * the file, so its absence is not an error; a present file must be well-formed.
+ */
+export function validateComponentsDefinitions(files: Record<string, string>, sourceName: string): void {
+  const content = files["components-definitions.json"];
+  if (content === undefined) return;
+
+  const invalid = (message: string): never => {
+    throw new Error(`${sourceName} contains invalid components-definitions.json: ${message}`);
+  };
+
+  let components: unknown;
+  try {
+    components = JSON.parse(content);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return invalid(message);
+  }
+
+  if (!components || typeof components !== "object" || Array.isArray(components)) {
+    return invalid("component definitions must be a JSON object");
+  }
+
+  for (const [name, definition] of Object.entries(components)) {
+    if (!definition || typeof definition !== "object" || Array.isArray(definition)) {
+      return invalid(`component ${name} must be a JSON object`);
+    }
+
+    const component = definition as Record<string, unknown>;
+    if (!isNonEmptyStringArray(component.names)) {
+      return invalid(`component ${name} names must be a non-empty array of strings`);
+    }
+    if (!isNonEmptyStringArray(component.fieldTypes)) {
+      return invalid(`component ${name} fieldTypes must be a non-empty array of strings`);
+    }
+    if (typeof component.description !== "string" || !component.description.trim()) {
+      return invalid(`component ${name} description must be a non-empty string`);
+    }
+    if (typeof component.whenToUse !== "string" || !component.whenToUse.trim()) {
+      return invalid(`component ${name} whenToUse must be a non-empty string`);
+    }
+    if (component.params !== undefined && !Array.isArray(component.params)) {
+      return invalid(`component ${name} params must be an array`);
+    }
+    if (component.examples !== undefined &&
+      !(Array.isArray(component.examples) && component.examples.every((example) => typeof example === "string"))) {
+      return invalid(`component ${name} examples must be an array of strings`);
+    }
+  }
+}
+
 /** Validates text content for remote release ZIPs. */
 export function validateReleaseFiles(files: Record<string, string>, sourceName: string): void {
   for (const filename of ["petriflow.schema.xsd", "overview.md", "actions-definitions.json"]) {
@@ -40,6 +97,8 @@ export function validateReleaseFiles(files: Record<string, string>, sourceName: 
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`${sourceName} contains invalid actions-definitions.json: ${message}`);
   }
+
+  validateComponentsDefinitions(files, sourceName);
 
   if (!Object.keys(files).some((name) => name.startsWith("elements/") && name.endsWith(".xsd"))) {
     throw new Error(`${sourceName} is missing element XSD files`);
