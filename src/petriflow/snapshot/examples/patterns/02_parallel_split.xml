@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>02_parallel_split</id>
 	<version>1.0.0</version>
-	<initials>WCP2</initials>
+	<initials>WCP</initials>
 	<title>Pattern 2 (Parallel Split)</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>

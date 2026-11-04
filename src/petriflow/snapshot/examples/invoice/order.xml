@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>order</id>
+	<version>1.0.0</version>
 	<initials>ORD</initials>
 	<title>Order</title>
 	<icon>device_hub</icon>
@@ -10,7 +11,7 @@
 		<event type="create">
 			<id>order_create</id>
 			<actions phase="post">
-				<action id="2">
+				<action id="action_2">
 					<![CDATA[
 					order_id: f.order_id,
 					processId_invoice: f.processId_invoice,
@@ -61,7 +62,7 @@
 		<event type="set">
 			<id>new_invoice_id_set</id>
 			<actions phase="post">
-				<action id="1">
+				<action id="action_1">
 					<![CDATA[
 					children_invoice_cases: f.children_invoice_cases,
 					new_invoice_id: f.new_invoice_id;
@@ -370,7 +371,7 @@
 		<event type="finish">
 			<id>t3_finish</id>
 			<actions phase="pre">
-				<action id="3">
+				<action id="action_3">
 					<![CDATA[
 					back: f.back,
 					reject: f.reject,
@@ -560,6 +561,7 @@
 		<id>p7</id>
 		<x>272</x>
 		<y>272</y>
+		<label>p7</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

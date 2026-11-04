@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>insurance</id>
+	<version>1.0.0</version>
 	<initials>POI</initials>
 	<title>Insurance</title>
 	<defaultRole>true</defaultRole>
@@ -18,7 +19,7 @@
 	<data type="button">
 		<id>button_0</id>
 		<title>Add insured person</title>
-		<action trigger="set">taskref: f.taskRef_0;
+		<action id="action_1" trigger="set">taskref: f.taskRef_0;
 def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
 def insured_person = createCase("${groupId}_insured_person")
 change taskref value {
@@ -34,10 +35,10 @@ change taskref value {
 		<id>t1</id>
 		<x>209</x>
 		<y>73</y>
+		<label></label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label></label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>

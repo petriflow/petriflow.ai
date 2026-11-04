@@ -2,6 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>region_2</id>
+    <version>1.0.0</version>
     <initials>KR2</initials>
     <title>Region</title>
     <defaultRole>true</defaultRole>
@@ -30,10 +31,10 @@
         <id>1</id>
         <x>220</x>
         <y>100</y>
+        <label>Add district</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Add district</label>
         <dataGroup>
             <id>DataGroup_1</id>
             <layout>grid</layout>
@@ -71,7 +72,7 @@
         <event type="finish">
             <id>1_finish</id>
             <actions phase="pre">
-                <action>
+                <action id="action_1">
 					districts: f.enumeration_1,
                 	mongoId: f.text_0,
                 	title: f.text_1;
@@ -87,10 +88,10 @@
         <id>2</id>
         <x>221</x>
         <y>101</y>
+        <label>Districts</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Districts</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>

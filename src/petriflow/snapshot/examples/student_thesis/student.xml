@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>student</id>
+	<version>1.0.0</version>
 	<initials>STD</initials>
 	<title>Student</title>
 	<defaultRole>false</defaultRole>
@@ -63,6 +64,7 @@
 		</layout>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student_first_name</id>
 				<logic>
@@ -171,6 +173,7 @@
 		</userRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student_ref</id>
 				<logic>
@@ -218,7 +221,7 @@
 				<event type="get">
 					<id>get_event_0</id>
 					<actions phase="pre">
-						<action id="5">
+						<action id="action_5">
 							<![CDATA[
 							topic: f.std_thesis_topics;
 							                    def group_prefix = useCase.processIdentifier - useCase.processIdentifier.split("/").last();
@@ -306,6 +309,7 @@
 		</userRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>std_ref_thesis_submission</id>
 				<logic>
@@ -325,7 +329,7 @@
 		<event type="assign">
 			<id>t6_assign</id>
 			<actions phase="pre">
-				<action id="action_5">
+				<action id="action_action_5">
 					<![CDATA[
 					thesis_submission: f.std_ref_thesis_submission,
 					                    topic: f.std_thesis_topics;
@@ -386,6 +390,7 @@
 		</userRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic_detail</id>
 				<logic>
@@ -422,6 +427,7 @@
 		<id>p1</id>
 		<x>48</x>
 		<y>144</y>
+		<label>p1</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -429,6 +435,7 @@
 		<id>p2</id>
 		<x>304</x>
 		<y>144</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -436,6 +443,7 @@
 		<id>p3</id>
 		<x>528</x>
 		<y>144</y>
+		<label>p3</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -443,6 +451,7 @@
 		<id>p4</id>
 		<x>784</x>
 		<y>144</y>
+		<label>p4</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -450,6 +459,7 @@
 		<id>p5</id>
 		<x>1008</x>
 		<y>144</y>
+		<label>p5</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -457,6 +467,7 @@
 		<id>p6</id>
 		<x>656</x>
 		<y>48</y>
+		<label>p6</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

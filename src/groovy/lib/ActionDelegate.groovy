@@ -1,5 +1,9 @@
-// AUTO-GENERATED from the NAE ActionDelegate.groovy by src/groovy/tools/generate-delegate.groovy
-// Do not edit by hand. Regenerate with: groovy src/groovy/tools/generate-delegate.groovy <path-to-ActionDelegate.groovy>
+// AUTO-GENERATED — do not edit by hand.
+// Source: netgrif/application-engine@v7.0.3
+// Path: application-engine/src/main/groovy/com/netgrif/application/engine/petrinet/domain/dataset/logic/action/ActionDelegate.groovy
+// SHA-256: f2cbd012f00be6829439d0fcb124f268bd25c5d43e7b2e50d87afa4b90a7eb04
+// Regenerate (pinned NAE ref): groovy src/groovy/tools/generate-delegate.groovy
+// Regenerate (local NAE checkout): groovy src/groovy/tools/generate-delegate.groovy --source /path/to/ActionDelegate.groovy
 // Stripped ActionDelegate: full DSL method surface, no Spring/NAE runtime deps.
 
 import groovy.transform.CompileStatic
@@ -25,10 +29,13 @@ class Case extends Stub {
     List tasks
 }
 class CaseField extends Field {}
+class CaseSearchRequest extends Stub {}
+class ChangedField extends Stub {}
 class ChoiceField extends Field {}
 class DashboardItemBody extends Stub {}
 class DashboardManagementBody extends Stub {}
 class DynamicValidation extends Stub {}
+class ElasticTaskSearchRequest extends Stub {}
 class EventOutcome extends Stub {}
 class ExportDataConfig extends Stub {}
 class Field extends Stub {
@@ -40,6 +47,7 @@ class Field extends Stub {
     Object validations
 }
 class FieldActionsRunner extends Stub {}
+class FieldBehavior extends Stub {}
 class FileField extends Field {}
 class FileFieldInputStream extends Stub {}
 class FileFieldValue extends Stub {}
@@ -64,6 +72,8 @@ class PetriNet extends Stub {
     Map dataSet
 }
 class PluginHolder extends Stub {}
+class Predicate extends Stub {}
+class ProcessRole extends Stub {}
 class SetDataEventOutcome extends Stub {}
 class TabbedCaseViewBody extends Stub {}
 class Task extends Stub {
@@ -139,7 +149,7 @@ class ActionDelegate {
     FrontendActionOutcome Frontend = null
     ModuleHolder NaeModule = null
     PluginHolder Plugin = null
-    Map map = null
+    Object map = null
 
     def init(Action action, Case useCase, Optional task, FieldActionsRunner actionsRunner, Map params = null) { null }
     void retainForAsyncExecution() {}
@@ -279,17 +289,22 @@ class ActionDelegate {
     def createFilter(Object title, String query, String type, List allowedNets, String icon, String visibility, Object filterMetadata) { null }
     def changeFilter(Case filter) { null }
     def deleteFilter(Case filter) { null }
-    def createMenuItem(String uri, String identifier, Case filter, String groupName, Map allowedRoles, Map bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null) { null }
-    def createMenuItem(String uri, String identifier, Case filter, String groupName, List allowedRoles, List bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null) { null }
-    def createMenuItem(String uri, String identifier, Case filter, Map allowedRoles, Map bannedRoles = null, Case group = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null) { null }
-    def createMenuItem(String uri, String identifier, Case filter, List allowedRoles, List bannedRoles = null, Case group = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null) { null }
-    def createMenuItem(String uri, String identifier, Object name, String icon = null, Case filter = null, Map allowedRoles = null, Map bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null) { null }
+    def createMenuItem(String uri, String identifier, Case filter, String groupName, Map allowedRoles, Map bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null, Double order = null) { null }
+    def createMenuItem(String uri, String identifier, Case filter, String groupName, List allowedRoles, List bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null, Double order = null) { null }
+    def createMenuItem(String uri, String identifier, Case filter, Map allowedRoles, Map bannedRoles = null, Case group = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null, Double order = null) { null }
+    def createMenuItem(String uri, String identifier, Case filter, List allowedRoles, List bannedRoles = null, Case group = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null, Double order = null) { null }
+    def createMenuItem(String uri, String identifier, Object name, String icon = null, Case filter = null, Map allowedRoles = null, Map bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null, Double order = null) { null }
     def changeMenuItem(Case item) { null }
+    def changeMenuItemOrder(Case item, Object order) { null }
+    def changeMenuItemOrder(String menuItemIdentifier, Object order) { null }
+    def getOrderedMenuItemChildren(Case parentItem) { null }
+    def moveMenuItemInOrder(Case item, int offset) { null }
     void updateMenuItemRoles(Case item, Closure cl, String roleFieldId) {}
+    def validateMenuOrder(Object value) { null }
     def deleteMenuItem(Case item) { null }
     def createFilterInMenu(String uri, String identifier, Object title, String query, String type, List allowedNets, String groupName, Map allowedRoles = null, Map bannedRoles = null, List defaultHeaders = null, String icon = null, String visibility = null) { null }
     def createFilterInMenu(String uri, String identifier, Object title, String query, String type, List allowedNets, Map allowedRoles = null, Map bannedRoles = null, List defaultHeaders, String icon = null, String visibility = null, Case orgGroup = null) { null }
-    def createFilterInMenu(String uri, String itemIdentifier, Object itemAndFilterName, String filterQuery, String filterType, String filterVisibility, List filterAllowedNets = null, String itemAndFilterIcon = null, Map itemAllowedRoles = null, Map itemBannedRoles = null, List itemCaseDefaultHeaders = null, List itemTaskDefaultHeaders = null, Object filterMetadata = null) { null }
+    def createFilterInMenu(String uri, String itemIdentifier, Object itemAndFilterName, String filterQuery, String filterType, String filterVisibility, List filterAllowedNets = null, String itemAndFilterIcon = null, Map itemAllowedRoles = null, Map itemBannedRoles = null, List itemCaseDefaultHeaders = null, List itemTaskDefaultHeaders = null, Object filterMetadata = null, Double order = null) { null }
     def createFilterInMenu(MenuItemBody body, String filterQuery, String filterType, String filterVisibility, List filterAllowedNets = null, Object filterMetadata = null) { null }
     def createMenuItem(MenuItemBody body) { null }
     def getOrCreateMenuItem(MenuItemBody body) { null }
@@ -325,13 +340,13 @@ class ActionDelegate {
     def collectRolesForPreferenceItem(Map roles) { null }
     void updateFilter(Case filter, Map dataSet) {}
     def i18n(String value, Map translations) { null }
-    def createMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles, Map bannedRoles = null, Case group = null, List defaultHeaders = null) { null }
-    def createTaskMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles, Case group = null, List defaultHeaders = null) { null }
-    def createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles = null, Map bannedRoles = null, Case group = null, List defaultHeaders = null) { null }
-    def createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles = null, Map bannedRoles = null, Case group = null, List defaultHeaders = null) { null }
-    def createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List allowedNets, Map roles = null, Map bannedRoles = null, Case group = null, List defaultHeaders = null) { null }
-    def createOrUpdateMenuItem(String uri, String identifier, Object name, String icon = null, Case filter = null, Map allowedRoles = null, Map bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null) { null }
-    def createOrUpdateMenuItemAndFilter(String uri, String itemIdentifier, Object itemAndFilterName, String filterQuery, String filterType, String filterVisibility, List filterAllowedNets = null, String itemAndFilterIcon = null, Map itemAllowedRoles = null, Map itemBannedRoles = null, List itemCaseDefaultHeaders = null, List itemTaskDefaultHeaders = null, Object filterMetadata = null) { null }
+    def createMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles, Map bannedRoles = null, Case group = null, List defaultHeaders = null, Double order = null) { null }
+    def createTaskMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles, Case group = null, List defaultHeaders = null, Double order = null) { null }
+    def createOrUpdateCaseMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles = null, Map bannedRoles = null, Case group = null, List defaultHeaders = null, Double order = null) { null }
+    def createOrUpdateTaskMenuItem(String id, String uri, String query, String icon, String title, List allowedNets, Map roles = null, Map bannedRoles = null, Case group = null, List defaultHeaders = null, Double order = null) { null }
+    def createOrUpdateMenuItem(String id, String uri, String type, String query, String icon, String title, List allowedNets, Map roles = null, Map bannedRoles = null, Case group = null, List defaultHeaders = null, Double order = null) { null }
+    def createOrUpdateMenuItem(String uri, String identifier, Object name, String icon = null, Case filter = null, Map allowedRoles = null, Map bannedRoles = null, List caseDefaultHeaders = null, List taskDefaultHeaders = null, Double order = null) { null }
+    def createOrUpdateMenuItemAndFilter(String uri, String itemIdentifier, Object itemAndFilterName, String filterQuery, String filterType, String filterVisibility, List filterAllowedNets = null, String itemAndFilterIcon = null, Map itemAllowedRoles = null, Map itemBannedRoles = null, List itemCaseDefaultHeaders = null, List itemTaskDefaultHeaders = null, Object filterMetadata = null, Double order = null) { null }
     def createOrUpdateMenuItem(MenuItemBody body) { null }
     def createOrUpdateMenuItemAndFilter(MenuItemBody body, String filterQuery, String filterType, String filterVisibility, List filterAllowedNets = null, Object filterMetadata = null) { null }
     def createOrIgnoreMenuItem(MenuItemBody body) { null }

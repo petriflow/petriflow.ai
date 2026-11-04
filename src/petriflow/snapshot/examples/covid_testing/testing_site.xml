@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>testing_site_2</id>
+	<version>1.0.0</version>
 	<initials>OD2</initials>
 	<title>Testing site</title>
 	<defaultRole>true</defaultRole>
@@ -19,7 +20,10 @@
 	<data type="enumeration_map">
 		<id>text_1</id>
 		<title>Region</title>
-		<action trigger="set">
+		<view>
+			<autocomplete/>
+		</view>
+		<action id="action_1" trigger="set">
 			region_field: f.text_1,
 			district:  f.text_2;
 
@@ -29,14 +33,11 @@
 				data["enumeration_1"].options
 			}
 		</action>
-		<view>
-			<autocomplete/>
-		</view>
 	</data>
 	<data type="enumeration_map">
 		<id>text_2</id>
 		<title>District</title>
-		<action trigger="set">
+		<action id="action_2" trigger="set">
 district_field: f.text_2,
 municipality:  f.text_3;
 
@@ -91,10 +92,10 @@ change municipality options {
 		<id>2</id>
 		<x>340</x>
 		<y>180</y>
+		<label>New testing site</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>New testing site</label>
 		<assignPolicy>auto</assignPolicy>
 <!--		<roleRef>-->
 <!--			<id>administrator</id>-->
@@ -164,7 +165,7 @@ change municipality options {
 					<y>2</y>
 					<rows>1</rows>
 					<cols>2</cols>
-					<offset>null</offset>
+					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
@@ -223,7 +224,7 @@ change municipality options {
 		<event type="assign">
 			<id>2_assign</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_3">
 region:  f.text_1;
 
 def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
@@ -241,10 +242,10 @@ change region options {
 		<id>5</id>
 		<x>460</x>
 		<y>100</y>
+		<label>Testing site details</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Testing site details</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>
@@ -329,10 +330,10 @@ change region options {
 		<id>6</id>
 		<x>460</x>
 		<y>340</y>
+		<label>Edit</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Edit</label>
 <!--		<roleRef>-->
 <!--			<id>administrator</id>-->
 <!--			<logic>-->
@@ -408,10 +409,10 @@ change region options {
 		<id>7</id>
 		<x>580</x>
 		<y>180</y>
+		<label>Delete</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Delete</label>
 <!--		<roleRef>-->
 <!--			<id>administrator</id>-->
 <!--			<logic>-->
@@ -443,10 +444,10 @@ change region options {
 		<id>21</id>
 		<x>580</x>
 		<y>340</y>
+		<label>Add appointment</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Add appointment</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup_0</id>
@@ -470,7 +471,7 @@ change region options {
 		<event type="assign">
 			<id>0</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_4">
 					appointment_ref: f.taskRef_0;
 
 					def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
@@ -485,7 +486,7 @@ change region options {
 		<event type="finish">
 			<id>1</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_5">
 					appointments: f.enumeration_1,
 					appointment_ref: f.taskRef_0;
 

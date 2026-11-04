@@ -112,6 +112,10 @@ Return convention:
 - `src/ts/services/action-validation.service.ts` — action/function compilation through a persistent Groovy subprocess.
   Pure reference helpers can be tested directly; daemon tests should use a fake child process rather than require
   Groovy.
+- `src/groovy/lib/ActionDelegate.groovy` is generated from `netgrif/application-engine` (pinned `NAE_REF` in
+  `src/groovy/tools/generate-delegate.groovy`, currently `v7.0.3`); never edit it by hand. Regenerate with
+  `groovy src/groovy/tools/generate-delegate.groovy`, or `--source <file>` for a local NAE checkout and `--check` to
+  detect drift. The NAE source itself is not vendored in this repository.
 
 ## MCP Resources
 

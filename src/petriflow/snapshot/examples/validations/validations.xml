@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
 	<id>validations</id>
+	<version>1.0.0</version>
 	<initials>VAL</initials>
 	<title>Validations</title>
 	<icon>device_hub</icon>
@@ -12,6 +13,7 @@
 		<validations>
 			<validation>
 				<expression>odd</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -21,6 +23,7 @@
 		<validations>
 			<validation>
 				<expression>even</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -30,6 +33,7 @@
 		<validations>
 			<validation>
 				<expression>positive</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -39,6 +43,7 @@
 		<validations>
 			<validation>
 				<expression>negative</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -48,6 +53,7 @@
 		<validations>
 			<validation>
 				<expression>decimal</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -57,6 +63,7 @@
 		<validations>
 			<validation>
 				<expression>inrange 10,2000</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -66,6 +73,7 @@
 		<validations>
 			<validation>
 				<expression>inrange inf,0</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -75,6 +83,7 @@
 		<validations>
 			<validation>
 				<expression>inrange 0,inf</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -84,6 +93,7 @@
 		<validations>
 			<validation>
 				<expression>minLength 3</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -93,6 +103,7 @@
 		<validations>
 			<validation>
 				<expression>maxLength 10</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -112,6 +123,7 @@
 		<validations>
 			<validation>
 				<expression>email</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>

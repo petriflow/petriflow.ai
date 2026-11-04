@@ -106,7 +106,7 @@ if (stepper.value == "key2") {
 		<event type="set">
 			<id>button_6_set</id>
 			<actions phase="post">
-				<action id="607mpf8lmv">
+				<action id="action_607mpf8lmv">
 					<!-- @formatter:off -->
 					btn_next: f.button_6,
 btn_back: f.button_5,
@@ -444,6 +444,7 @@ change taskRef_2 value {
 		<id>p1</id>
 		<x>380</x>
 		<y>180</y>
+		<label>p1</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -451,6 +452,7 @@ change taskRef_2 value {
 		<id>p2</id>
 		<x>540</x>
 		<y>180</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

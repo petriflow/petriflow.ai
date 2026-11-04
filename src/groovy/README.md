@@ -1,6 +1,6 @@
 # Groovy Action Validation
 
-This directory contains the Groovy side of the `validate-action` MCP tool. It
+This directory contains the Groovy side of the `validate_action` MCP tool. It
 validates a single Petriflow action (a Groovy code snippet) by compiling it —
 **compile-only, never executed** — against the Petriflow DSL.
 
@@ -26,7 +26,7 @@ daemon** spawned by the Node server, avoiding per-call JVM startup cost.
 | `Validator.groovy` | The daemon. Reads newline-delimited JSON on stdin, compiles each action, writes one JSON result per request to stdout. |
 | `lib/ActionDelegate.groovy` | **Generated.** A stripped `ActionDelegate` exposing the full DSL method surface (signatures only) plus stub domain types. No Spring/NAE runtime dependencies. |
 | `lib/DynamicTypeCheckingExtension.groovy` | A `TypeCheckingExtension` that relaxes static checking for the dynamic parts of the DSL while keeping DSL method names strict. |
-| `tools/generate-delegate.groovy` | Regenerates `lib/ActionDelegate.groovy` from the original NAE source (passed as an argument). |
+| `tools/generate-delegate.groovy` | Regenerates `lib/ActionDelegate.groovy` from the pinned NAE source, or from a local NAE checkout. |
 
 ## How validation works
 
@@ -83,8 +83,10 @@ Plain `@CompileStatic` would reject these as false positives.
 the `ActionDelegate`/`ActionScript` itself:
 
 - `handleMissingMethod` — allows method calls on `Object` and stub domain types
-  (returns a synthetic `Object`-returning method), but returns an empty list for
-  the delegate so undefined DSL methods are still reported.
+  (returns a synthetic `Object`-returning method). On the delegate, an unknown
+  name is still reported, but a known DSL method called with dynamically typed
+  arguments (for example `assignTask(findTask { ... })`) is accepted, so
+  `def` values from `findTask`/`findCases` do not produce false positives.
 - `handleUnresolvedProperty` — allows property access on `Object` and stub types
   (typed as `Object`), but not on the delegate.
 - `onMethodSelection` — drops the direct-call target for synthetic methods so
@@ -97,16 +99,32 @@ properties (`value`, `stringId`, `importId`, …) and a `getAt` method so that
 
 ## Regenerating the stripped delegate
 
-`lib/ActionDelegate.groovy` is generated from the original NAE `ActionDelegate`
-source, which is **not** part of this project — it is passed to the generator as
-an argument:
+`lib/ActionDelegate.groovy` is generated from the original NAE `ActionDelegate`,
+which is **not** part of this project. The generator downloads it from the NAE
+repository at the ref pinned in `NAE_REF`:
 
 ```bash
-groovy src/groovy/tools/generate-delegate.groovy /path/to/NAE/ActionDelegate.groovy
+# Pinned ref (NAE_REPO / NAE_REF / NAE_PATH in the script)
+groovy src/groovy/tools/generate-delegate.groovy
+
+# Another ref, or a different path inside that ref
+groovy src/groovy/tools/generate-delegate.groovy --ref master --path src/main/groovy/com/netgrif/application/engine/petrinet/domain/dataset/logic/action/ActionDelegate.groovy
+
+# Local NAE checkout (wins over the download)
+groovy src/groovy/tools/generate-delegate.groovy --source /path/to/application-engine/src/main/groovy/com/netgrif/application/engine/petrinet/domain/dataset/logic/action/ActionDelegate.groovy
+
+# Fail instead of writing when the checked-in file is out of date
+groovy src/groovy/tools/generate-delegate.groovy --check
 ```
 
-An optional second argument overrides the output path (defaults to
-`src/groovy/lib/ActionDelegate.groovy`).
+Other flags: `--out <file>` (defaults to `src/groovy/lib/ActionDelegate.groovy`)
+and `--help`. The generated header records the source ref, path, and SHA-256, so
+the checked-in artifact can be traced back to an exact NAE revision.
+
+To move to a newer NAE, change `NAE_REF` and `NAE_PATH` together, regenerate, run
+`--check`, review the diff, and commit the script constants with the generated
+file. `--check` needs network and Groovy, so it is not part of the build; the
+generated file stays checked in and the build never downloads NAE.
 
 The generator:
 
@@ -114,8 +132,10 @@ The generator:
   original, replacing bodies with `null`.
 - Replaces default parameter values with `null` (so `change(field)` still matches
   `change(Field, Case = null, Optional = null)`).
-- Emits stub types for every NAE domain class referenced by the signatures, with
-  common properties on the frequently-used ones.
+- Emits stub types for every NAE domain class referenced by the signatures or by
+  the delegate's context fields, including generic arguments such as
+  `Optional<Task>` and `List<EventOutcome>`. Stubs are empty: the generated class
+  is only used for compilation, so no implementation is copied.
 - Emits typed result classes for the DSL chains (`change(...).value { ... }`,
   `changeCaseProperty(...).about { ... }`, `make(...).on(...).when { ... }`, …).
 - Emits the delegate's context fields (`useCase`, `task`, `params`, …) and
@@ -180,9 +200,14 @@ compiling. The closure parameter names are preserved; parameter *types* are
   parameters access properties dynamically (e.g. `u.fullName`); these are allowed
   (typed `Object`), so typos in those properties are not caught. DSL method-name
   typos are still caught.
-- **Field existence** — `validate-action` (standalone) does not check field
-  existence; the `validate-process` rule does (it has the process's `<data>` and
+- **Field existence** — `validate_action` (standalone) does not check field
+  existence; the `action-validation` rule does (it has the process's `<data>` and
   `<transition>` declarations).
+- **Closure-shared variables** — reusing a `def` variable inside a closure for
+  values of different types (for example `def c = findCase { ... }` followed by
+  `c.getFieldValue(...)`) can still produce Groovy's "closure shared variable"
+  error. That diagnostic comes from `@CompileStatic`'s variable analysis rather
+  than from method resolution, so the extension cannot relax it.
 
 ## Requirements
 

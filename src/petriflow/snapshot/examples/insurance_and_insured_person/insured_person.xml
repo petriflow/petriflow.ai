@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>insured_person</id>
+	<version>1.0.0</version>
 	<initials>POS</initials>
 	<title>Insured person</title>
 	<defaultRole>true</defaultRole>
@@ -22,10 +23,10 @@
 		<id>t1</id>
 		<x>162</x>
 		<y>113</y>
+		<label></label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label></label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>

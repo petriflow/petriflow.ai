@@ -32,13 +32,31 @@ class DynamicTypeCheckingExtension extends TypeCheckingExtension {
     List<MethodNode> handleMissingMethod(ClassNode receiver, String name, ArgumentListExpression args,
                                          ClassNode[] argTypes, MethodCall call) {
         // Keep strict checking for the delegate (the DSL surface) and the action script itself.
+        // An unknown name is always an error; a known DSL method called with dynamically typed
+        // arguments (`def` values from findTask/findCases/...) is accepted.
         if (receiver.name in ["ActionScript", "ActionDelegate"]) {
-            return []
+            return declaresMethod(receiver, name) ? [dynamicMethod(name)] : []
         }
         // Any other receiver (Object, stub domain types, ...) is dynamic: allow the call.
-        def method = new MethodNode(name, 1 /* ACC_PUBLIC */, ClassHelper.OBJECT_TYPE,
+        return [dynamicMethod(name)]
+    }
+
+    /** Whether the type or one of its superclasses declares a method with this name. */
+    private static boolean declaresMethod(ClassNode type, String name) {
+        def current = type
+        while (current != null && current.name != "java.lang.Object") {
+            if (current.getMethods(name)) {
+                return true
+            }
+            current = current.getSuperClass()
+        }
+        return false
+    }
+
+    /** Synthetic method used to accept a call whose exact signature cannot be resolved. */
+    private static MethodNode dynamicMethod(String name) {
+        return new MethodNode(name, 1 /* ACC_PUBLIC */, ClassHelper.OBJECT_TYPE,
                 new Parameter[0], new ClassNode[0], EmptyStatement.INSTANCE)
-        return [method]
     }
 
     @Override

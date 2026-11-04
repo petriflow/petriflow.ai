@@ -1,15 +1,15 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>insured_person</id>
+	<version>1.0.0</version>
 	<initials>INP</initials>
 	<title>Insured person</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
-	<role>
+	<role global="false">
 		<id>system</id>
 		<title>System</title>
-		<global>false</global>
 	</role>
 	<data type="date">
 		<id>date</id>
@@ -185,6 +185,7 @@
 		<id>p2</id>
 		<x>528</x>
 		<y>144</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -192,6 +193,7 @@
 		<id>p4</id>
 		<x>304</x>
 		<y>144</y>
+		<label>p4</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>

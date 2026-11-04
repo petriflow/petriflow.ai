@@ -2,6 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>person_2</id>
+    <version>1.0.0</version>
     <initials>OS2</initials>
     <title>Person</title>
     <defaultRole>true</defaultRole>
@@ -43,10 +44,10 @@
         <id>2</id>
         <x>300</x>
         <y>220</y>
+        <label>Personal information</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Personal information</label>
 		<icon>person</icon>
 		<assignPolicy>auto</assignPolicy>
         <dataGroup>
@@ -119,7 +120,7 @@
         <event type="finish">
             <id>2_finish</id>
             <actions phase="pre">
-                <action>
+                <action id="action_1">
                     address_ref: f.taskRef_0;
 
                     def groupId = findCase{it.processIdentifier.eq("org_group").and(it.author.id.eq(loggedUser().id))}?.stringId
@@ -136,10 +137,10 @@
         <id>8</id>
         <x>540</x>
         <y>220</y>
+        <label>Permanent address</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Permanent address</label>
 		<icon>home</icon>
 		<assignPolicy>auto</assignPolicy>
         <dataGroup>
@@ -164,7 +165,7 @@
         <event type="finish">
             <id>8_finish</id>
             <actions phase="pre">
-                <action>
+                <action id="action_2">
 					address_ref_visible: f.taskRef_1,
                     address_ref: f.taskRef_0;
 
@@ -187,10 +188,10 @@
         <id>14</id>
         <x>660</x>
         <y>140</y>
+        <label>Detail</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Detail</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
@@ -275,10 +276,10 @@
         <id>18</id>
         <x>780</x>
         <y>220</y>
+        <label>Delete</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Delete</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
@@ -303,10 +304,10 @@
         <id>19</id>
         <x>660</x>
         <y>380</y>
+        <label>Edit</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Edit</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>

@@ -7,25 +7,21 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
-	<role>
+	<role global="false">
 		<id>legal</id>
 		<title>Legal</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>pr</id>
 		<title>PR</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>registration</id>
 		<title>Registration</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>system</id>
 		<title>System</title>
-		<global>false</global>
 	</role>
 	<function scope="process" name="decision">
 		<![CDATA[
@@ -53,7 +49,7 @@
 		<event type="set">
 			<id>decision_business_set</id>
 			<actions phase="post">
-				<action id="8">
+				<action id="action_8">
 					<![CDATA[
 					go_business: f.go_business,
 					decision_business: f.decision_business;
@@ -70,7 +66,7 @@
 		<event type="set">
 			<id>decision_legal_set</id>
 			<actions phase="post">
-				<action id="6">
+				<action id="action_6">
 					<![CDATA[
 					go_legal: f.go_legal,
 					decision_legal: f.decision_legal;
@@ -87,7 +83,7 @@
 		<event type="set">
 			<id>decision_technical_set</id>
 			<actions phase="post">
-				<action id="7">
+				<action id="action_7">
 					<![CDATA[
 					decision_technical: f.decision_technical,
 					go_technical: f.go_technical;
@@ -298,7 +294,7 @@
 		<event type="finish">
 			<id>t2_finish</id>
 			<actions phase="pre">
-				<action id="1">
+				<action id="action_1">
 					<![CDATA[
 					state: f.state;
 					change state value { "Your request was submitted."; }
@@ -382,7 +378,7 @@
 		<event type="finish">
 			<id>t3_finish</id>
 			<actions phase="pre">
-				<action id="2">
+				<action id="action_2">
 					<![CDATA[
 					state: f.state;
 					change state value { "Your requast was registered."; }
@@ -442,7 +438,7 @@
 		<event type="finish">
 			<id>t5_finish</id>
 			<actions phase="pre">
-				<action id="4">
+				<action id="action_4">
 					<![CDATA[
 					t6: t.t6,
 					statement_of_legal: f.statement_of_legal;
@@ -517,7 +513,7 @@
 		<event type="finish">
 			<id>t6_finish</id>
 			<actions phase="pre">
-				<action id="3">
+				<action id="action_3">
 					<![CDATA[
 					t8: t.t8,
 					answer: f.answer,
@@ -600,6 +596,7 @@
 		<id>p10</id>
 		<x>1072</x>
 		<y>272</y>
+		<label>p10</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -607,6 +604,7 @@
 		<id>p11</id>
 		<x>1072</x>
 		<y>400</y>
+		<label>p11</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -614,6 +612,7 @@
 		<id>p13</id>
 		<x>912</x>
 		<y>592</y>
+		<label>p13</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -645,6 +644,7 @@
 		<id>p6</id>
 		<x>1424</x>
 		<y>272</y>
+		<label>p6</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
