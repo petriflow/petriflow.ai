@@ -130,7 +130,7 @@ jobs:
 
           This bundle contains the built application and production Node.js dependencies.
           It targets Node.js 26 on Alpine Linux (musl), with libxml2 available at runtime.
-          Action validation additionally requires Java 21 and Groovy 4.0.33 on PATH.
+          Action validation additionally requires Java 21 and Groovy 5.0.5 on PATH.
 
           Run from this directory with:
             node --enable-source-maps server.cjs

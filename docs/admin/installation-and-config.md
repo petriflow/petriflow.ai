@@ -4,7 +4,7 @@
 
 - Node.js **26.x** and pnpm.
 - To build the native `libxmljs5` dependency from source: Python 3, `make`, `g++`, and `libxml2` development headers.
-- To use `validate-action` or the action-validation semantic rule: a JVM (OpenJDK 21) and Groovy 4.0.x on `PATH`.
+- To use `validate_action` or the action-validation semantic rule: a JVM (OpenJDK 21) and Groovy 5.0.x on `PATH`.
 
 The production bundle externalizes `libxmljs5`; the runtime image must include `node_modules` and the native library.
 The action-validation service also needs the Groovy validator files from `src/groovy`.
@@ -40,7 +40,7 @@ The application does not authenticate the sync endpoint. Protect it at the deplo
 
 ## Docker status
 
-The Dockerfile installs pnpm with the official standalone installer, using the version declared in `package.json`, and uses the repository lockfile with `--frozen-lockfile`. It uses the Node 26/Alpine 3.24 image tag for build and runtime, verifies the Groovy 4.0.33 archive checksum, and sets `HOST=0.0.0.0` so published container ports work.
+The Dockerfile installs pnpm with the official standalone installer, using the version declared in `package.json`, and uses the repository lockfile with `--frozen-lockfile`. It uses the Node 26/Alpine 3.24 image tag for build and runtime, verifies the Groovy 5.0.5 archive checksum, and sets `HOST=0.0.0.0` so published container ports work.
 
 The runtime image declares `/app/dist/storage` as a volume. Configure a named volume at that path to preserve synchronized releases when containers are replaced. The server also writes the recreatable version cache to `/app/dist/cache.json`.
 

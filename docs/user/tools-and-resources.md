@@ -7,21 +7,21 @@ content; raw schema, overview, element, and example tools return text.
 
 | Tool               | Inputs               | Result                                                                 |
 |--------------------|----------------------|------------------------------------------------------------------------|
-| `list-versions`    | None                 | Published versions with release date, prerelease, and latest flags.    |
-| `get-schema`       | `version`            | Complete XSD as text.                                                  |
-| `get-overview`     | `version`            | Version overview as Markdown text.                                     |
-| `list-elements`    | `version`            | Element names and descriptions.                                        |
-| `get-element`      | `version`, `name`    | Element XSD as text.                                                   |
-| `list-actions`     | `version`            | Action names, signatures, and descriptions.                            |
-| `get-action`       | `version`, `name`    | Full action definition.                                                |
-| `list-components`  | `version`            | Component ids, `<name>` values, field types, description, when to use. |
-| `get-component`    | `version`, `name`    | Full component definition with properties and examples.                |
-| `list-examples`    | `version`            | Example names and descriptions taken from their XML titles.            |
-| `get-example`      | `version`, `example` | Example process XML as text.                                           |
-| `validate-process` | `version`, `xml`     | `{ valid, issues }` after XML, XSD, and semantic checks.               |
-| `validate-action`  | `definition`         | `{ valid, issues }` from Groovy compilation against the Petriflow DSL. |
+| `list_versions`    | None                 | Published versions with release date, prerelease, and latest flags.    |
+| `get_schema`       | `version`            | Complete XSD as text.                                                  |
+| `get_overview`     | `version`            | Version overview as Markdown text.                                     |
+| `list_elements`    | `version`            | Element names and descriptions.                                        |
+| `get_element`      | `version`, `name`    | Element XSD as text.                                                   |
+| `list_actions`     | `version`            | Action names, signatures, and descriptions.                            |
+| `get_action`       | `version`, `name`    | Full action definition.                                                |
+| `list_components`  | `version`            | Component ids, `<name>` values, field types, description, when to use. |
+| `get_component`    | `version`, `name`    | Full component definition with properties and examples.                |
+| `list_examples`    | `version`            | Example names and descriptions taken from their XML titles.            |
+| `get_example`      | `version`, `example` | Example process XML as text.                                           |
+| `validate_process` | `version`, `xml`     | `{ valid, issues }` after XML, XSD, and semantic checks.               |
+| `validate_action`  | `definition`         | `{ valid, issues }` from Groovy compilation against the Petriflow DSL. |
 
-For all versioned tools, `latest` resolves to the latest stable version. `validate-action` accepts an action body, not a
+For all versioned tools, `latest` resolves to the latest stable version. `validate_action` accepts an action body, not a
 full process XML document; it compiles the code but never executes it.
 
 ## Resources
@@ -49,9 +49,9 @@ does not download data or replace validation when reading a resource.
 
 ## Validation results
 
-`validate-process` returns a `valid` boolean and an `issues` array. Each issue includes a rule identifier, severity
+`validate_process` returns a `valid` boolean and an `issues` array. Each issue includes a rule identifier, severity
 (`error` or `warning`), and message; source location or an element path may also be present. Warnings do not make the
 result invalid.
 
-`validate-action` returns compilation issues with optional line and column numbers.
+`validate_action` returns compilation issues with optional line and column numbers.
 See [server requirements](../admin/installation-and-config.md) for its JVM/Groovy requirements.

@@ -163,7 +163,8 @@ Return convention:
   permissions apply.
 - Builder and runtime share the `node:26-alpine3.24` image so `libxmljs5` is built for the runtime ABI. The image tag
   follows Node 26 patch releases while keeping the Alpine release line fixed.
-- Groovy 4.0.33 is downloaded from Apache and SHA-256 verified. Update its version and checksum together.
+- Groovy 5.0.5 is downloaded from Apache and SHA-256 verified (`GROOVY_VERSION` / `GROOVY_SHA256`). Update the
+  version and checksum together.
 - The application defaults to `HOST=127.0.0.1`; the container sets `HOST=0.0.0.0` for published ports.
 - Runtime writes `dist/cache.json` and `dist/storage`; the image makes `dist` writable by `node` and declares
   `/app/dist/storage` as a volume. Deployments should use a named volume there.

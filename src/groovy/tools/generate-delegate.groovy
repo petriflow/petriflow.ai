@@ -136,12 +136,8 @@ def CLOSURE_FIELDS = [
     "byCode", "byCity", "byIco",
 ] as Set
 
-// --- Delegate state referenced by action code ------------------------------
-// Spring-injected NAE services are deliberately not part of the stripped class.
-def CONTEXT_FIELDS = [
-    "useCase", "task", "params", "action", "actionsRunner",
-    "outcomes", "Frontend", "NaeModule", "Plugin", "map",
-]
+// Delegate state and injected NAE services. Action code can reference all of
+// them, so the stripped class exposes the same non-static fields.
 
 // --- Emitted result classes, never stubbed ---------------------------------
 def RESULT_TYPES = [
@@ -196,12 +192,8 @@ ad.methods.each { method ->
     method.parameters.each { parameter -> collectTypes(parameter.type, referencedTypes) }
 }
 
-def contextFields = CONTEXT_FIELDS.collect { fieldName ->
-    def field = ad.fields.find { it.name == fieldName }
-    if (field == null) fail("Context field ${fieldName} not found in ActionDelegate; review CONTEXT_FIELDS")
-    collectTypes(field.type, referencedTypes)
-    field
-}
+def contextFields = ad.fields.findAll { !it.isStatic() && !CLOSURE_FIELDS.contains(it.name) }
+contextFields.each { field -> collectTypes(field.type, referencedTypes) }
 
 // Determine which types need stubs
 def isIdentifier = { String name -> name ==~ /[A-Za-z_$][A-Za-z0-9_$]*/ }
@@ -224,7 +216,18 @@ sb << "// SHA-256: ${sourceSha}\n"
 sb << "// Regenerate (pinned NAE ref): groovy src/groovy/tools/generate-delegate.groovy\n"
 sb << "// Regenerate (local NAE checkout): groovy src/groovy/tools/generate-delegate.groovy --source /path/to/ActionDelegate.groovy\n"
 sb << "// Stripped ActionDelegate: full DSL method surface, no Spring/NAE runtime deps.\n\n"
-sb << "import groovy.transform.CompileStatic\n\n"
+sb << "import groovy.transform.CompileStatic\n"
+// Groovy's default imports cover java.lang, java.util, java.io and java.net, but
+// not java.time or java.util.stream. The NAE signatures reference these types
+// unqualified, and Groovy 4.x does not resolve them without an import.
+sb << "import java.time.Instant\n"
+sb << "import java.time.LocalDate\n"
+sb << "import java.time.LocalDateTime\n"
+sb << "import java.time.LocalTime\n"
+sb << "import java.time.ZoneId\n"
+sb << "import java.time.ZonedDateTime\n"
+sb << "import java.util.stream.Stream\n"
+sb << "\n"
 
 // Stub types
 sb << "// --- Stub types (stand-ins for NAE domain classes) ---\n"

@@ -34,4 +34,4 @@ and add it to `docs/_sidebar.md`.
 ## Native/runtime requirements
 
 `libxmljs5` requires native build tools and libxml2 headers. The Groovy validation path additionally requires JVM 21 and
-Groovy 4.0.x. See the [administrator installation guide](../admin/installation-and-config.md).
+Groovy 5.0.x. See the [administrator installation guide](../admin/installation-and-config.md).

@@ -13,7 +13,7 @@ MCP tool or resource read
   -> PetriflowDataService reads the requested version from StorageService
   -> result is adapted to the tool or resource response format
 
-validate-process
+validate_process
   -> reject malformed XML immediately
   -> collect XSD validation issues using the stored schema
   -> run registered semantic rules

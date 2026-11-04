@@ -17,7 +17,7 @@ guarantee that every Petriflow release asset is available.
 
 ## Choose a language version
 
-Use `list-versions` to discover published Petriflow versions. Most versioned tools and resources accept a concrete
+Use `list_versions` to discover published Petriflow versions. Most versioned tools and resources accept a concrete
 SemVer version or `latest`, which means the latest stable release.
 
 By default, the server synchronizes release metadata and missing ZIP assets at startup (`PETRIFLOW_MODE=REMOTE`). For an
@@ -26,9 +26,9 @@ without contacting GitHub. The LOCAL snapshot is stored in `src/petriflow/snapsh
 
 ## Typical workflow
 
-1. Call `list-versions` and choose a version (or `latest`).
-2. Inspect the language with `get-overview` and `get-schema`.
-3. Use `list-elements` / `get-element`, `list-actions` / `get-action`, `list-components` / `get-component`, and `list-examples` / `get-example` as needed.
-4. Validate a process with `validate-process`, or compile-check a Groovy action with `validate-action`.
+1. Call `list_versions` and choose a version (or `latest`).
+2. Inspect the language with `get_overview` and `get_schema`.
+3. Use `list_elements` / `get_element`, `list_actions` / `get_action`, `list_components` / `get_component`, and `list_examples` / `get_example` as needed.
+4. Validate a process with `validate_process`, or compile-check a Groovy action with `validate_action`.
 
 See [Tools and resources](tools-and-resources.md) for inputs and outputs.

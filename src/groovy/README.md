@@ -138,8 +138,12 @@ The generator:
   is only used for compilation, so no implementation is copied.
 - Emits typed result classes for the DSL chains (`change(...).value { ... }`,
   `changeCaseProperty(...).about { ... }`, `make(...).on(...).when { ... }`, …).
-- Emits the delegate's context fields (`useCase`, `task`, `params`, …) and
-  closure-valued fields (`visible`, `editable`, `transitions`, …).
+- Emits the delegate's non-static fields — the DSL context (`useCase`, `task`,
+  `params`, …) and the injected NAE services action code can reference (`async`,
+  `workflowService`, `userService`, …) — plus the closure-valued fields
+  (`visible`, `editable`, `transitions`, …).
+- Adds imports for JDK types the NAE signatures use unqualified and Groovy does
+  not import by default (`java.time.*`, `java.util.stream.Stream`).
 
 ## Protocol
 
@@ -208,8 +212,14 @@ compiling. The closure parameter names are preserved; parameter *types* are
   `c.getFieldValue(...)`) can still produce Groovy's "closure shared variable"
   error. That diagnostic comes from `@CompileStatic`'s variable analysis rather
   than from method resolution, so the extension cannot relax it.
+- **Properties missing from stubs (Groovy 4 only)** — under Groovy 4, reading a
+  property the stripped stubs do not declare fails with
+  `Access to <Type>#<property> is forbidden` (for example
+  `useCase.processIdentifier`, `userService.loggedOrSystem`,
+  `field.value.path`). The runtime image ships Groovy 5.0.5, which accepts the
+  same code; a local Groovy 4 environment still reports it.
 
 ## Requirements
 
-- A JVM (OpenJDK 21) and Groovy (4.0.x) on `PATH`. The `Dockerfile` installs both
+- A JVM (OpenJDK 21) and Groovy (5.0.x) on `PATH`. The `Dockerfile` installs both
   into the runtime image.

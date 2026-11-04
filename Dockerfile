@@ -40,13 +40,15 @@ FROM runtime-base AS runtime
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 
-ARG GROOVY_VERSION=4.0.33
+ARG GROOVY_VERSION=5.0.5
+ARG GROOVY_SHA256=eec490f4710cbb0811b935f78b4ec3da6d5eb19a25c692b3c7284ef9a1fc5182
 
 # JVM + Groovy power action validation. Verify the pinned Apache binary before installing it.
 RUN apk add --no-cache --virtual .groovy-install-deps curl unzip \
     && curl --fail --silent --show-error --location \
       "https://archive.apache.org/dist/groovy/${GROOVY_VERSION}/distribution/apache-groovy-binary-${GROOVY_VERSION}.zip" \
       --output /tmp/groovy.zip \
+    && echo "${GROOVY_SHA256}  /tmp/groovy.zip" | sha256sum -c - \
     && unzip -q /tmp/groovy.zip -d /opt \
     && rm /tmp/groovy.zip \
     && apk del .groovy-install-deps \

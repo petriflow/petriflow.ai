@@ -7,6 +7,13 @@
 // Stripped ActionDelegate: full DSL method surface, no Spring/NAE runtime deps.
 
 import groovy.transform.CompileStatic
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.stream.Stream
 
 // --- Stub types (stand-ins for NAE domain classes) ---
 class Stub {
@@ -21,6 +28,7 @@ class AbstractUser extends Stub {
     String email
 }
 class Action extends Stub {}
+class AsyncRunner extends Stub {}
 class Case extends Stub {
     String title
     String color
@@ -33,10 +41,13 @@ class CaseSearchRequest extends Stub {}
 class ChangedField extends Stub {}
 class ChoiceField extends Field {}
 class DashboardItemBody extends Stub {}
+class DashboardItemService extends Stub {}
 class DashboardManagementBody extends Stub {}
+class DashboardManagementService extends Stub {}
 class DynamicValidation extends Stub {}
 class ElasticTaskSearchRequest extends Stub {}
 class EventOutcome extends Stub {}
+class ExportConfiguration extends Stub {}
 class ExportDataConfig extends Stub {}
 class Field extends Stub {
     Object type
@@ -48,15 +59,38 @@ class Field extends Stub {
 }
 class FieldActionsRunner extends Stub {}
 class FieldBehavior extends Stub {}
+class FieldFactory extends Stub {}
 class FileField extends Field {}
 class FileFieldInputStream extends Stub {}
 class FileFieldValue extends Stub {}
 class FilterBody extends Stub {}
+class FilterConfigurationProperties extends Stub {}
 class FrontendActionOutcome extends Stub {}
 class GetDataEventOutcome extends Stub {}
+class GroupService extends Stub {}
 class I18nString extends Stub {
 }
+class IConfigurableMenuService extends Stub {}
+class IDataService extends Stub {}
+class IDataValidationExpressionEvaluator extends Stub {}
+class IElasticCaseService extends Stub {}
+class IElasticTaskService extends Stub {}
+class IExportService extends Stub {}
+class IFilterImportExportService extends Stub {}
+class IImpersonationService extends Stub {}
+class IMailAttemptService extends Stub {}
+class IMailService extends Stub {}
+class IMenuImportExportService extends Stub {}
+class IMenuItemService extends Stub {}
+class IPdfGenerator extends Stub {}
+class IPetriNetService extends Stub {}
+class IRegistrationService extends Stub {}
+class IStorageResolverService extends Stub {}
+class IUserFilterSearchService extends Stub {}
+class IWorkflowService extends Stub {}
+class InitValueExpressionEvaluator extends Stub {}
 class LoggedUser extends Stub {}
+class MailConfigurationProperties extends Stub {}
 class MailDraft extends Stub {}
 class MapOptionsField extends Field {}
 class MenuItemBody extends Stub {}
@@ -67,6 +101,7 @@ class NewUserRequest extends Stub {}
 class Nullable extends Stub {}
 class Page extends Stub {}
 class Pageable extends Stub {}
+class PaginationProperties extends Stub {}
 class PetriNet extends Stub {
     Map transitions
     Map dataSet
@@ -74,6 +109,9 @@ class PetriNet extends Stub {
 class PluginHolder extends Stub {}
 class Predicate extends Stub {}
 class ProcessRole extends Stub {}
+class ProcessRoleService extends Stub {}
+class Scheduler extends Stub {}
+class SecurityConfigurationProperties extends Stub {}
 class SetDataEventOutcome extends Stub {}
 class TabbedCaseViewBody extends Stub {}
 class Task extends Stub {
@@ -82,9 +120,12 @@ class Task extends Stub {
     Map dataSet
 }
 class TaskEventOutcome extends Stub {}
+class TaskService extends Stub {}
 class Transition extends Stub {
     Map dataSet
 }
+class UserDetailsServiceImpl extends Stub {}
+class UserService extends Stub {}
 class Validation extends Stub {}
 class Version extends Stub {}
 class ViewBody extends Stub {}
@@ -140,16 +181,53 @@ class ActionDelegate {
     Closure byCode = null
     Closure byCity = null
     Closure byIco = null
-    Case useCase = null
-    Optional<Task> task = null
-    Map<String, String> params = null
-    Action action = null
-    FieldActionsRunner actionsRunner = null
-    List<EventOutcome> outcomes = null
+    MailConfigurationProperties mailProperties = null
+    FilterConfigurationProperties filterConfigurationProperties = null
+    FieldFactory fieldFactory = null
+    TaskService taskService = null
+    IDataService dataService = null
+    IWorkflowService workflowService = null
+    UserService userService = null
+    IPetriNetService petriNetService = null
+    AsyncRunner async = null
+    IPdfGenerator pdfGenerator = null
+    IMailService mailService = null
+    GroupService groupService = null
+    ProcessRoleService processRoleService = null
+    IRegistrationService registrationService = null
+    IMailAttemptService mailAttemptService = null
+    UserDetailsServiceImpl userDetailsService = null
+    IDataValidationExpressionEvaluator dataValidationExpressionEvaluator = null
+    InitValueExpressionEvaluator initValueExpressionEvaluator = null
+    Scheduler scheduler = null
+    IUserFilterSearchService filterSearchService = null
+    IConfigurableMenuService configurableMenuService = null
+    IMenuImportExportService menuImportExportService = null
+    IFilterImportExportService filterImportExportService = null
+    IExportService exportService = null
+    IElasticCaseService elasticCaseService = null
+    IElasticTaskService elasticTaskService = null
+    ExportConfiguration exportConfiguration = null
+    IImpersonationService impersonationService = null
+    SecurityConfigurationProperties securityProperties = null
+    IMenuItemService menuItemService = null
+    DashboardManagementService dashboardManagementService = null
+    DashboardItemService dashboardItemService = null
+    IStorageResolverService storageResolverService = null
+    PaginationProperties paginationProperties = null
     FrontendActionOutcome Frontend = null
     ModuleHolder NaeModule = null
     PluginHolder Plugin = null
+    Case useCase = null
+    Optional<Task> task = null
+    Map<String, String> params = null
     Object map = null
+    Action action = null
+    FieldActionsRunner actionsRunner = null
+    List<EventOutcome> outcomes = null
+    int pendingAsyncExecutions = null
+    boolean executionFinished = null
+    boolean executionStateCleared = null
 
     def init(Action action, Case useCase, Optional task, FieldActionsRunner actionsRunner, Map params = null) { null }
     void retainForAsyncExecution() {}
