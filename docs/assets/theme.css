@@ -1,0 +1,172 @@
+/* Petriflow documentation theme — dark only.
+   Brand colors come from the Petriflow mark: magenta #ff1578 and blue #0aa8ff.
+   Everything below overrides Docsify 5 CSS custom properties, so the core
+   stylesheet and the core-dark addon keep doing the layout work. */
+
+:root {
+  color-scheme: dark;
+
+  /* Surfaces and text */
+  --color-bg: #0b0d18;
+  --color-text: #e9edf7;
+  --color-mono-min: #0b0d18;
+  --color-mono-max: #e9edf7;
+  --border-color: #232a4d;
+  --border-radius: 8px;
+  --strong-color: #ffffff;
+
+  /* Brand */
+  --theme-color: #0aa8ff;
+  --link-color: #0aa8ff;
+  --link-color-hover: #ff1578;
+  --link-underline-color: rgba(10, 168, 255, 0.4);
+  --link-underline-color-hover: rgba(255, 21, 120, 0.55);
+
+  /* Layout */
+  --content-max-width: 78ch;
+  --content-margin-inline: 3.2rem;
+  --sidebar-width: 272px;
+  --sidebar-bg: #0d1020;
+  --sidebar-border-color: #232a4d;
+  --sidebar-link-color: #aab3cd;
+  --sidebar-link-color-active: #ffffff;
+  --sidebar-name-color: #ffffff;
+  --sidebar-name-font-size: 1.05rem;
+  --sidebar-name-font-weight: 600;
+
+  /* Code */
+  --code-bg: #141833;
+  --code-color: #8fd6ff;
+  --codeblock-bg: #080a12;
+  --codeblock-color: #dbe3f4;
+  --codeblock-comment: #5d6885;
+  --codeblock-keyword: #ff6fae;
+  --codeblock-function: #8fd6ff;
+  --codeblock-selector: #7fe3c0;
+  --codeblock-variable: #ffcb6b;
+  --codeblock-tag: #ff6fae;
+  --codeblock-operator: #a7b3d6;
+  --codeblock-punctuation: #7c88a8;
+
+  /* Tables, quotes, callouts */
+  --table-row-alt-bg: rgba(20, 24, 51, 0.6);
+  --blockquote-border-color: #ff1578;
+  --blockquote-color: #c3cbe0;
+  --callout-bg: #141833;
+  --callout-border-color: #2b3357;
+  --mark-bg: #ff1578;
+  --mark-color: #0b0d18;
+}
+
+/* Page headings carry the brand underline. */
+.markdown-section h1 {
+  padding-bottom: 0.4em;
+  background-image: linear-gradient(90deg, #ff1578, #0aa8ff);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 56px 2px;
+}
+
+.markdown-section h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-section h3 {
+  color: #cdd6ec;
+}
+
+/* Sidebar: brand marker on the current page and quiet group headings. */
+.sidebar-nav li.active > a {
+  color: var(--sidebar-link-color-active);
+  background-image: linear-gradient(90deg, rgba(255, 21, 120, 0.16), rgba(10, 168, 255, 0.08));
+  box-shadow: inset 2px 0 0 #ff1578;
+}
+
+#__sidebar > div > p {
+  margin: 1.1em 20px 0.35em;
+  color: #6f7a9c;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+#__sidebar > div > p strong {
+  color: inherit;
+  font-weight: inherit;
+}
+
+#__sidebar > section {
+  padding: 14px 0 2px;
+}
+
+.sidebar .app-name img {
+  width: 46px;
+  height: 46px;
+}
+
+.sidebar .search {
+  margin: 0 1rem 0.75rem;
+}
+
+.sidebar .search input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  color: var(--color-text);
+  background: #141833;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  outline: none;
+}
+
+.sidebar .search input:focus {
+  border-color: var(--theme-color);
+}
+
+/* Content details. */
+.markdown-section table th {
+  color: #8f9ab8;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #2b3357;
+}
+
+.markdown-section table td {
+  border-bottom: 1px solid #1b2140;
+}
+
+.markdown-section table td:first-child {
+  color: #ffffff;
+}
+
+.markdown-section pre {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.markdown-section :not(pre) > code {
+  border: 1px solid rgba(10, 168, 255, 0.16);
+}
+
+.markdown-section blockquote {
+  padding: 0.2em 0 0.2em 1.1em;
+  background: rgba(255, 21, 120, 0.05);
+  border-radius: 0 8px 8px 0;
+}
+
+.markdown-section hr {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+}
+
+::selection {
+  background: rgba(255, 21, 120, 0.35);
+}
+
+/* The source ribbon stays quiet: navy plate, blue cat. */
+.github-corner svg {
+  fill: #141833;
+  color: #0aa8ff;
+}

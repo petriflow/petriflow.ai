@@ -115,6 +115,11 @@ fabric.properties
 ### Example user template template
 ### Example user template
 
+.opencode/
+.openchamber
+.superpowers
+TODOs.md
+
 # IntelliJ project files
 .idea
 *.iml
@@ -301,6 +306,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-
-.opencode/
-TODOs.md

@@ -1,9 +1,11 @@
 import {mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync} from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import {pino} from "pino";
 import {expect, test, vi} from "vitest";
 import {StorageService} from "../../src/ts/services/storage.service";
 import {PetriflowSnapshotService} from "../../src/ts/services/petriflow-snapshot.service";
+import {setLogger} from "../../src/ts/services/logger.service";
 
 const releaseFiles: Record<string, string> = {
   "petriflow.schema.xsd": "<schema />",
@@ -71,6 +73,26 @@ test("installs the checked-in snapshot including binary assets", () => {
   } finally {
     rmSync(directory, {recursive: true, force: true});
   }
+});
+
+test("warns when the snapshot version is already installed and keeps the stored files", () => {
+  withSnapshot((snapshotPath, storage) => {
+    storage.installVersion("1.2.3", releaseFiles);
+    const warnings: Array<{context: unknown; message: string}> = [];
+    const logger = {warn: (context: unknown, message: string) => warnings.push({context, message})};
+    setLogger(logger as unknown as Parameters<typeof setLogger>[0]);
+
+    try {
+      const manifest = new PetriflowSnapshotService(snapshotPath, storage).install();
+
+      expect(manifest.version).toBe("1.2.3");
+      expect(warnings).toHaveLength(1);
+      expect(warnings[0].message).toMatch(/already installed/i);
+      expect(warnings[0].context).toMatchObject({version: "1.2.3"});
+    } finally {
+      setLogger(pino({level: "silent"}));
+    }
+  });
 });
 
 test("copies non-UTF-8 snapshot files without decoding them", () => {

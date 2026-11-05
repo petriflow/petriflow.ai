@@ -94,6 +94,34 @@ test("resolves latest and reports missing release files clearly", () => {
   });
 });
 
+test("reports components a release does not publish instead of a missing file", () => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "petriflow-data-components-"));
+  try {
+    const storage = new StorageService(directory);
+    storage.installVersion("1.2.3", {
+      "petriflow.schema.xsd": "<schema />",
+      "overview.md": "# Overview",
+      "actions-definitions.json": "{}",
+      "elements/place.xsd": "<place />",
+      "examples/simple.xml": "<process />",
+    });
+    const service = new PetriflowDataService(storage, {resolveVersion: (version) => version});
+
+    expect(service.listComponents("1.2.3")).toEqual([]);
+    expect(() => service.getComponent("1.2.3", "button-style"))
+      .toThrow(/components are not available for version 1\.2\.3/i);
+  } finally {
+    rmSync(directory, {recursive: true, force: true});
+  }
+});
+
+test("rejects uninstalled versions when components are requested", () => {
+  withData((service) => {
+    expect(() => service.listComponents("9.9.9")).toThrow(/not installed/i);
+    expect(() => service.getComponent("9.9.9", "button-style")).toThrow(/not installed/i);
+  });
+});
+
 test("rejects old stored versions when the LOCAL catalog exposes only its snapshot", () => {
   const directory = mkdtempSync(path.join(os.tmpdir(), "petriflow-local-data-"));
   try {
