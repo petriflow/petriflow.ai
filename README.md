@@ -61,6 +61,7 @@ Current tools:
 | `get-example`      | Get the content of one example process                                              |
 | `validate-process` | Validate a process XML against its schema and semantic rules                        |
 | `validate-action`  | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
+| `generate-app-manifest` | Generate a `manifest.xml` for an application bundle deployed to cloud NAE      |
 
 Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
 
@@ -143,6 +144,32 @@ image is the recommended deployment artifact because it includes the runtime env
 ```bash
 pnpm start            # node dist/server.cjs
 ```
+
+## Application packaging
+
+`POST /applications/package` builds a cloud NAE application ZIP from `multipart/form-data`. Send the manifest fields
+`appId`, `name`, and `version` (required) plus `description`, `author`, and `title` (optional), together with one or more
+process XML files. A file named `manifest.xml` is used verbatim; otherwise the manifest is generated from the fields and
+the `<id>` inside each process XML. Generated manifests still omit the optional NAE `imports`, `dependencies`, `assets`,
+and `app_meta` fields. The response is `application/zip` with `manifest.xml` at the root and processes under
+`processes/`.
+
+For incremental uploads, use a batch. The `validate` flag is batch-only; sending it to the one-shot endpoint is
+rejected.
+
+| Endpoint                                            | Purpose                                                                                                  |
+|-----------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| `POST /applications/package/batches`                | Start a batch with manifest fields or `manifest.xml`, plus optional `validate=true`. Returns `{batchId, processCount, validate, expiresAt}`. |
+| `POST /applications/package/batches/:id/processes`  | Add one or more process XMLs. With `validate=true`, invalid processes return `422` with issues and are not added. |
+| `POST /applications/package/batches/:id/complete`   | Return the ZIP and delete the batch.                                                                     |
+| `DELETE /applications/package/batches/:id`          | Cancel the batch.                                                                                        |
+
+Batches are kept in memory for 30 minutes after the last successful upload, are lost on restart, and are not shared
+between replicas. Limits are 5 MiB per file, 100 files per request, 16 KiB per field, 100 processes and 50 MiB
+(including the manifest) per application, at most 10 open batches, and 200 MiB retained across batches. The endpoints
+return `400` for invalid requests, `404` for unknown or expired batches, `409` for duplicates, `413` for limits, `422`
+for validation failures, and `503` when validation or batch capacity is unavailable. They are not authenticated;
+deployment infrastructure must protect them.
 
 ## Learn More
 

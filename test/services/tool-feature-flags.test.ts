@@ -5,6 +5,7 @@ import {metadata as getComponent} from "../../src/ts/tools/get_component.tool";
 import {metadata as getElement} from "../../src/ts/tools/get_element.tool";
 import {metadata as getExample} from "../../src/ts/tools/get_example.tool";
 import {metadata as getSchema} from "../../src/ts/tools/get_schema.tool";
+import {metadata as generateAppManifest} from "../../src/ts/tools/generate_app_manifest.tool";
 import {metadata as listActions} from "../../src/ts/tools/list_actions.tool";
 import {metadata as listComponents} from "../../src/ts/tools/list_components.tool";
 import {metadata as listElements} from "../../src/ts/tools/list_elements.tool";
@@ -17,6 +18,7 @@ import {metadata as validateProcess} from "../../src/ts/tools/validate_process.t
 test("the feature-flag tool catalog matches XMCP tool metadata names", () => {
   const metadata = [
     getSchema,
+    generateAppManifest,
     getAction,
     listActions,
     getExample,

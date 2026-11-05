@@ -24,6 +24,7 @@
     "dev": "pnpm build && pnpm start"
   },
   "dependencies": {
+    "@fastify/multipart": "^10.1.7",
     "@fastify/static": "^10.1.4",
     "@xmldom/xmldom": "^0.9.12",
     "fastify": "^5.12.5",

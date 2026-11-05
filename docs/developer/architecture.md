@@ -34,6 +34,10 @@ validate-process
 | `src/ts/services/petriflow-data.service.ts`    | Shared version resolution and readers for schema, overview, elements, actions, and examples. |
 | `src/ts/services/validation.service.ts`        | XML/XSD validation followed by registered semantic rules.                                    |
 | `src/ts/services/action-validation.service.ts` | Persistent Groovy subprocess protocol for action/function compilation.                       |
+| `src/ts/services/app-manifest.service.ts`      | Pure `manifest.xml` generator for cloud NAE application bundles.                              |
+| `src/ts/services/app-packaging.service.ts`     | XML upload parsing, process id extraction, limits, and application ZIP construction.          |
+| `src/ts/services/package-batch.service.ts`     | In-memory packaging batches with a sliding TTL; single-instance only.                         |
+| `src/ts/routes/application-package.route.ts`   | Multipart packaging endpoints under `/applications/package`.                                  |
 | `src/ts/resources/`                            | xmcp-discovered MCP resources and resource templates.                                        |
 | `src/ts/tools/`                                | xmcp-discovered MCP tools.                                                                   |
 

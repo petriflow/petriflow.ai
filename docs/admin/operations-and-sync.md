@@ -7,10 +7,19 @@
 | `GET /health`                | Basic process health (`{"status":"ok"}`). It does not assert that all release assets are installed. |
 | `GET` / `POST /mcp`          | MCP HTTP endpoint.                                                                                  |
 | `POST /admin/petriflow/sync` | Refresh release metadata and install missing release assets.                                        |
+| `POST /applications/package` | Build and return a cloud NAE application ZIP from uploaded XML files.                               |
+| `POST /applications/package/batches` | Start an in-memory packaging batch.                                                          |
+| `POST /applications/package/batches/{batchId}/processes` | Add process XMLs to a packaging batch.                                    |
+| `POST /applications/package/batches/{batchId}/complete` | Return the batch ZIP and delete the batch.                                 |
+| `DELETE /applications/package/batches/{batchId}` | Cancel a packaging batch.                                                          |
 
 Protect the administrative sync endpoint outside the application. The endpoint waits for synchronization to finish. It
 returns HTTP 200 with `status: "synchronized"` on complete success, HTTP 503 with `status: "partial"` / `"failed"`
 and error details for remote failures, or HTTP 409 with `status: "disabled"` in LOCAL mode.
+
+Protect the packaging endpoints outside the application as well; they are unauthenticated and write process memory.
+Batches are kept in memory for 30 minutes after the last successful upload, are lost on restart, and are not shared
+between replicas. Limits are 5 MiB per file, 100 processes, and 50 MiB per application, with at most 10 open batches.
 
 Example successful response:
 `{"status":"synchronized","discoveredVersions":12,"downloadedVersions":["1.2.3"],"alreadyInstalledVersions":["1.2.2"],"failedVersions":[]}`.

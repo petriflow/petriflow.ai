@@ -33,6 +33,18 @@ Create `src/ts/services/rules/<name>.rule.ts` and export a `ValidationRule` with
 Use helpers from `rules/helpers.ts` for local-name XPath lookups and identifier/integer parsing. Add tests under
 `test/services/rules/` for valid, invalid, and boundary inputs.
 
+## Application packaging endpoints
+
+`src/ts/routes/application-package.route.ts` registers the HTTP packaging API. It parses multipart uploads with
+`@fastify/multipart`, delegates XML parsing and ZIP creation to `app-packaging.service.ts`, and keeps open batches in
+`package-batch.service.ts`. Batches are process-local, so the API assumes a single server instance and no persistence
+across restarts.
+
+`POST /applications/package` is one-shot. The batch routes start with manifest data, accept process XMLs one or more at
+a time, and finish with a ZIP. A batch can set `validate=true`; each uploaded process is then checked by
+`ValidationService` against the active latest Petriflow version and rejected with `422` when invalid. Limits live in
+`PACKAGE_LIMITS` and in the route options used by tests.
+
 ## Change release data
 
 The Petriflow repository is the source of truth. Add versioned content to the release asset using the exact root paths

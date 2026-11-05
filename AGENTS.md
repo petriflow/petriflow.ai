@@ -78,6 +78,9 @@ Return convention:
 
 - `PORT` defaults to `3000`; `HOST` defaults to `127.0.0.1` for local use. The Docker image sets `HOST=0.0.0.0` so
   published container ports are reachable.
+- Application packaging endpoints live under `/applications/package` and use `@fastify/multipart`. Limits are defined in
+  `PACKAGE_LIMITS`; batch state is in memory only. Deployment infrastructure owns authentication for these endpoints, as
+  it does for `POST /admin/petriflow/sync`.
 
 ## Services
 
@@ -99,6 +102,12 @@ Return convention:
   and XMCP adapter module graph. Use stable namespaced keys; do not add a production reset.
 - `src/ts/services/petriflow-data.service.ts` — shared readers for schema, overview, elements, action definitions, and
   examples. Tools, resources, and validation should use this service rather than reading files directly.
+- `src/ts/services/app-manifest.service.ts` — pure `manifest.xml` generator for cloud NAE application bundles. Optional
+  NAE fields (`imports`, `dependencies`, `assets`, `app_meta`) are not generated yet.
+- `src/ts/services/app-packaging.service.ts` — parses uploaded manifest/process XML, extracts process ids, enforces
+  `PACKAGE_LIMITS`, and builds the application ZIP with `fflate`.
+- `src/ts/services/package-batch.service.ts` — process-local in-memory packaging batches with a sliding TTL. Batches are
+  not persisted and are not shared between replicas.
 - `src/ts/services/version-completions.service.ts` — resource-template completion values from the active catalog;
   completion must not fetch from GitHub.
 - `src/ts/services/logger.service.ts` — `getLogger()` returns the process-shared logger and `setLogger()` updates it;

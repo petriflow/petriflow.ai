@@ -13,6 +13,7 @@ tools to be implemented
 - [x] getExample (id) - get complete annotated example - id of example get via listExample
 - [x] validateProcess (xml) - validate process xml - XSD validation, semantic checks, verbous errors
 - [x] validateAction (definition) - validate one action as a code - syntax, semantics, best practices
+- [x] generateAppManifest (appId, name, version, processes, description?, author?, title?) - manifest.xml for a cloud NAE application bundle
 
 optional
 

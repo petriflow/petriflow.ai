@@ -20,6 +20,7 @@ content; raw schema, overview, element, and example tools return text.
 | `get-example`      | `version`, `example` | Example process XML as text.                                           |
 | `validate-process` | `version`, `xml`     | `{ valid, issues }` after XML, XSD, and semantic checks.               |
 | `validate-action`  | `definition`         | `{ valid, issues }` from Groovy compilation against the Petriflow DSL. |
+| `generate-app-manifest` | `appId`, `name`, `version`, `processes` (optional `description`, `author`, `title`) | `manifest.xml` XML as text. |
 
 For all versioned tools, `latest` resolves to the latest stable version. `validate-action` accepts an action body, not a
 full process XML document; it compiles the code but never executes it.
