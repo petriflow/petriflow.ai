@@ -8,7 +8,7 @@ local build. All of them serve the same HTTP API and need no Petriflow download 
 ```bash
 docker run --rm -p 3000:3000 \
   -v petriflow-storage:/app/storage \
-  netgrif/petriflow-mcp:1.0.0
+  netgrif/petriflow-mcp:1.1.0
 ```
 
 The image already contains the bundled Petriflow release, Java 21, and Groovy 5.0.5, so every tool works without
@@ -26,7 +26,7 @@ curl http://localhost:3000/health
 # {"status":"ok"}
 ```
 
-Use a version tag in production (`1.0.0`), not `latest`. Stable releases also publish `latest`; prereleases do not.
+Use a version tag in production (`1.1.0`), not `latest`. Stable releases also publish `latest`; prereleases do not.
 
 ## Runtime bundle
 
@@ -34,7 +34,7 @@ Each GitHub release attaches `petriflow-mcp-vX.Y.Z-linux-alpine-node26.tar.gz`, 
 `node_modules` from the image's `/app` directory.
 
 ```bash
-tar -xzf petriflow-mcp-v1.0.0-linux-alpine-node26.tar.gz -C /opt/petriflow-mcp
+tar -xzf petriflow-mcp-v1.1.0-linux-alpine-node26.tar.gz -C /opt/petriflow-mcp
 cd /opt/petriflow-mcp
 node --enable-source-maps server.cjs
 ```

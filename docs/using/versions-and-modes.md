@@ -79,6 +79,6 @@ You can run both in different deployments against the same image; the mode is pe
 
 ## Pinning a version
 
-Pin the server image and the language version together. `netgrif/petriflow-mcp:1.0.0` carries one specific snapshot, so
+Pin the server image and the language version together. `netgrif/petriflow-mcp:1.1.0` carries one specific snapshot, so
 tool behaviour does not change under a running deployment. Upgrade deliberately: pull a new image tag, read its
 [release notes](operations/releases.md), and restart.

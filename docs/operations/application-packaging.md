@@ -12,7 +12,7 @@ The server can package Petriflow process XMLs and a cloud NAE `manifest.xml` int
 |---|---|---|
 | `appId` | yes | Unique application identifier (`app_id`) |
 | `name` | yes | Application display name |
-| `version` | yes | Application version, for example `1.0.0` |
+| `version` | yes | Application version, for example `1.1.0` |
 | `description` | no | Application description |
 | `author` | no | Application author |
 | `title` | no | Case title; defaults to `name` |

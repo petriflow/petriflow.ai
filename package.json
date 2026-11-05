@@ -1,6 +1,6 @@
 {
   "name": "petriflow.ai",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for Petriflow, exposing Petriflow tools and resources to MCP-compatible AI clients.",
   "private": true,
   "license": "Apache-2.0",

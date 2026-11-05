@@ -10,7 +10,7 @@ docker run -d --name petriflow-mcp \
   --restart unless-stopped \
   -p 127.0.0.1:3000:3000 \
   -v petriflow-storage:/app/storage \
-  netgrif/petriflow-mcp:1.0.0
+  netgrif/petriflow-mcp:1.1.0
 ```
 
 | Setting | Value | Note |
@@ -47,7 +47,7 @@ Docker Compose equivalent:
 ```yaml
 services:
   petriflow-mcp:
-    image: netgrif/petriflow-mcp:1.0.0
+    image: netgrif/petriflow-mcp:1.1.0
     ports: ["127.0.0.1:3000:3000"]
     volumes: ["petriflow-storage:/app/storage"]
     environment:

@@ -129,7 +129,7 @@ pnpm build
 ## GitHub Actions releases
 
 Pull requests and pushes to `main` run typechecking, tests, and a production build. To publish a release, make sure
-`package.json` contains the intended version and push the matching `vX.Y.Z` tag (for example, `v1.0.0`). The release
+`package.json` contains the intended version and push the matching `vX.Y.Z` tag (for example, `v1.1.0`). The release
 workflow rejects tags that do not match the package version, smoke-tests the Docker image, publishes it to Docker Hub,
 and creates a GitHub Release with generated notes and a runtime bundle. Stable versions also update the Docker `latest`
 tag; prereleases do not.
