@@ -2,6 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>municipality_2</id>
+    <version>1.0.0</version>
     <initials>OB2</initials>
     <title>Municipality</title>
     <defaultRole>true</defaultRole>
@@ -20,10 +21,10 @@
         <id>2</id>
         <x>221</x>
         <y>101</y>
+        <label>Municipality</label>
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Municipality</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>

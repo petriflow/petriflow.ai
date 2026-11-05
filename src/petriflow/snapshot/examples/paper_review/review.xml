@@ -1,6 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>review</id>
-	<initials>rvw</initials>
+	<version>1.0.0</version>
+	<initials>RVW</initials>
 	<title name="model_title">Review</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
@@ -89,10 +90,10 @@
 		<userRef>
 			<id>reviewer</id>
 			<logic>
+				<perform>true</perform>
+				<delegate>false</delegate>
 				<view>true</view>
 				<cancel>false</cancel>
-				<delegate>false</delegate>
-				<perform>true</perform>
 			</logic>
 		</userRef>
 		<dataGroup>
@@ -120,7 +121,7 @@
 		<event type="finish">
 			<id>t1_finish</id>
 			<actions phase="pre">
-				<action id="1">paperCase: f.paperCase;
+				<action id="action_1">paperCase: f.paperCase;
 
 def pprCase = findCase({it._id.eq(paperCase.value)});
 def currentReviewed = (int) pprCase.getDataField("currentReviewed").getValue()
@@ -156,11 +157,11 @@ if( currentReviewed == pprCase.getDataField("all_reviews").getValue().size() ){
 		<userRef>
 			<id>reviewer</id>
 			<logic>
+				<perform>false</perform>
+				<delegate>false</delegate>
 				<view>true</view>
 				<cancel>false</cancel>
 				<assign>false</assign>
-				<delegate>false</delegate>
-				<perform>false</perform>
 			</logic>
 		</userRef>
 		<dataGroup>
@@ -386,6 +387,7 @@ if( currentReviewed == pprCase.getDataField("all_reviews").getValue().size() ){
 		<id>p1</id>
 		<x>340</x>
 		<y>140</y>
+		<label>p1</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -393,6 +395,7 @@ if( currentReviewed == pprCase.getDataField("all_reviews").getValue().size() ){
 		<id>p2</id>
 		<x>580</x>
 		<y>140</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>thesis</id>
+	<version>1.0.0</version>
 	<initials>PRC</initials>
 	<title>Thesis</title>
 	<defaultRole>false</defaultRole>
@@ -224,6 +225,7 @@
 		</userRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic</id>
 				<logic>
@@ -271,6 +273,7 @@
 		</userRef>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student</id>
 				<logic>
@@ -320,6 +323,7 @@
 		</userRef>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student</id>
 				<logic>
@@ -363,6 +367,7 @@
 		</layout>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic</id>
 				<logic>
@@ -434,6 +439,7 @@
 		</layout>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic</id>
 				<logic>
@@ -497,6 +503,7 @@
 		<id>p1</id>
 		<x>16</x>
 		<y>144</y>
+		<label>p1</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -504,6 +511,7 @@
 		<id>p2</id>
 		<x>176</x>
 		<y>144</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -511,6 +519,7 @@
 		<id>p3</id>
 		<x>432</x>
 		<y>144</y>
+		<label>p3</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -518,6 +527,7 @@
 		<id>p4</id>
 		<x>656</x>
 		<y>144</y>
+		<label>p4</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -525,6 +535,7 @@
 		<id>p5</id>
 		<x>912</x>
 		<y>144</y>
+		<label>p5</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -532,6 +543,7 @@
 		<id>p6</id>
 		<x>1136</x>
 		<y>144</y>
+		<label>p6</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -539,6 +551,7 @@
 		<id>p7</id>
 		<x>1392</x>
 		<y>144</y>
+		<label>p7</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

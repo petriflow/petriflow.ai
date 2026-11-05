@@ -17,7 +17,7 @@
 		<event type="set">
 			<id>enumeration_map_0_set</id>
 			<actions phase="post">
-				<action>
+				<action id="action_1">
 					<!-- @formatter:off -->
 					enumeration_map_2: f.enumeration_map_2,
 number_2: f.number_2,

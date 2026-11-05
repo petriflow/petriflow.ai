@@ -7,25 +7,21 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
-	<role>
+	<role global="false">
 		<id>legal</id>
 		<title>Legal</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>pr</id>
 		<title>PR</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>registration</id>
 		<title>Registration</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>system</id>
 		<title>System</title>
-		<global>false</global>
 	</role>
 	<function scope="process" name="decision">
 		<![CDATA[
@@ -256,7 +252,7 @@
 		<event type="finish">
 			<id>t2_finish</id>
 			<actions phase="pre">
-				<action id="1">
+				<action id="action_1">
 					<![CDATA[
 					state: f.state;
 					change state value { "Your request was submitted."; }
@@ -299,7 +295,7 @@
 				<event type="set">
 					<id>department_choice_set</id>
 					<actions phase="post">
-						<action id="5">
+						<action id="action_5">
 							<![CDATA[
 							go_business: f.go_business,
 							go_technical: f.go_technical,
@@ -343,7 +339,7 @@
 		<event type="finish">
 			<id>t3_finish</id>
 			<actions phase="pre">
-				<action id="2">
+				<action id="action_2">
 					<![CDATA[
 					state: f.state;
 					change state value { "Your requast was registered."; }
@@ -403,7 +399,7 @@
 		<event type="finish">
 			<id>t5_finish</id>
 			<actions phase="pre">
-				<action id="4">
+				<action id="action_4">
 					<![CDATA[
 					t6: t.t6,
 					statement_of_legal: f.statement_of_legal;
@@ -478,7 +474,7 @@
 		<event type="finish">
 			<id>t6_finish</id>
 			<actions phase="pre">
-				<action id="3">
+				<action id="action_3">
 					<![CDATA[
 					t8: t.t8,
 					answer: f.answer,
@@ -561,6 +557,7 @@
 		<id>p10</id>
 		<x>1072</x>
 		<y>272</y>
+		<label>p10</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -568,6 +565,7 @@
 		<id>p11</id>
 		<x>1072</x>
 		<y>400</y>
+		<label>p11</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -575,6 +573,7 @@
 		<id>p13</id>
 		<x>912</x>
 		<y>592</y>
+		<label>p13</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -606,6 +605,7 @@
 		<id>p6</id>
 		<x>1424</x>
 		<y>272</y>
+		<label>p6</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

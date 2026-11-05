@@ -15,7 +15,7 @@ The server ships with a complete Petriflow release bundled in the image, which m
 | **Tools** | 13, for discovery, language data, and validation |
 | **Resources** | 11 templates over `petriflow://versions/...` |
 | **Validation** | XML well-formedness, XSD, 8 semantic rules, and Groovy action compilation |
-| **Runtime** | Node.js 26, `libxmljs5` native module, Java 21 + Groovy 4.0.33 for action validation |
+| **Runtime** | Node.js 26, `libxmljs5` native module, Java 21 + Groovy 5.0.5 for action validation |
 
 ## Quick start
 

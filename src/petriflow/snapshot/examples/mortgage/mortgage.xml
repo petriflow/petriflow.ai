@@ -58,20 +58,17 @@
 			</actions>
 		</event>
 	</caseEvents>
-	<role>
+	<role global="false">
 		<id>appraiser</id>
 		<title>Property appraiser</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>banker</id>
 		<title>Banker</title>
-		<global>false</global>
 	</role>
-	<role>
+	<role global="false">
 		<id>system</id>
 		<title>System</title>
-		<global>false</global>
 	</role>
 	<function scope="process" name="calculation">
 		<![CDATA[
@@ -124,6 +121,7 @@
 		<validations>
 			<validation>
 				<expression>^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$</expression>
+				<message></message>
 			</validation>
 		</validations>
 	</data>
@@ -1406,6 +1404,7 @@
 		<id>p10</id>
 		<x>1104</x>
 		<y>336</y>
+		<label>p10</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1413,6 +1412,7 @@
 		<id>p11</id>
 		<x>1296</x>
 		<y>336</y>
+		<label>p11</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1420,6 +1420,7 @@
 		<id>p12</id>
 		<x>528</x>
 		<y>336</y>
+		<label>p12</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1427,6 +1428,7 @@
 		<id>p13</id>
 		<x>336</x>
 		<y>432</y>
+		<label>p13</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1434,6 +1436,7 @@
 		<id>p14</id>
 		<x>752</x>
 		<y>432</y>
+		<label>p14</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1441,6 +1444,7 @@
 		<id>p2</id>
 		<x>240</x>
 		<y>240</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1448,6 +1452,7 @@
 		<id>p3</id>
 		<x>432</x>
 		<y>240</y>
+		<label>p3</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1455,6 +1460,7 @@
 		<id>p4</id>
 		<x>624</x>
 		<y>240</y>
+		<label>p4</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1462,6 +1468,7 @@
 		<id>p5</id>
 		<x>816</x>
 		<y>240</y>
+		<label>p5</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1469,6 +1476,7 @@
 		<id>p6</id>
 		<x>944</x>
 		<y>240</y>
+		<label>p6</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1476,6 +1484,7 @@
 		<id>p7</id>
 		<x>1104</x>
 		<y>144</y>
+		<label>p7</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1483,6 +1492,7 @@
 		<id>p8</id>
 		<x>1296</x>
 		<y>144</y>
+		<label>p8</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

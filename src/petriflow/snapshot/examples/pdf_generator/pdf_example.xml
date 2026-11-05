@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>pdf_example</id>
+	<version>1.0.0</version>
 	<initials>PDF</initials>
 	<title>PDF Example</title>
 	<icon>picture_as_pdf</icon>
@@ -58,10 +59,10 @@
 		<id>t1</id>
 		<x>220</x>
 		<y>100</y>
+		<label>Contract</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Contract</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>
@@ -176,10 +177,10 @@
 		<id>t2</id>
 		<x>340</x>
 		<y>100</y>
+		<label>Download PDF</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Download PDF</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>
@@ -201,7 +202,7 @@
 				<id>button_0</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="set">pdf: f.file_0;
+					<action id="action_1" trigger="set">pdf: f.file_0;
 
 generatePDF("t1", "file_0")</action>
 				</logic>

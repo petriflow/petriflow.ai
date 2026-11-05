@@ -1,5 +1,6 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>invoice</id>
+	<version>1.0.0</version>
 	<initials>INV</initials>
 	<title>Invoice</title>
 	<icon>device_hub</icon>
@@ -10,7 +11,7 @@
 		<event type="create">
 			<id>new_model_create</id>
 			<actions phase="post">
-				<action id="1">
+				<action id="action_1">
 					<![CDATA[
 					invoice_id: f.invoice_id;
 					change invoice_id value { useCase.stringId; }
@@ -164,7 +165,7 @@
 		<event type="assign">
 			<id>t1_assign</id>
 			<actions phase="pre">
-				<action id="5">
+				<action id="action_5">
 					<![CDATA[
 					parent_order_id: f.parent_order_id;
 					def orders = findCases { it.processIdentifier.eq(workspace + "order").and(it.activePlaces.get("p5").eq(1))}.collectEntries { 
@@ -178,7 +179,7 @@
 		<event type="finish">
 			<id>t1_finish</id>
 			<actions phase="post">
-				<action id="4">
+				<action id="action_4">
 					<![CDATA[
 					state: f.state,
 					invoice_id: f.invoice_id,
@@ -503,6 +504,7 @@
 		<id>p3</id>
 		<x>592</x>
 		<y>208</y>
+		<label>p3</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -510,6 +512,7 @@
 		<id>p4</id>
 		<x>848</x>
 		<y>48</y>
+		<label>p4</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -517,6 +520,7 @@
 		<id>p5</id>
 		<x>848</x>
 		<y>176</y>
+		<label>p5</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -524,6 +528,7 @@
 		<id>p6</id>
 		<x>1104</x>
 		<y>48</y>
+		<label>p6</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -531,6 +536,7 @@
 		<id>p7</id>
 		<x>1104</x>
 		<y>176</y>
+		<label>p7</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

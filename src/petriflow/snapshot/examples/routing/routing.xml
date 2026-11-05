@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>routing</id>
+	<version>1.0.0</version>
+	<initials>ROU</initials>
+	<title>Routing</title>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- DATA -->
@@ -528,8 +531,8 @@
 		<sourceId>18</sourceId>
 		<destinationId>30</destinationId>
 		<multiplicity>64</multiplicity>
-		<breakPoint><x>500</x><y>580</y></breakPoint>
-		<breakPoint><x>260</x><y>580</y></breakPoint>
+		<breakpoint><x>500</x><y>580</y></breakpoint>
+		<breakpoint><x>260</x><y>580</y></breakpoint>
 	</arc>
 	<arc>
 		<id>67</id>

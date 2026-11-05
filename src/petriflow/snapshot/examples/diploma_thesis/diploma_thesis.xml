@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>thesis</id>
+	<version>1.0.0</version>
 	<initials>PRC</initials>
 	<title>Thesis</title>
 	<defaultRole>false</defaultRole>
@@ -86,10 +87,10 @@
 		<id>t1</id>
 		<x>300</x>
 		<y>60</y>
+		<label>Topic</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Topic</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>
@@ -174,15 +175,15 @@
 		<id>t2</id>
 		<x>100</x>
 		<y>140</y>
+		<label>Init</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Init</label>
 		<trigger type="auto"/>
 		<event type="finish">
 			<id>t2_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_1">
 				first_name: f.supervisor_first_name,
 				last_name: f.supervisor_last_name,
 				email: f.supervisor_email,
@@ -204,10 +205,10 @@
 		<id>t3</id>
 		<x>300</x>
 		<y>140</y>
+		<label>Assign thesis topic</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Assign thesis topic</label>
 		<usersRef>
 			<id>autor</id>
 			<logic>
@@ -216,6 +217,7 @@
 		</usersRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic</id>
 				<logic>
@@ -237,19 +239,19 @@
 		<id>t4</id>
 		<x>540</x>
 		<y>140</y>
+		<label>Thesis reservation</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Thesis reservation</label>
 	</transition>
 	<transition>
 		<id>t5</id>
 		<x>780</x>
 		<y>140</y>
+		<label>Confirm reservation</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Confirm reservation</label>
 		<usersRef>
 			<id>autor</id>
 			<logic>
@@ -258,17 +260,27 @@
 		</usersRef>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>t5_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_2">
 				student: f.student;
 				def student_task = findTask({it._id.eq(student.value[0])})
 				def case = findCase({it._id.eq(student_task.caseId)})
@@ -286,10 +298,10 @@
 		<id>t6</id>
 		<x>540</x>
 		<y>60</y>
+		<label>Reject reservation</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Reject reservation</label>
 		<usersRef>
 			<id>autor</id>
 			<logic>
@@ -298,17 +310,27 @@
 		</usersRef>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>t6_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_3">
 				student: f.student;
 				def student_task = findTask({it._id.eq(student.value[0])})
 				def case = findCase({it._id.eq(student_task.caseId)})
@@ -326,12 +348,13 @@
 		<id>t7</id>
 		<x>1020</x>
 		<y>140</y>
+		<label>Thesis submission</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Thesis submission</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic</id>
 				<logic>
@@ -350,26 +373,46 @@
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_2</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>thesis_file</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>t7_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_4">
 				student: f.student,
 				first_name: f.student_first_name,
 				last_name: f.student_last_name;
@@ -385,12 +428,13 @@
 		<id>t8</id>
 		<x>1260</x>
 		<y>140</y>
+		<label>Thesis defense</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Thesis defense</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>topic</id>
 				<logic>
@@ -409,26 +453,46 @@
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>student</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_2</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>grade</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<event type="finish">
 			<id>t8_finish</id>
 			<actions phase="post">
-				<action>
+				<action id="action_5">
 					student: f.student,
 					grade: f.grade;
 					def task = findTask({it._id.eq(student.value[0])})

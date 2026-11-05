@@ -1,15 +1,15 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>insurance</id>
+	<version>1.0.0</version>
 	<initials>INS</initials>
 	<title>Travel insurance</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
 	<anonymousRole>true</anonymousRole>
 	<transitionRole>false</transitionRole>
-	<role>
+	<role global="false">
 		<id>system</id>
 		<title>system</title>
-		<global>false</global>
 	</role>
 	<data type="button">
 		<id>add_insured_person</id>
@@ -18,7 +18,7 @@
 		<event type="set">
 			<id>button_0_set</id>
 			<actions phase="pre">
-				<action id="1">
+				<action id="action_1">
 					<![CDATA[
 					id_of_process_insured_person: f.id_of_process_insured_person,
 					cases_insured_persons: f.cases_insured_persons,
@@ -48,7 +48,7 @@
 		<event type="set">
 			<id>button_1_set</id>
 			<actions phase="pre">
-				<action id="2">
+				<action id="action_2">
 					<![CDATA[
 					cases_insured_persons: f.cases_insured_persons,
 					tasks_data_of_insured_person: f.tasks_data_of_insured_person,
@@ -105,7 +105,7 @@
 		<event type="set">
 			<id>number_0_set</id>
 			<actions phase="post">
-				<action id="4">
+				<action id="action_4">
 					<![CDATA[
 					tasks_data_of_insured_person: f.tasks_data_of_insured_person,
 					insurance_price: f.insurance_price,
@@ -261,7 +261,7 @@
 		<event type="assign">
 			<id>t2_assign</id>
 			<actions phase="pre">
-				<action id="11">
+				<action id="action_11">
 					<![CDATA[
 					id_of_insurance_case: f.id_of_insurance_case,
 					cases_insured_persons: f.cases_insured_persons,
@@ -276,9 +276,8 @@
 		</event>
 		<event type="finish">
 			<id>t2_finish</id>
-			<title>Conclude contract</title>
 			<actions phase="pre">
-				<action id="6">
+				<action id="action_6">
 					<![CDATA[
 					tasks_data_of_insured_person: f.tasks_data_of_insured_person;
 					tasks_data_of_insured_person.value.each{id_of_task_data_of_insured_person -> 
@@ -289,7 +288,7 @@
 				</action>
 			</actions>
 			<actions phase="post">
-				<action id="10">
+				<action id="action_10">
 					<![CDATA[
 					tasks_insured_persons: f.tasks_insured_persons,
 					cases_insured_persons: f.cases_insured_persons;
@@ -299,6 +298,7 @@
 					]]>
 				</action>
 			</actions>
+			<title>Conclude contract</title>
 		</event>
 	</transition>
 	<transition>
@@ -406,6 +406,7 @@
 		<id>p1</id>
 		<x>304</x>
 		<y>144</y>
+		<label>p1</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -413,6 +414,7 @@
 		<id>p2</id>
 		<x>528</x>
 		<y>144</y>
+		<label>p2</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

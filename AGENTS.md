@@ -117,6 +117,10 @@ Return convention:
 - `src/ts/services/action-validation.service.ts` — action/function compilation through a persistent Groovy subprocess.
   Pure reference helpers can be tested directly; daemon tests should use a fake child process rather than require
   Groovy.
+- `src/groovy/lib/ActionDelegate.groovy` is generated from `netgrif/application-engine` (pinned `NAE_REF` in
+  `src/groovy/tools/generate-delegate.groovy`, currently `v7.0.3`); never edit it by hand. Regenerate with
+  `groovy src/groovy/tools/generate-delegate.groovy`, or `--source <file>` for a local NAE checkout and `--check` to
+  detect drift. The NAE source itself is not vendored in this repository.
 
 ## MCP Resources
 
@@ -164,7 +168,8 @@ Return convention:
   permissions apply.
 - Builder and runtime share the `node:26-alpine3.24` image so `libxmljs5` is built for the runtime ABI. The image tag
   follows Node 26 patch releases while keeping the Alpine release line fixed.
-- Groovy 4.0.33 is downloaded from Apache and SHA-256 verified. Update its version and checksum together.
+- Groovy 5.0.5 is downloaded from Apache and SHA-256 verified (`GROOVY_VERSION` / `GROOVY_SHA256`). Update the
+  version and checksum together.
 - The application defaults to `HOST=127.0.0.1`; the container sets `HOST=0.0.0.0` for published ports.
 - Runtime writes `cache.json` and `storage/` next to the built server: `dist/` locally and `/app/` in the image. The
   image makes `/app` writable by `node` and declares `/app/storage` as a volume. Deployments should use a named volume
