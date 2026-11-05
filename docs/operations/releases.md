@@ -62,7 +62,7 @@ Missing settings fail the workflow early, before the image is built.
 
 | Artifact | Where | Contents |
 |---|---|---|
-| Docker image | `DOCKERHUB_IMAGE:X.Y.Z`, plus `latest` for stable | Application, production `node_modules`, Java 21, Groovy 4.0.33, bundled snapshot |
+| Docker image | `DOCKERHUB_IMAGE:X.Y.Z`, plus `latest` for stable | Application, production `node_modules`, Java 21, Groovy 5.0.5, bundled snapshot |
 | Runtime bundle | GitHub Release asset `petriflow-mcp-vX.Y.Z-linux-alpine-node26.tar.gz` | `/app` from the image, including `server.cjs` and `node_modules` |
 | Release notes | GitHub Release | Generated from merged pull requests |
 

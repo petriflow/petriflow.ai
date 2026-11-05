@@ -56,7 +56,7 @@ run.
 ## Action validation
 
 `validate_action(definition)` compiles a Groovy action or function body against the Petriflow DSL and reports compile
-errors with line and column positions. It needs **Java 21** and **Groovy 4.0.33** on `PATH` — both ship in the Docker
+errors with line and column positions. It needs **Java 21** and **Groovy 5.0.5** on `PATH` — both ship in the Docker
 image. Outside the image, a missing runtime surfaces as a tool error, not a validation issue.
 
 Use it for the body of a `<function>` or an action `definition`, not for the enclosing XML.

@@ -7,7 +7,7 @@
 | Node.js | 26.x | Runtime target (`engines` pins `^26.0.0`) |
 | pnpm | 12.16.1 | Declared in `packageManager`; `--frozen-lockfile` is used in CI |
 | `python3`, `make`, `g++`, `libxml2-dev` | system packages | Compile the `libxmljs5` native addon |
-| Java 21 + Groovy 4.0.33 | optional | Only for `validate_action` and the `action-validation` rule |
+| Java 21 + Groovy 5.0.5 | optional | Only for `validate_action` and the `action-validation` rule |
 
 ## Install and run
 
@@ -59,6 +59,21 @@ carries. To refresh it:
    not reinstalled.
 
 A missing or invalid snapshot stops startup in `LOCAL` mode; there is no remote fallback.
+
+## Working with the Groovy delegate
+
+`src/groovy/lib/ActionDelegate.groovy` is generated from `netgrif/application-engine`; never edit it by hand. The
+generator pins the source with `NAE_REF` (currently `v7.0.3`) in `src/groovy/tools/generate-delegate.groovy`. The NAE
+source is not vendored in this repository.
+
+```bash
+groovy src/groovy/tools/generate-delegate.groovy                   # pinned ref
+groovy src/groovy/tools/generate-delegate.groovy --check           # fail on drift
+groovy src/groovy/tools/generate-delegate.groovy --source <file>   # local NAE checkout
+```
+
+`--check` needs network and Groovy, so it is not part of the build. See `src/groovy/README.md` for the remaining flags
+and the generated output.
 
 ## Running against GitHub releases
 

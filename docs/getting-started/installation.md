@@ -11,7 +11,7 @@ docker run --rm -p 3000:3000 \
   netgrif/petriflow-mcp:1.0.0
 ```
 
-The image already contains the bundled Petriflow release, Java 21, and Groovy 4.0.33, so every tool works without
+The image already contains the bundled Petriflow release, Java 21, and Groovy 5.0.5, so every tool works without
 extra packages. It sets `HOST=0.0.0.0` internally so the published port is reachable.
 
 | Flag | Why |
@@ -40,7 +40,7 @@ node --enable-source-maps server.cjs
 ```
 
 The bundle targets **Node.js 26 on Alpine Linux (musl)** and needs `libxml2` on the system. Action validation
-additionally needs **Java 21** and **Groovy 4.0.33** on `PATH`; without them `validate_action` cannot run, while the
+additionally needs **Java 21** and **Groovy 5.0.5** on `PATH`; without them `validate_action` cannot run, while the
 other tools are unaffected. The Docker image is the supported artifact because it already provides this environment.
 
 ## From source
