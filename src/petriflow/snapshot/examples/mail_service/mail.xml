@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>mail_test</id>
+	<version>1.0.0</version>
 	<initials>MLT</initials>
 	<title>Mail Test</title>
 	<defaultRole>true</defaultRole>
@@ -29,7 +30,7 @@
 		<id>button_0</id>
 		<title></title>
 		<placeholder>Send</placeholder>
-		<action trigger="set">
+		<action id="action_1" trigger="set">
 email_from_field: f.text_0,
 email_to_field: f.text_1,
 email_body_field: f.text_2;
@@ -48,10 +49,10 @@ sendMail(draft)
 		<id>t1</id>
 		<x>151</x>
 		<y>116</y>
+		<label></label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label></label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>

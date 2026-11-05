@@ -1,13 +1,13 @@
 # petriflow.ai
 
-An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/netgrif/petriflow), built
+An [MCP](https://modelcontextprotocol.io) server for [Petriflow](https://github.com/petriflow/petriflow), built
 with [xmcp](https://xmcp.dev) + Fastify. It exposes Petriflow tools to MCP-compatible AI clients over HTTP.
 
 See the [project documentation](docs/README.md) for user, server administration, and developer guides.
 
 ## Getting Started
 
-Requires Node.js >= 22.12.0 and pnpm.
+Requires Node.js 26 and pnpm 12.16.1.
 
 ```bash
 pnpm install
@@ -15,9 +15,9 @@ pnpm dev        # build then run
 ```
 
 This starts the MCP server on `http://localhost:3000` (the `/mcp` endpoint). Override the port with `PORT` or the bind
-address with `HOST`; the default host is loopback (`127.0.0.1`). Set `PETRIFLOW_MODE=LOCAL` to use the bundled Petriflow
-snapshot without GitHub, or leave it unset (`REMOTE`) to synchronize releases. The Docker image sets `HOST=0.0.0.0` for
-container port publishing.
+address with `HOST`; the default host is loopback (`127.0.0.1`). The server uses the bundled Petriflow snapshot by
+default (`LOCAL`) and makes no GitHub requests; set `PETRIFLOW_MODE=REMOTE` to synchronize releases instead. The Docker
+image sets `HOST=0.0.0.0` for container port publishing.
 
 ## Commands
 
@@ -48,38 +48,45 @@ Current tools:
 
 | Tool               | Purpose                                                                             |
 |--------------------|-------------------------------------------------------------------------------------|
-| `list-versions`    | List available Petriflow versions (flags the latest)                                |
-| `get-schema`       | Get the full XSD schema for a version                                               |
-| `get-overview`     | Show the Petriflow language overview                                                |
-| `list-actions`     | List available action functions                                                     |
-| `get-action`       | Get the definition of one action                                                    |
-| `list-components`  | List field components (`<component><name>`) with when to use each                   |
-| `get-component`    | Get the definition and configuration properties of one component                    |
-| `list-elements`    | List Petriflow elements                                                             |
-| `get-element`      | Get the XSD schema of one element                                                   |
-| `list-examples`    | List example processes                                                              |
-| `get-example`      | Get the content of one example process                                              |
-| `validate-process` | Validate a process XML against its schema and semantic rules                        |
-| `validate-action`  | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
+| `list_versions`    | List available Petriflow versions (flags the latest)                                |
+| `get_schema`       | Get the full XSD schema for a version                                               |
+| `get_overview`     | Show the Petriflow language overview                                                |
+| `list_actions`     | List available action functions                                                     |
+| `get_action`       | Get the definition of one action                                                    |
+| `list_components`  | List field components (`<component><name>`) with when to use each                   |
+| `get_component`    | Get the definition and configuration properties of one component                    |
+| `list_elements`    | List Petriflow elements                                                             |
+| `get_element`      | Get the XSD schema of one element                                                   |
+| `list_examples`    | List example processes                                                              |
+| `get_example`      | Get the content of one example process                                              |
+| `validate_process` | Validate a process XML against its schema and semantic rules                        |
+| `validate_action`  | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
 | `generate-app-manifest` | Generate a `manifest.xml` for an application bundle deployed to cloud NAE      |
 
 Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
 
 ### Resources and release synchronization
 
-Resources mirror the version, schema, overview, element, action, and example data exposed by the tools. Versioned
+Resources mirror the version, schema, overview, element, action, component, and example data exposed by the tools.
+Versioned
 resource templates use URIs such as `petriflow://versions/{version}/schema` and complete versions from the active
 catalog, including `latest`.
 
-In `REMOTE` mode (the default), startup checks releases from `petriflow/petriflow` and installs missing assets named
-`petriflow-vX.Y.Z.zip`. In `LOCAL` mode, the server installs the single checked-in snapshot from
-`src/petriflow/snapshot/` and makes no GitHub requests. The snapshot includes `manifest.json` and the same schema,
-overview, actions, elements, and examples files as a release archive. `POST /admin/petriflow/sync` remains available in
-REMOTE mode and returns HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or overwritten.
+In `LOCAL` mode (the default), the server installs the single checked-in snapshot from `src/petriflow/snapshot/` and
+makes no GitHub requests. The snapshot includes `manifest.json` and the same schema, overview, actions, components,
+elements, and examples files as a release archive. In `REMOTE` mode, startup checks releases from
+`petriflow/petriflow` and installs missing assets named `petriflow-vX.Y.Z.zip`; `POST /admin/petriflow/sync` is
+available in REMOTE mode and returns HTTP 409 in LOCAL mode. Installed releases are immutable and are not deleted or
+overwritten.
+
+REMOTE is opt-in while `petriflow/petriflow` releases do not publish ZIP assets yet: until they do, a REMOTE server
+finds versions but cannot install their data. A release archive may also include `components-definitions.json`; it is
+optional and validated when present. For a version that omits it, `list_components` returns an empty list and
+`get_component` reports that components are not available.
 
 ## Validation
 
-`validate-process` runs a pipeline in `src/ts/services/validation.service.ts`:
+`validate_process` runs a pipeline in `src/ts/services/validation.service.ts`:
 
 1. XML well-formedness
 2. XSD schema validation (via the native `libxmljs5` module)
@@ -93,7 +100,7 @@ The `action-validation` rule compiles every `<action>` and every `<function>` in
 (via the Groovy daemon), checks that `f.*`/`t.*` references resolve to declared fields/transitions, and warns about
 unused functions.
 
-`validate-action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See
+`validate_action` compiles a single action's Groovy code against the Petriflow DSL in a persistent Groovy daemon. See
 `src/groovy/README.md` for details.
 
 > `libxmljs5` is a native addon and must be compiled on install and present at runtime (see `Dockerfile`). The
@@ -136,7 +143,7 @@ Configure these repository settings before the first release:
 
 The attached `.tar.gz` mirrors the application files and production `node_modules` from the image's `/app` directory.
 Run it from the extracted bundle directory with `node --enable-source-maps server.cjs`. It targets Node.js 26 on Alpine
-Linux (musl) and requires `libxml2`; action validation additionally requires Java 21 and Groovy 4.0.33. The Docker
+Linux (musl) and requires `libxml2`; action validation additionally requires Java 21 and Groovy 5.0.5. The Docker
 image is the recommended deployment artifact because it includes the runtime environment.
 
 ## Running the Server
@@ -173,7 +180,7 @@ deployment infrastructure must protect them.
 
 ## Learn More
 
-- [Petriflow](https://github.com/netgrif/petriflow)
+- [Petriflow](https://github.com/petriflow/petriflow)
 - [xmcp Documentation](https://xmcp.dev/docs)
 - [Model Context Protocol](https://modelcontextprotocol.io)
 

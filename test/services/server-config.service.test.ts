@@ -11,10 +11,10 @@ test("uses a configured host for container networking", () => {
   expect(getServerHost({HOST: "0.0.0.0"})).toBe("0.0.0.0");
 });
 
-test("defaults to REMOTE for an unset or blank mode", () => {
-  expect(getPetriflowMode({})).toBe("REMOTE");
-  expect(getPetriflowMode({PETRIFLOW_MODE: ""})).toBe("REMOTE");
-  expect(getPetriflowMode({PETRIFLOW_MODE: "   "})).toBe("REMOTE");
+test("defaults to LOCAL for an unset or blank mode", () => {
+  expect(getPetriflowMode({})).toBe("LOCAL");
+  expect(getPetriflowMode({PETRIFLOW_MODE: ""})).toBe("LOCAL");
+  expect(getPetriflowMode({PETRIFLOW_MODE: "   "})).toBe("LOCAL");
 });
 
 test("accepts LOCAL and REMOTE case-insensitively", () => {

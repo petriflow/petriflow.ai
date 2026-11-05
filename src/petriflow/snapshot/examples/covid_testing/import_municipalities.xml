@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>import_municipalities_2</id>
+	<version>1.0.0</version>
 	<initials>IM2</initials>
 	<title>Import municipalities</title>
 	<defaultRole>true</defaultRole>
@@ -25,10 +26,10 @@
 		<id>3</id>
 		<x>180</x>
 		<y>100</y>
+		<label>Upload file</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Upload file</label>
 		<icon>cloud_upload</icon>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
@@ -52,7 +53,7 @@
 		<event type="finish">
 			<id>3_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_1">
 result: f.text_0,
 subor: f.file_0;
 
@@ -101,10 +102,10 @@ new File(subor.value.path as String).splitEachLine(",") { cells ->
 		<id>4</id>
 		<x>340</x>
 		<y>100</y>
+		<label>Result</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Result</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>

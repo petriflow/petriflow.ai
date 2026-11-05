@@ -4,6 +4,7 @@ import {valid as isValidVersion} from "semver";
 import storage, {StorageService} from "./storage.service";
 import {validateReleasePaths} from "./release-files.service";
 import {getSingleton} from "./singleton-registry.service";
+import {getLogger} from "./logger.service";
 
 export interface SnapshotManifest {
   version: string;
@@ -30,7 +31,13 @@ export class PetriflowSnapshotService {
     const manifest = this.readManifest(manifestPath);
     const relativePaths = this.listSnapshotFiles();
     validateReleasePaths(relativePaths, "Petriflow snapshot");
-    this.fileStorage.installVersionFromDirectory(manifest.version, this.snapshotPath, relativePaths);
+    const installed = this.fileStorage.installVersionFromDirectory(manifest.version, this.snapshotPath, relativePaths);
+    if (!installed) {
+      getLogger().warn(
+        {version: manifest.version},
+        "Petriflow snapshot version is already installed; using the stored files",
+      );
+    }
     return manifest;
   }
 

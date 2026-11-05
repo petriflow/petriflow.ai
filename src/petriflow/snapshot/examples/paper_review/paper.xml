@@ -1,6 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>paper</id>
-	<initials>ppr</initials>
+	<version>1.0.0</version>
+	<initials>PPR</initials>
 	<title name="model_title">Paper</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
@@ -10,7 +11,7 @@
 		<event type="create">
 			<id>paper_create</id>
 			<actions phase="post">
-				<action id="8">
+				<action id="action_8">
 					<![CDATA[
 					corrensponding_author: f.corrensponding_author,
 					email: f.email,
@@ -234,7 +235,7 @@
 		<event type="finish">
 			<id>t1_finish</id>
 			<actions phase="pre">
-				<action id="9">
+				<action id="action_9">
 					<![CDATA[
 					t11: t.t11,
 					enumeration_0: f.enumeration_0;
@@ -759,7 +760,7 @@
 		<event type="assign">
 			<id>t2_assign</id>
 			<actions phase="post">
-				<action id="1">
+				<action id="action_1">
 					<![CDATA[
 					reviewers: f.reviewers;
 					def mapOptions = [:]
@@ -774,7 +775,7 @@
 		<event type="finish">
 			<id>t2_finish</id>
 			<actions phase="pre">
-				<action id="2">
+				<action id="action_2">
 					<![CDATA[
 					surname: f.surname,
 					name: f.name,
@@ -816,11 +817,11 @@
 		<roleRef>
 			<id>system</id>
 			<logic>
+				<perform>true</perform>
+				<delegate>true</delegate>
 				<view>true</view>
 				<cancel>true</cancel>
 				<assign>true</assign>
-				<delegate>true</delegate>
-				<perform>true</perform>
 			</logic>
 		</roleRef>
 		<dataGroup>
@@ -878,7 +879,7 @@
 				<event type="set">
 					<id>decision_set</id>
 					<actions phase="post">
-						<action id="7">
+						<action id="action_7">
 							<![CDATA[
 							reject: f.reject,
 							accept: f.accept,
@@ -943,7 +944,7 @@
 		<event type="finish">
 			<id>t4_finish</id>
 			<actions phase="pre">
-				<action id="11">
+				<action id="action_11">
 					<![CDATA[
 					enumeration_0: f.enumeration_0,
 					accept: f.accept;
@@ -1040,7 +1041,7 @@
 		<event type="finish">
 			<id>t8_finish</id>
 			<actions phase="pre">
-				<action id="12">
+				<action id="action_12">
 					<![CDATA[
 					enumeration_0: f.enumeration_0,
 					corection: f.corection,
@@ -1088,7 +1089,7 @@
 				<event type="set">
 					<id>decision2_set</id>
 					<actions phase="post">
-						<action id="5">
+						<action id="action_5">
 							<![CDATA[
 							reason: f.reason,
 							t9: t.t9,
@@ -1220,7 +1221,7 @@
 		<event type="finish">
 			<id>t9_finish</id>
 			<actions phase="pre">
-				<action id="13">
+				<action id="action_13">
 					<![CDATA[
 					t13: t.t13,
 					reason: f.reason,
@@ -1270,6 +1271,7 @@
 		<id>p13</id>
 		<x>848</x>
 		<y>112</y>
+		<label>p13</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -1277,6 +1279,7 @@
 		<id>p14</id>
 		<x>368</x>
 		<y>112</y>
+		<label>p14</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>

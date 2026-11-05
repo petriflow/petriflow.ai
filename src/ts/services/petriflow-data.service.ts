@@ -111,7 +111,8 @@ export class PetriflowDataService {
   }
 
   listComponents(version: string): ListedComponent[] {
-    const components = this.readJsonRecord(version, "components-definitions.json");
+    const components = this.readOptionalJsonRecord(version, "components-definitions.json");
+    if (components === undefined) return [];
     return Object.keys(components).map((name) => {
       const component = components[name] as Record<string, any>;
       return {
@@ -125,7 +126,10 @@ export class PetriflowDataService {
   }
 
   getComponent(version: string, name: string): Record<string, any> {
-    const components = this.readJsonRecord(version, "components-definitions.json");
+    const components = this.readOptionalJsonRecord(version, "components-definitions.json");
+    if (components === undefined) {
+      throw new Error(`Components are not available for version ${this.resolveVersion(version)}`);
+    }
     const component = components[name];
     if (!component || typeof component !== "object") {
       throw new Error(`Component ${name} not found`);
@@ -164,7 +168,20 @@ export class PetriflowDataService {
   }
 
   private readJsonRecord(version: string, relativePath: string): Record<string, any> {
-    const content = this.readRequired(version, relativePath);
+    return this.parseJsonRecord(this.readRequired(version, relativePath), relativePath);
+  }
+
+  /** Reads a JSON record that an installed release may not publish at all. */
+  private readOptionalJsonRecord(version: string, relativePath: string): Record<string, any> | undefined {
+    const resolvedVersion = this.resolveVersion(version);
+    if (!this.fileStorage.hasVersion(resolvedVersion)) {
+      throw new Error(`Petriflow version ${resolvedVersion} is not installed`);
+    }
+    const content = this.fileStorage.readVersionFile(resolvedVersion, relativePath);
+    return content === undefined ? undefined : this.parseJsonRecord(content, relativePath);
+  }
+
+  private parseJsonRecord(content: string, relativePath: string): Record<string, any> {
     const parsed: unknown = JSON.parse(content);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       throw new Error(`${relativePath} must contain a JSON object`);

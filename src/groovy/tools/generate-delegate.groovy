@@ -2,33 +2,113 @@ import org.codehaus.groovy.control.*
 import org.codehaus.groovy.ast.*
 
 // ---------------------------------------------------------------------------
-// Generates a stripped, standalone ActionDelegate from the original NAE source.
+// Generates a stripped, standalone ActionDelegate from the NAE source.
+//
 // The stripped version keeps the full DSL method surface (signatures only) so
 // that action code can be statically compiled against it, without any Spring
-// or NAE runtime dependencies.
+// or NAE runtime dependencies. The original NAE source is NOT part of this
+// project: it is downloaded from the pinned NAE ref, or read from a local NAE
+// checkout.
 //
 // Usage:
-//   groovy src/groovy/tools/generate-delegate.groovy <path-to-ActionDelegate.groovy> [output-path]
+//   groovy src/groovy/tools/generate-delegate.groovy [options] [path]
 //
-// The original NAE ActionDelegate.groovy is NOT part of this project; it is
-// provided as the first argument.
+//   --source <file>      Local NAE ActionDelegate.groovy (wins over --ref/--path).
+//                        A bare positional path is accepted too.
+//   --ref <git-ref>      NAE ref to download (default: NAE_REF below).
+//   --path <repo-path>   ActionDelegate path inside that ref (default: NAE_PATH).
+//   --out <file>         Output path (default: src/groovy/lib/ActionDelegate.groovy).
+//   --check              Do not write; fail when the output is out of date.
+//
+// When bumping NAE, change NAE_REF and NAE_PATH together, regenerate, and
+// commit both this script's constants and the generated file.
 // ---------------------------------------------------------------------------
 
-if (args.length < 1) {
-    System.err.println "Usage: groovy src/groovy/tools/generate-delegate.groovy <path-to-ActionDelegate.groovy> [output-path]"
+def NAE_REPO = "netgrif/application-engine"
+def NAE_REF = "v7.0.3"
+def NAE_PATH = "application-engine/src/main/groovy/com/netgrif/application/engine/petrinet/domain/dataset/logic/action/ActionDelegate.groovy"
+def DEFAULT_OUT = "src/groovy/lib/ActionDelegate.groovy"
+def CONNECT_TIMEOUT_MS = 10_000
+def READ_TIMEOUT_MS = 60_000
+
+def fail = { String message ->
+    System.err.println message
     System.exit 1
 }
 
-def srcFile = new File(args[0])
-def outFile = new File(args.length > 1 ? args[1] : "src/groovy/lib/ActionDelegate.groovy")
+def parseArgs = { String[] argv ->
+    def options = [source: null, ref: NAE_REF, path: NAE_PATH, out: DEFAULT_OUT, check: false]
+    def positional = []
 
-def src = srcFile.text
+    for (int i = 0; i < argv.length; i++) {
+        def arg = argv[i]
+        if (arg == "--source" || arg == "--ref" || arg == "--path" || arg == "--out") {
+            if (i + 1 >= argv.length) fail("Missing value for ${arg}")
+            options[arg.substring(2)] = argv[++i]
+        } else if (arg == "--check") {
+            options.check = true
+        } else if (arg == "--help" || arg == "-h") {
+            println "Usage: groovy src/groovy/tools/generate-delegate.groovy [--source <file>] [--ref <git-ref>] [--path <repo-path>] [--out <file>] [--check]"
+            System.exit 0
+        } else if (arg.startsWith("--")) {
+            fail("Unknown option ${arg}")
+        } else {
+            positional << arg
+        }
+    }
+
+    if (positional.size() > 1) fail("Unexpected extra arguments: ${positional[1..-1].join(' ')}")
+    if (!options.source && positional) options.source = positional[0]
+    options
+}
+
+def options = parseArgs(args)
+
+def sha256 = { String text ->
+    def digest = java.security.MessageDigest.getInstance("SHA-256")
+    digest.digest(text.getBytes("UTF-8")).collect { String.format("%02x", it) }.join()
+}
+
+// --- Resolve the original NAE source ---------------------------------------
+def sourceText
+def sourceLabel
+if (options.source) {
+    def sourceFile = new File(options.source)
+    if (!sourceFile.isFile()) fail("ActionDelegate source not found: ${sourceFile.path}")
+    sourceText = sourceFile.text
+    sourceLabel = "local file ${sourceFile.name}"
+} else {
+    def url = "https://raw.githubusercontent.com/${NAE_REPO}/${options.ref}/${options.path}"
+    try {
+        def connection = (java.net.HttpURLConnection) new URL(url).openConnection()
+        connection.connectTimeout = CONNECT_TIMEOUT_MS
+        connection.readTimeout = READ_TIMEOUT_MS
+        connection.setRequestProperty("User-Agent", "petriflow.ai-generate-delegate")
+        if (connection.responseCode != 200) {
+            fail("Failed to download ${url} (HTTP ${connection.responseCode})")
+        }
+        sourceText = connection.inputStream.getText("UTF-8")
+    } catch (java.io.IOException e) {
+        fail("Failed to download ${url}: ${e.message}")
+    }
+    sourceLabel = "${NAE_REPO}@${options.ref}"
+}
+
+if (!sourceText?.trim()) fail("ActionDelegate source is empty (${sourceLabel})")
+if (!sourceText.contains("class ActionDelegate")) {
+    fail("Source does not declare a class ActionDelegate (${sourceLabel})")
+}
+def sourceSha = sha256(sourceText)
+
+// --- Parse the original at CONVERSION --------------------------------------
+// Bodies and imports are never resolved, so NAE itself is not needed here.
 def cu = new CompilationUnit()
-cu.addSource("ActionDelegate.groovy", src)
+cu.addSource("ActionDelegate.groovy", sourceText)
 cu.compile(Phases.CONVERSION)
-def ad = cu.ast.modules[0].classes[0]
+def ad = cu.ast.modules[0].classes.find { it.name.tokenize(".").last() == "ActionDelegate" }
+if (ad == null) fail("ActionDelegate class not found in the parsed source")
 
-// --- Types that are available on the JVM/Groovy classpath (no stub needed) ---
+// --- Types that are available on the JVM/Groovy classpath (no stub needed) --
 def KNOWN = [
     "void", "int", "long", "boolean", "double", "float", "byte", "char", "short",
     "String", "Object", "Integer", "Long", "Boolean", "Double", "Float", "Byte",
@@ -40,7 +120,7 @@ def KNOWN = [
     "Closure", "MetaClass", "GString",
 ] as Set
 
-// --- DSL chain methods that need typed return types ---
+// --- DSL chain methods that need typed return types ------------------------
 def DSL_RETURNS = [
     "change": "ChangeResult",
     "changeCaseProperty": "CasePropertyResult",
@@ -49,55 +129,105 @@ def DSL_RETURNS = [
     "generate": "GenerateResult",
 ] as Map
 
-// --- Closure-valued fields (properties holding closures) ---
+// --- Closure-valued fields (properties holding closures) -------------------
 def CLOSURE_FIELDS = [
     "visible", "editable", "required", "optional", "hidden", "forbidden", "initial",
     "unchanged", "transitions", "initValueOfField", "close", "always", "once",
     "byCode", "byCity", "byIco",
 ] as Set
 
-// --- Collect all referenced types and method signatures ---
-def types = new TreeSet<String>()
+// Delegate state and injected NAE services. Action code can reference all of
+// them, so the stripped class exposes the same non-static fields.
+
+// --- Emitted result classes, never stubbed ---------------------------------
+def RESULT_TYPES = [
+    "ChangeResult", "CasePropertyResult", "MakeResult", "MakeOnResult",
+    "ExecuteResult", "GenerateResult",
+] as Set
+
+def normalizeType = { String type ->
+    type = type.replace("java.lang.", "")
+    // Single-letter names are generic type parameters (e.g. <T>); map to Object
+    if (type ==~ /[A-Z]/) {
+        type = "Object"
+    }
+    type
+}
+
+// --- Collect every referenced type, including generic arguments ------------
+def collectTypes
+collectTypes = { ClassNode type, Set<String> acc ->
+    if (type == null) return
+    if (type.isArray()) {
+        collectTypes(type.componentType, acc)
+        return
+    }
+    if (type.name) acc << type.name
+    type.genericsTypes?.each { generic ->
+        if (generic?.type != null) collectTypes(generic.type, acc)
+    }
+}
+
+def typeText
+typeText = { ClassNode type ->
+    if (type.isArray()) return "${typeText(type.componentType)}[]"
+    def base = normalizeType(type.name)
+    def generics = type.genericsTypes
+    if (generics == null || generics.length == 0) return base
+    def arguments = generics.collect { generic -> generic?.type != null ? typeText(generic.type) : "?" }
+    "${base}<${arguments.join(', ')}>"
+}
+
+// --- Collect method signatures and context field types ---------------------
+def referencedTypes = new TreeSet<String>()
 def methods = []
 
-ad.methods.each { m ->
-    def params = m.parameters.collect { p ->
-        [name: p.name, type: p.type.name, hasDefault: p.hasInitialExpression()]
+ad.methods.each { method ->
+    def params = method.parameters.collect { parameter ->
+        [name: parameter.name, type: parameter.type.name, hasDefault: parameter.hasInitialExpression()]
     }
-    methods << [name: m.name, returnType: m.returnType.name, params: params]
-    if (m.returnType.name != "void" && m.returnType.name != "java.lang.Object") {
-        types << m.returnType.name
-    }
-    params.each { p -> types << p.type }
+    methods << [name: method.name, returnType: method.returnType.name, params: params]
+
+    collectTypes(method.returnType, referencedTypes)
+    method.parameters.each { parameter -> collectTypes(parameter.type, referencedTypes) }
 }
 
-// Normalize type names (strip java.lang. prefix, handle generics)
-def normalizeType = { String t ->
-    t = t.replace("java.lang.", "")
-    // Single-letter names are generic type parameters (e.g. <T>); map to Object
-    if (t ==~ /[A-Z]/) {
-        t = "Object"
-    }
-    t
-}
+def contextFields = ad.fields.findAll { !it.isStatic() && !CLOSURE_FIELDS.contains(it.name) }
+contextFields.each { field -> collectTypes(field.type, referencedTypes) }
 
 // Determine which types need stubs
-def stubTypes = types.findAll { t ->
-    def base = t.replaceAll(/<.*>/, "").replaceAll(/\[\]/, "")
-    !KNOWN.contains(base) && !KNOWN.contains(normalizeType(base))
-}.collect { normalizeType(it) }.sort()
-
-// Additional types referenced only by delegate fields (not method signatures).
-stubTypes = (stubTypes + ["EventOutcome", "FrontendActionOutcome", "ModuleHolder", "PluginHolder"]).unique().sort()
+def isIdentifier = { String name -> name ==~ /[A-Za-z_$][A-Za-z0-9_$]*/ }
+def stubTypes = referencedTypes.findAll { name ->
+    def base = normalizeType(name.replaceAll(/<.*>/, "").replaceAll(/\[\]/, ""))
+    isIdentifier(base) && !KNOWN.contains(base) && !base.startsWith("java.") &&
+        !RESULT_TYPES.contains(base) && base != "ActionDelegate"
+}.collect { normalizeType(it) }.unique().sort()
 
 // ---------------------------------------------------------------------------
 // Emit the stripped delegate
 // ---------------------------------------------------------------------------
 def sb = new StringBuilder()
-sb << "// AUTO-GENERATED from ${srcFile.name} by src/groovy/tools/generate-delegate.groovy\n"
-sb << "// Do not edit by hand. Regenerate with: groovy src/groovy/tools/generate-delegate.groovy <path-to-ActionDelegate.groovy>\n"
+sb << "// AUTO-GENERATED — do not edit by hand.\n"
+sb << "// Source: ${sourceLabel}\n"
+if (!options.source) {
+    sb << "// Path: ${options.path}\n"
+}
+sb << "// SHA-256: ${sourceSha}\n"
+sb << "// Regenerate (pinned NAE ref): groovy src/groovy/tools/generate-delegate.groovy\n"
+sb << "// Regenerate (local NAE checkout): groovy src/groovy/tools/generate-delegate.groovy --source /path/to/ActionDelegate.groovy\n"
 sb << "// Stripped ActionDelegate: full DSL method surface, no Spring/NAE runtime deps.\n\n"
-sb << "import groovy.transform.CompileStatic\n\n"
+sb << "import groovy.transform.CompileStatic\n"
+// Groovy's default imports cover java.lang, java.util, java.io and java.net, but
+// not java.time or java.util.stream. The NAE signatures reference these types
+// unqualified, and Groovy 4.x does not resolve them without an import.
+sb << "import java.time.Instant\n"
+sb << "import java.time.LocalDate\n"
+sb << "import java.time.LocalDateTime\n"
+sb << "import java.time.LocalTime\n"
+sb << "import java.time.ZoneId\n"
+sb << "import java.time.ZonedDateTime\n"
+sb << "import java.util.stream.Stream\n"
+sb << "\n"
 
 // Stub types
 sb << "// --- Stub types (stand-ins for NAE domain classes) ---\n"
@@ -128,13 +258,13 @@ def SPECIAL_STUBS = [
     "I18nString": "class I18nString extends Stub {\n}",
 ]
 
-stubTypes.each { t ->
-    if (SPECIAL_STUBS.containsKey(t)) {
-        sb << SPECIAL_STUBS[t] << "\n"
-    } else if (FIELD_SUBTYPES.contains(t)) {
-        sb << "class ${t} extends Field {}\n"
+stubTypes.each { type ->
+    if (SPECIAL_STUBS.containsKey(type)) {
+        sb << SPECIAL_STUBS[type] << "\n"
+    } else if (FIELD_SUBTYPES.contains(type)) {
+        sb << "class ${type} extends Field {}\n"
     } else {
-        sb << "class ${t} extends Stub {}\n"
+        sb << "class ${type} extends Stub {}\n"
     }
 }
 sb << "\n"
@@ -178,33 +308,26 @@ sb << "    static final String TRANSITIONS = \"transitions\"\n"
 sb << "    static final String GLOBAL_ROLE = \"GLOBAL_ROLE\"\n\n"
 
 // Closure fields
-CLOSURE_FIELDS.each { f ->
-    sb << "    Closure ${f} = null\n"
+CLOSURE_FIELDS.each { field ->
+    sb << "    Closure ${field} = null\n"
 }
 
-// Context fields (delegate state referenced by action code)
-sb << "    Case useCase = null\n"
-sb << "    Optional<Task> task = null\n"
-sb << "    Map<String, String> params = null\n"
-sb << "    Action action = null\n"
-sb << "    FieldActionsRunner actionsRunner = null\n"
-sb << "    List<EventOutcome> outcomes = null\n"
-sb << "    FrontendActionOutcome Frontend = null\n"
-sb << "    ModuleHolder NaeModule = null\n"
-sb << "    PluginHolder Plugin = null\n"
-sb << "    Map map = null\n"
+// Context fields, typed from the parsed source
+contextFields.each { field ->
+    sb << "    ${typeText(field.type)} ${field.name} = null\n"
+}
 sb << "\n"
 
 // Methods
-methods.each { m ->
-    def ret = m.returnType == "void" ? "void" : (DSL_RETURNS[m.name] ?: "def")
-    def params = m.params.collect { p ->
-        def t = normalizeType(p.type)
-        def d = p.hasDefault ? " = null" : ""
-        "${t} ${p.name}${d}"
+methods.each { method ->
+    def returnType = method.returnType == "void" ? "void" : (DSL_RETURNS[method.name] ?: "def")
+    def params = method.params.collect { parameter ->
+        def type = normalizeType(parameter.type)
+        def defaultValue = parameter.hasDefault ? " = null" : ""
+        "${type} ${parameter.name}${defaultValue}"
     }.join(", ")
-    def body = m.returnType == "void" ? "{}" : "{ null }"
-    sb << "    ${ret} ${m.name}(${params}) ${body}\n"
+    def body = method.returnType == "void" ? "{}" : "{ null }"
+    sb << "    ${returnType} ${method.name}(${params}) ${body}\n"
 }
 
 // Loose `Object` overloads for the DSL chain methods that take a field/transition
@@ -216,6 +339,31 @@ sb << "    ChangeResult change(Object field, Case targetCase = null, Optional ta
 sb << "    MakeResult make(Object fieldOrList, Closure behavior) { null }\n"
 sb << "}\n"
 
+def generated = sb.toString()
+def outFile = new File(options.out)
+
+if (options.check) {
+    if (!outFile.isFile()) fail("Generated file not found: ${outFile.path}")
+    if (outFile.text == generated) {
+        println "Up to date: ${outFile.path}"
+        return
+    }
+
+    def expected = generated.readLines()
+    def actual = outFile.text.readLines()
+    def limit = Math.max(expected.size(), actual.size())
+    def index = (0..<limit).find { i -> i >= expected.size() || i >= actual.size() || expected[i] != actual[i] }
+    System.err.println "Generated ActionDelegate is out of date: ${outFile.path}"
+    if (index == null) {
+        System.err.println "The files differ but no differing line was found; check line endings or the trailing newline."
+        System.exit 1
+    }
+    System.err.println "First difference at line ${index + 1}:"
+    System.err.println "  expected: ${index < expected.size() ? expected[index] : '<missing>'}"
+    System.err.println "  actual:   ${index < actual.size() ? actual[index] : '<missing>'}"
+    System.exit 1
+}
+
 outFile.parentFile.mkdirs()
-outFile.text = sb.toString()
-println "Generated ${outFile} (${methods.size()} methods, ${stubTypes.size()} stub types)"
+outFile.text = generated
+println "Generated ${outFile} (${methods.size()} methods, ${stubTypes.size()} stub types) from ${sourceLabel}"

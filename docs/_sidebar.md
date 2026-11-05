@@ -1,15 +1,26 @@
-- [Home](README.md)
+**Getting started**
 
-- **For users**
-  - [Getting started](user/getting-started.md)
-  - [Tools and resources](user/tools-and-resources.md)
-  - [Troubleshooting](user/troubleshooting.md)
+- [Installation](getting-started/installation.md)
+- [Configuration](getting-started/configuration.md)
+- [Connect a client](getting-started/connect-a-client.md)
 
-- **For server administrators**
-  - [Installation and configuration](admin/installation-and-config.md)
-  - [Operations and release synchronization](admin/operations-and-sync.md)
+**Using the server**
 
-- **For developers**
-  - [Architecture](developer/architecture.md)
-  - [Development and tests](developer/development-and-tests.md)
-  - [Extending the server](developer/extending-the-server.md)
+- [Tools](using/tools.md)
+- [Resources](using/resources.md)
+- [Validation](using/validation.md)
+- [Versions and modes](using/versions-and-modes.md)
+- [Troubleshooting](using/troubleshooting.md)
+
+**Operating**
+
+- [Deployment](operations/deployment.md)
+- [Synchronization](operations/synchronization.md)
+- [Releases](operations/releases.md)
+
+**Developing**
+
+- [Architecture](development/architecture.md)
+- [Local setup](development/local-setup.md)
+- [Extending the server](development/extending.md)
+- [Testing](development/testing.md)

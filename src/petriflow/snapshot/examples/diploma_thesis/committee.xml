@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>committee_01</id>
+	<version>1.0.0</version>
 	<initials>KMS</initials>
 	<title>Committee V01</title>
 	<defaultRole>false</defaultRole>
@@ -53,12 +54,13 @@
 		<id>t1</id>
 		<x>180</x>
 		<y>20</y>
+		<label>Chair</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Chair</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>chair_first_name</id>
 				<logic>
@@ -110,15 +112,15 @@
 		<id>t2</id>
 		<x>100</x>
 		<y>100</y>
+		<label>Init</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Init</label>
 		<trigger type="auto"/>
 		<event type="finish">
 			<id>t2_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_1">
 				first_name: f.chair_first_name,
 				last_name: f.chair_last_name,
 				email: f.chair_email,
@@ -139,10 +141,10 @@
 		<id>t3</id>
 		<x>260</x>
 		<y>100</y>
+		<label>Select theses for the committee</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Select theses for the committee</label>
 		<usersRef>
 			<id>autor</id>
 			<logic>
@@ -151,6 +153,7 @@
 		</usersRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>chair</id>
 				<logic>
@@ -169,11 +172,12 @@
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>multichoice_0</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="get">
+					<action id="action_2" trigger="get">
 					theses: f.this;
 					def submitted_theses = findCases { it.processIdentifier.eq("601fdf0a0a975a3b82912fd5_thesis").and(it.activePlaces.get("p6").eq(1))}.collectEntries { 
 						[(it.stringId): "Name: " + it.getFieldValue("thesis_title")  + " Student: " + it.getFieldValue("student_first_name") + " " + it.getFieldValue("student_last_name")] 
@@ -182,7 +186,7 @@
 						submitted_theses
 					}
 					</action>
-					<action trigger="set">
+					<action id="action_3" trigger="set">
 					defenses: f.defenses,
 					theses: f.this;
 					change defenses value {
@@ -206,10 +210,10 @@
 		<id>t4</id>
 		<x>500</x>
 		<y>100</y>
+		<label>Defenses</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Defenses</label>
 		<usersRef>
 			<id>autor</id>
 			<logic>
@@ -218,15 +222,26 @@
 		</usersRef>
 		<dataGroup>
 			<id>DataGroup_0</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>chair</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
 			<id>DataGroup_1</id>
+			<layout>grid</layout>
 			<dataRef>
 				<id>defenses</id>
 				<logic>
@@ -246,7 +261,7 @@
 		<event type="assign">
 			<id>t4_assign</id>
 			<actions phase="post">
-				<action>
+				<action id="action_4">
 				submission: f.defenses;
 				submission.value.each{id -> assignTask(findTask({it._id.eq(id)}))				
 				}
@@ -256,7 +271,7 @@
 		<event type="cancel">
 			<id>t4_cancel</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_5">
 				submission: f.defenses;
 				submission.value.each{id -> cancelTask(findTask({it._id.eq(id)}))				
 				}</action>
@@ -265,7 +280,7 @@
 		<event type="finish">
 			<id>t4_finish</id>
 			<actions phase="pre">
-				<action>
+				<action id="action_6">
 				submission: f.defenses;
 				submission.value.each{id -> finishTask(findTask({it._id.eq(id)}))
 				}</action>

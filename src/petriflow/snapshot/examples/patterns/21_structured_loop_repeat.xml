@@ -1,7 +1,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://petriflow.com/petriflow.schema.xsd">
 	<id>21_structured_loop_repeat</id>
 	<version>1.0.0</version>
-	<initials>WCP21r</initials>
+	<initials>WCP</initials>
 	<title>Pattern 21 (Structured Loop) - repeat variant</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>

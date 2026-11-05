@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
 	<id>appointment_2</id>
+	<version>1.0.0</version>
 	<initials>TE2</initials>
 	<title>Appointment</title>
 	<defaultRole>true</defaultRole>
@@ -70,10 +71,10 @@
 		<id>2</id>
 		<x>260</x>
 		<y>180</y>
+		<label>New appointment</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>New appointment</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>
@@ -82,7 +83,7 @@
 				<logic>
 					<behavior>editable</behavior>
 					<behavior>required</behavior>
-					<action trigger="set">
+					<action id="action_1" trigger="set">
 						capacity: f.number_0,
 						available_capacity: f.number_1;
 
@@ -169,10 +170,10 @@
 		<id>3</id>
 		<x>340</x>
 		<y>60</y>
+		<label>Detail</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Detail</label>
 		<dataGroup>
 			<id>DataGroup_0</id>
 			<layout>grid</layout>
@@ -272,19 +273,19 @@
 		<id>4</id>
 		<x>340</x>
 		<y>300</y>
+		<label>Show</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Show</label>
 	</transition>
 	<transition>
 		<id>5</id>
 		<x>420</x>
 		<y>180</y>
+		<label>Delete</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
-		<label>Delete</label>
 	</transition>
 	<!-- PLACES -->
 	<place>

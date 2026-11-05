@@ -92,7 +92,6 @@ jobs:
 
           docker run --detach --name "$CONTAINER_NAME" \
             --publish 127.0.0.1:3000:3000 \
-            --env PETRIFLOW_MODE=LOCAL \
             "${DOCKERHUB_IMAGE}:${IMAGE_TAG}"
 
           healthy=false
@@ -130,13 +129,13 @@ jobs:
 
           This bundle contains the built application and production Node.js dependencies.
           It targets Node.js 26 on Alpine Linux (musl), with libxml2 available at runtime.
-          Action validation additionally requires Java 21 and Groovy 4.0.33 on PATH.
+          Action validation additionally requires Java 21 and Groovy 5.0.5 on PATH.
 
           Run from this directory with:
             node --enable-source-maps server.cjs
 
-          Configure HOST, PORT, and PETRIFLOW_MODE as needed. LOCAL mode uses the bundled
-          snapshot; REMOTE mode synchronizes Petriflow releases from GitHub.
+          Configure HOST, PORT, and PETRIFLOW_MODE as needed. LOCAL is the default and uses
+          the bundled snapshot; REMOTE mode synchronizes Petriflow releases from GitHub.
           BUNDLE_README
 
           tar --create --gzip --file "$BUNDLE_FILE" --directory "$BUNDLE_DIR" .
