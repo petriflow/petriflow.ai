@@ -47,7 +47,7 @@ ARG GROOVY_SHA256=eec490f4710cbb0811b935f78b4ec3da6d5eb19a25c692b3c7284ef9a1fc51
 RUN apk add --no-cache --virtual .groovy-install-deps curl unzip \
     && curl --fail --silent --show-error --location --ipv4 \
       --retry 5 --retry-delay 2 --retry-all-errors --connect-timeout 15 \
-      "https://archive.apache.org/dist/groovy/${GROOVY_VERSION}/distribution/apache-groovy-binary-${GROOVY_VERSION}.zip" \
+      "https://repo1.maven.org/maven2/org/apache/groovy/groovy-binary/${GROOVY_VERSION}/groovy-binary-${GROOVY_VERSION}.zip" \
       --output /tmp/groovy.zip \
     && echo "${GROOVY_SHA256}  /tmp/groovy.zip" | sha256sum -c - \
     && unzip -q /tmp/groovy.zip -d /opt \
