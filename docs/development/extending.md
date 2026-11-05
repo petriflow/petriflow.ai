@@ -1,7 +1,9 @@
 # Extending the server
 
-Three extension points: tools, resources, and validation rules. Each is discovered from the filesystem, so adding a
-file is enough — no central registration list, apart from the feature-flag name list for tools.
+Three extension points: tools, resources, and validation rules. Tools and resources are discovered from the
+filesystem, so adding a file is enough — apart from the feature-flag name list for tools. Validation rules are not
+auto-discovered: add each new rule to the `rules` array in `src/ts/services/rules/index.ts` so it is registered at
+startup.
 
 ## Add a tool
 

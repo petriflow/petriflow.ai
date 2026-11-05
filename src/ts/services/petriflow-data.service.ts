@@ -171,9 +171,13 @@ export class PetriflowDataService {
     return this.parseJsonRecord(this.readRequired(version, relativePath), relativePath);
   }
 
-  /** Reads a JSON record that a release may not publish at all. */
+  /** Reads a JSON record that an installed release may not publish at all. */
   private readOptionalJsonRecord(version: string, relativePath: string): Record<string, any> | undefined {
-    const content = this.fileStorage.readVersionFile(this.resolveVersion(version), relativePath);
+    const resolvedVersion = this.resolveVersion(version);
+    if (!this.fileStorage.hasVersion(resolvedVersion)) {
+      throw new Error(`Petriflow version ${resolvedVersion} is not installed`);
+    }
+    const content = this.fileStorage.readVersionFile(resolvedVersion, relativePath);
     return content === undefined ? undefined : this.parseJsonRecord(content, relativePath);
   }
 

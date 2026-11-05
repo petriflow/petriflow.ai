@@ -26,8 +26,13 @@ authentication.
 
 ## Health and readiness
 
-`GET /health` returns `{"status":"ok"}` once the server is listening. It does not verify that language data is
-installed — startup already fails if it is not, so a listening process is a ready process.
+`GET /health` returns `{"status":"ok"}` once the server is listening. It checks only that the process is running and
+does not confirm that language data is installed or current. A failed `LOCAL` snapshot install prevents startup, but
+`REMOTE` synchronization failures are logged and the server still starts with whatever is already in storage.
+
+If a deployment requires language data, add a separate readiness check instead of relying on `/health` — for example
+call the `list_versions` tool from an MCP client and assert the expected version, or verify that version's directory in
+`storage/` exists.
 
 ```yaml
 healthcheck:

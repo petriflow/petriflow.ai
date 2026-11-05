@@ -1,6 +1,8 @@
 # Testing
 
-Tests use [Vitest](https://vitest.dev) in a Node environment. They must run offline and without external processes.
+Tests use [Vitest](https://vitest.dev) in a Node environment. They must run offline. Service tests run without
+external processes; the only exception is the opt-in integration test that starts a local server subprocess when
+`PETRIFLOW_TEST_SERVER_PATH` is set.
 
 ## Running
 
@@ -28,8 +30,9 @@ Tests never live under `src/`. `tsconfig.test.json` includes both trees, so test
 - **No network.** `ReleaseSyncService` accepts an injected `fetcher`; tests pass a fake that returns canned JSON and ZIP
   buffers.
 - **No shared filesystem.** Storage and cache tests use `mkdtempSync` directories and remove them in `finally`.
-- **No external processes.** The Groovy daemon is tested with a fake child process; the pure reference helpers are
-  tested directly.
+- **No external processes in service tests.** The Groovy daemon is tested with a fake child process; the pure reference
+  helpers are tested directly. The singleton integration test starts a local server subprocess only when
+  `PETRIFLOW_TEST_SERVER_PATH` points at a built server, and is skipped otherwise.
 - **No global state leaks.** Services are constructed per test, or reloaded with `vi.resetModules()` when the singleton
   registry is the subject.
 

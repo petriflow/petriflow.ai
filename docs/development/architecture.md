@@ -9,7 +9,8 @@ hold the domain logic and are shared through a singleton registry.
 Startup
   -> LOCAL (default): PetriflowSnapshotService validates and installs the bundled snapshot
   -> REMOTE: ReleaseSyncService fetches GitHub release metadata
-       -> missing petriflow-vX.Y.Z.zip assets are downloaded and validated
+       -> releases not installed locally are downloaded when their petriflow-vX.Y.Z.zip asset is available
+       -> a missing ZIP asset fails that version's sync
        -> StorageService atomically installs each version
        -> CacheService retains version-list/latest metadata
 

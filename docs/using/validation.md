@@ -5,7 +5,8 @@ Groovy action code. Both return the same shape — a boolean and a list of issue
 
 ## Process validation
 
-`validate_process(version, xml)` runs three stages in order and stops at the first that produces errors:
+`validate_process(version, xml)` runs three stages in order. It returns immediately if the XML is not well-formed;
+otherwise it runs XSD validation and then the semantic rules, even when XSD errors are found:
 
 1. **Well-formedness** — the XML parses. Issues carry `rule: "xml"`.
 2. **XSD** — the document matches the Petriflow schema for that version, validated with `libxmljs5`. Issues carry

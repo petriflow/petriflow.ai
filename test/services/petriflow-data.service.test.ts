@@ -115,6 +115,13 @@ test("reports components a release does not publish instead of a missing file", 
   }
 });
 
+test("rejects uninstalled versions when components are requested", () => {
+  withData((service) => {
+    expect(() => service.listComponents("9.9.9")).toThrow(/not installed/i);
+    expect(() => service.getComponent("9.9.9", "button-style")).toThrow(/not installed/i);
+  });
+});
+
 test("rejects old stored versions when the LOCAL catalog exposes only its snapshot", () => {
   const directory = mkdtempSync(path.join(os.tmpdir(), "petriflow-local-data-"));
   try {

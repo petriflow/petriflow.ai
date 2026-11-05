@@ -34,7 +34,8 @@ Element names are the XSD file names: `data`, `transition`, `place`, `arc`, `rol
 | `get_action` | `version`, `name` | The full action definition |
 
 `list_actions` flattens alternatives and DSL chains into callable entries, so one definition can appear several times
-with suffixed names (`choose-0`, `chain-then`). Pass the exact returned name to `get_action`.
+with suffixed names (`choose-0`, `chain-then`). `get_action` expects the base top-level definition name (`choose`,
+`chain`), not the suffixed entry. Pass the base name to retrieve the full definition and all of its alternatives.
 
 ### Field components
 
