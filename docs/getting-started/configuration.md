@@ -65,15 +65,16 @@ Validation rule names: `valid-version`, `unique-ids`, `valid-identifiers`, `uniq
 `arc-connectivity`, `place-tokens`, `action-validation`.
 
 Tool names: `list_versions`, `get_overview`, `get_schema`, `list_elements`, `get_element`, `list_actions`,
-`get_action`, `list_components`, `get_component`, `list_examples`, `get_example`, `validate_process`, `validate_action`.
+`get_action`, `list_components`, `get_component`, `list_examples`, `get_example`, `validate_process`, `validate_action`,
+`generate_app_manifest`.
 
 Disabling `action-validation` removes the Groovy dependency from `validate_process`; `validate_action` remains a tool but
 still needs Java and Groovy to run.
 
 ## Authentication
 
-The server does not authenticate `/mcp` or `/admin/petriflow/sync`. Protect both at the ingress or reverse proxy if the
-server is reachable beyond localhost. `/health` is unauthenticated by design.
+The server does not authenticate `/mcp`, `/admin/petriflow/sync`, or the `/applications/package` endpoints. Protect them
+at the ingress or reverse proxy if the server is reachable beyond localhost. `/health` is unauthenticated by design.
 
 ## Next
 

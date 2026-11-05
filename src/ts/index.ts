@@ -13,6 +13,7 @@ import petriflowSnapshotService from "./services/petriflow-snapshot.service";
 import petriflowVersionService from "./services/petriflow-version.service";
 import {PetriflowRuntimeService} from "./services/petriflow-runtime.service";
 import {registerPetriflowSyncRoute} from "./routes/petriflow-sync.route";
+import {registerApplicationPackageRoutes} from "./routes/application-package.route";
 import {getPetriflowMode, getServerHost} from "./services/server-config.service";
 
 const app = Fastify({
@@ -48,6 +49,7 @@ app.get("/health", async () => ({status: "ok"}));
 app.post("/mcp", xmcpHandler);
 app.get("/mcp", xmcpHandler);
 registerPetriflowSyncRoute(app, releaseSyncService, {syncEnabled: petriflowMode === "REMOTE"});
+registerApplicationPackageRoutes(app);
 
 app.register(fastifyStatic, {
   root: publicDir

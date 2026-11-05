@@ -1,6 +1,6 @@
 # Tools
 
-Thirteen MCP tools. Every tool that reads language data takes a `version` argument: a concrete SemVer such as `1.0.9`,
+Fourteen MCP tools. Every tool that reads language data takes a `version` argument: a concrete SemVer such as `1.0.9`,
 or `latest`, which resolves through the active version catalog. See [Versions and modes](using/versions-and-modes.md).
 
 ## Discovery
@@ -87,6 +87,17 @@ Both return structured content:
 `validate_process` runs well-formedness, XSD, and semantic rules — see [Validation](using/validation.md) for the full
 pipeline and rule list. `validate_action` compiles Groovy against the Petriflow DSL and needs Java 21 and Groovy on the
 host; in the Docker image both are present.
+
+## Application packaging
+
+| Tool | Inputs | Returns |
+|---|---|---|
+| `generate_app_manifest` | `appId`, `name`, `version`, `processes` (optional `description`, `author`, `title`) | A cloud NAE `manifest.xml` as XML text |
+
+`processes` lists process ids that must match the `<id>` inside the packaged process XMLs. `title` defaults to `name`;
+optional fields are omitted when empty. The generated manifest omits the optional NAE `imports`, `dependencies`,
+`assets`, and `app_meta` fields. To build the complete application ZIP, use the
+[packaging endpoints](operations/application-packaging.md).
 
 ## Calling conventions
 

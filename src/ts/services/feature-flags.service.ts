@@ -13,6 +13,7 @@ export interface FeatureFlags {
 /** Tool ids exposed by the XMCP tool metadata. Keep this in sync with tool metadata names. */
 export const knownToolNames = [
   "get_schema",
+  "generate_app_manifest",
   "get_action",
   "list_actions",
   "get_example",
