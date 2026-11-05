@@ -84,9 +84,10 @@ the `ActionDelegate`/`ActionScript` itself:
 
 - `handleMissingMethod` — allows method calls on `Object` and stub domain types
   (returns a synthetic `Object`-returning method). On the delegate, an unknown
-  name is still reported, but a known DSL method called with dynamically typed
-  arguments (for example `assignTask(findTask { ... })`) is accepted, so
-  `def` values from `findTask`/`findCases` do not produce false positives.
+  name is still reported, and a known DSL method is accepted only when the
+  argument count matches an overload and any mismatch comes from dynamically
+  typed arguments (for example `assignTask(findTask { ... })`). Wrong arity or
+  concrete type mismatches such as `assignTask()` or `assignTask(42)` stay errors.
 - `handleUnresolvedProperty` — allows property access on `Object` and stub types
   (typed as `Object`), but not on the delegate.
 - `onMethodSelection` — drops the direct-call target for synthetic methods so

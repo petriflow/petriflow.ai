@@ -354,6 +354,10 @@ if (options.check) {
     def limit = Math.max(expected.size(), actual.size())
     def index = (0..<limit).find { i -> i >= expected.size() || i >= actual.size() || expected[i] != actual[i] }
     System.err.println "Generated ActionDelegate is out of date: ${outFile.path}"
+    if (index == null) {
+        System.err.println "The files differ but no differing line was found; check line endings or the trailing newline."
+        System.exit 1
+    }
     System.err.println "First difference at line ${index + 1}:"
     System.err.println "  expected: ${index < expected.size() ? expected[index] : '<missing>'}"
     System.err.println "  actual:   ${index < actual.size() ? actual[index] : '<missing>'}"
