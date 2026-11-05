@@ -16,7 +16,14 @@ function packageErrorOf(fn: () => unknown): PackageError {
   throw new Error("Expected a PackageError");
 }
 
-function createStore(overrides: {ttlMs?: number; maxProcesses?: number; maxPackageBytes?: number; maxBatches?: number; maxRetainedBytes?: number} = {}) {
+function createStore(overrides: {
+  ttlMs?: number;
+  maxProcesses?: number;
+  maxPackageBytes?: number;
+  maxBatches?: number;
+  maxRetainedBytes?: number;
+  createId?: () => string;
+} = {}) {
   let now = 1_000;
   const store = new PackageBatchStore({
     ttlMs: 1_000,
@@ -136,6 +143,50 @@ test("caps the number of open batches", () => {
   store.create({metadata: {appId: "app", name: "App", version: "1"}});
   expect(packageErrorOf(() => store.create({metadata: {appId: "app", name: "App", version: "1"}})).statusCode)
     .toBe(503);
+});
+
+test("sweeps expired batches before enforcing the open-batch limit", () => {
+  const {store, advance} = createStore({ttlMs: 100, maxBatches: 1});
+  store.create({metadata: {appId: "app", name: "App", version: "1"}});
+
+  advance(101);
+  const batch = store.create({metadata: {appId: "app", name: "App", version: "1"}});
+  expect(store.get(batch.id)).toBe(batch);
+});
+
+test("counts an uploaded manifest in the package size limit", () => {
+  const {store} = createStore({maxPackageBytes: 40});
+  store.create({manifest: {xml: "<cases/>", content: Buffer.alloc(20)}});
+
+  expect(packageErrorOf(() => store.addProcesses("batch-1", [processFile("a.xml", "a")])).statusCode)
+    .toBe(413);
+  expect(store.get("batch-1")?.processes).toEqual([]);
+});
+
+test("counts the generated manifest in the package size limit", () => {
+  const {store} = createStore({maxPackageBytes: 50});
+  store.create({metadata: {appId: "app", name: "App", version: "1"}});
+
+  expect(packageErrorOf(() => store.addProcesses("batch-1", [processFile("a.xml", "a")])).statusCode)
+    .toBe(413);
+  expect(store.get("batch-1")?.processes).toEqual([]);
+});
+
+test("sweeps expired batches before enforcing retained bytes", () => {
+  let nextId = 0;
+  const {store, advance} = createStore({
+    ttlMs: 100,
+    maxRetainedBytes: 100,
+    createId: () => `batch-${++nextId}`,
+  });
+  store.create({manifest: {xml: "<cases/>", content: Buffer.alloc(80)}});
+
+  advance(50);
+  store.create({metadata: {appId: "app", name: "App", version: "1"}});
+  advance(60);
+
+  const batch = store.addProcesses("batch-2", [processFile("a.xml", "a")]);
+  expect(batch.processes.map(process => process.id)).toEqual(["a"]);
 });
 
 test("caps retained bytes across batches", () => {

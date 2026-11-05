@@ -17,6 +17,10 @@ Startup
 POST /admin/petriflow/sync (REMOTE only)
   -> ReleaseSyncService retries missing or failed releases
 
+POST /applications/package
+  -> AppPackagingService parses uploaded XML and builds the application ZIP
+  -> PackageBatchService keeps in-progress batches in process memory
+
 MCP tool or resource call
   -> PetriflowDataService reads the version from StorageService
   -> result is adapted to the tool or resource response
@@ -28,6 +32,7 @@ MCP tool or resource call
 |---|---|
 | `src/ts/index.ts` | Fastify setup, `/health`, `/mcp`, admin route, startup sequence |
 | `src/ts/routes/` | HTTP routes outside the MCP surface |
+| `src/ts/routes/application-package.route.ts` | Multipart application-packaging endpoints under `/applications/package` |
 | `src/ts/tools/` | xmcp-discovered MCP tools, one file each |
 | `src/ts/resources/` | xmcp-discovered resources; directory names form the URI |
 | `src/ts/services/` | Domain logic: versions, storage, data, validation, sync |
@@ -49,12 +54,17 @@ MCP tool or resource call
 | `petriflow-snapshot.service` | Validates and installs the bundled snapshot |
 | `validation.service` | XML → XSD → semantic rules pipeline |
 | `action-validation.service` | Persistent Groovy subprocess for action compilation |
+| `app-manifest.service` | Pure `manifest.xml` generator for cloud NAE application bundles |
+| `app-packaging.service` | Upload parsing, process id extraction, `PACKAGE_LIMITS`, and ZIP construction |
+| `package-batch.service` | Process-local in-memory packaging batches with a sliding TTL |
 | `feature-flags.service` | Parses disabled rule/tool lists at startup |
 | `logger.service` | Process-shared Pino logger |
 | `singleton-registry.service` | Shared instances on `globalThis`, stable across module graphs |
 
 The registry exists because the main bundle and the generated xmcp adapter are separate module graphs; without it, the
 adapter would build its own service instances and see an empty version catalog.
+
+The packaging batch store is process-local: open batches do not survive restarts and are not shared between replicas.
 
 ## Data model
 

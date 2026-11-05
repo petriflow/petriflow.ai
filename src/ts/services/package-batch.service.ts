@@ -1,5 +1,5 @@
 import {randomUUID} from "node:crypto";
-import type {AppManifestMetadata} from "./app-manifest.service";
+import {generateAppManifest, type AppManifestMetadata} from "./app-manifest.service";
 import {
   PACKAGE_LIMITS,
   PackageError,
@@ -7,6 +7,7 @@ import {
   type ProcessXmlFile,
 } from "./app-packaging.service";
 
+/** A live packaging batch and the files accumulated for it. */
 export interface PackageBatch {
   id: string;
   createdAt: number;
@@ -20,6 +21,7 @@ export interface PackageBatch {
   totalBytes: number;
 }
 
+/** Limits and clock/id overrides for a {@link PackageBatchStore}. */
 export interface PackageBatchStoreOptions {
   ttlMs?: number;
   maxProcesses?: number;
@@ -30,6 +32,7 @@ export interface PackageBatchStoreOptions {
   createId?: () => string;
 }
 
+/** Initial manifest or metadata used when creating a batch. */
 export interface PackageBatchCreateInput {
   manifest?: ApplicationManifest;
   metadata?: AppManifestMetadata;
@@ -48,6 +51,7 @@ export class PackageBatchStore {
   private readonly createId: () => string;
   private retainedBytes = 0;
 
+  /** Creates a store; omitted options fall back to {@link PACKAGE_LIMITS}. */
   constructor(options: PackageBatchStoreOptions = {}) {
     this.ttlMs = options.ttlMs ?? PACKAGE_LIMITS.batchTtlMs;
     this.maxProcesses = options.maxProcesses ?? PACKAGE_LIMITS.maxProcesses;
@@ -58,7 +62,9 @@ export class PackageBatchStore {
     this.createId = options.createId ?? randomUUID;
   }
 
+  /** Creates a batch and reserves the bytes of an uploaded manifest. */
   create(input: PackageBatchCreateInput): PackageBatch {
+    this.sweep();
     if (this.batches.size >= this.maxBatches) {
       throw new PackageError("Too many open packaging batches; retry later", 503);
     }
@@ -86,6 +92,7 @@ export class PackageBatchStore {
     return batch;
   }
 
+  /** Returns a live batch, purging it first when its TTL elapsed. */
   get(id: string): PackageBatch | undefined {
     return this.live(id);
   }
@@ -111,6 +118,7 @@ export class PackageBatchStore {
     return true;
   }
 
+  /** Adds process files after duplicate, process-count, package-size, and storage checks. */
   addProcesses(id: string, files: ProcessXmlFile[]): PackageBatch {
     const batch = this.live(id);
     if (!batch) {
@@ -136,9 +144,10 @@ export class PackageBatchStore {
     if (batch.processes.length + files.length > this.maxProcesses) {
       throw new PackageError("Application package exceeds the process limit", 413);
     }
-    if (batch.totalBytes + addedBytes > this.maxPackageBytes) {
+    if (this.projectedPackageBytes(batch, addedBytes, processIds) > this.maxPackageBytes) {
       throw new PackageError("Application package exceeds the size limit", 413);
     }
+    this.sweep();
     if (this.retainedBytes + addedBytes > this.maxRetainedBytes) {
       throw new PackageError("Packaging storage is full; retry later", 503);
     }
@@ -152,6 +161,7 @@ export class PackageBatchStore {
     return batch;
   }
 
+  /** Deletes a batch and releases its retained bytes. */
   delete(id: string): boolean {
     const batch = this.batches.get(id);
     if (!batch) {
@@ -162,6 +172,7 @@ export class PackageBatchStore {
     return !this.expired(batch);
   }
 
+  /** Absolute expiry timestamp for a batch. */
   expiresAt(batch: PackageBatch): number {
     return batch.updatedAt + this.ttlMs;
   }
@@ -179,6 +190,7 @@ export class PackageBatchStore {
     return removed;
   }
 
+  /** Returns a live batch, removing it when its TTL elapsed. */
   private live(id: string): PackageBatch | undefined {
     const batch = this.batches.get(id);
     if (!batch) {
@@ -192,10 +204,24 @@ export class PackageBatchStore {
     return batch;
   }
 
+  /** Bytes retained by a batch: process files plus an uploaded manifest. */
   private retained(batch: PackageBatch): number {
     return batch.totalBytes + (batch.manifest?.content.length ?? 0);
   }
 
+  /** Total package bytes after adding files, including the manifest that will be emitted. */
+  private projectedPackageBytes(batch: PackageBatch, addedBytes: number, processIds: Set<string>): number {
+    if (batch.manifest) {
+      return this.retained(batch) + addedBytes;
+    }
+    if (batch.metadata) {
+      const manifestXml = generateAppManifest({...batch.metadata, processes: [...processIds]});
+      return batch.totalBytes + addedBytes + Buffer.byteLength(manifestXml, "utf8");
+    }
+    return batch.totalBytes + addedBytes;
+  }
+
+  /** Whether a batch's TTL has elapsed. */
   private expired(batch: PackageBatch): boolean {
     return this.now() > this.expiresAt(batch);
   }

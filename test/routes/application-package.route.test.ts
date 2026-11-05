@@ -134,8 +134,8 @@ test("strips paths from uploaded filenames", async () => {
   await app.close();
 });
 
-test("rejects the validate flag on the one-shot endpoint", async () => {
-  const {app} = await createApp();
+test("validates processes when the one-shot flag is enabled", async () => {
+  const {app} = await createApp({validateProcess: invalidValidator()});
 
   const response = await postMultipart(app, "/applications/package", [
     ...metadataParts(),
@@ -143,8 +143,55 @@ test("rejects the validate flag on the one-shot endpoint", async () => {
     processPart("alpha"),
   ]);
 
-  expect(response.statusCode).toBe(400);
-  expect(response.json().error).toContain("only supported for batches");
+  expect(response.statusCode).toBe(422);
+  expect(response.json()).toMatchObject({
+    status: "invalid",
+    issues: [{filename: "alpha.xml", id: "alpha", rule: "xsd", severity: "error"}],
+  });
+
+  await app.close();
+});
+
+test("packages one-shot requests that pass validation", async () => {
+  const validator: Validator = async () => ({
+    valid: true,
+    issues: [{rule: "style", severity: "warning", message: "minor"}],
+  });
+  const {app} = await createApp({validateProcess: validator});
+
+  const response = await postMultipart(app, "/applications/package", [
+    ...metadataParts(),
+    {name: "validate", value: "true"},
+    processPart("alpha"),
+  ]);
+
+  expect(response.statusCode).toBe(200);
+  expect(Object.keys(unzipSync(response.rawPayload))).toContain("processes/alpha.xml");
+
+  await app.close();
+});
+
+test("does not validate one-shot requests unless the flag is enabled", async () => {
+  let calls = 0;
+  const validator: Validator = async () => {
+    calls++;
+    return {valid: false, issues: []};
+  };
+  const {app} = await createApp({validateProcess: validator});
+
+  const withoutFlag = await postMultipart(app, "/applications/package", [
+    ...metadataParts(),
+    processPart("alpha"),
+  ]);
+  expect(withoutFlag.statusCode).toBe(200);
+
+  const explicitlyOff = await postMultipart(app, "/applications/package", [
+    ...metadataParts(),
+    {name: "validate", value: "false"},
+    processPart("alpha"),
+  ]);
+  expect(explicitlyOff.statusCode).toBe(200);
+  expect(calls).toBe(0);
 
   await app.close();
 });
@@ -333,16 +380,13 @@ test("caps the number of open batches", async () => {
   await app.close();
 });
 
-test("applies route limits to the package builder without a custom store", async () => {
+test("applies route limits to the default batch store", async () => {
   const {app} = await createAppWithRouteOptionsOnly({maxPackageBytes: 100});
 
   const started = await postMultipart(app, "/applications/package/batches", metadataParts());
   const {batchId} = started.json();
   expect((await postMultipart(app, `/applications/package/batches/${batchId}/processes`, [processPart("alpha")])).statusCode)
-    .toBe(200);
-
-  const completed = await app.inject({method: "POST", url: `/applications/package/batches/${batchId}/complete`});
-  expect(completed.statusCode).toBe(413);
+    .toBe(413);
 
   await app.close();
 });
@@ -452,11 +496,18 @@ test("adds processes that pass validation, including warnings", async () => {
 test("rejects an invalid validate flag and reports validator failures", async () => {
   const {app} = await createApp();
 
-  const invalidFlag = await postMultipart(app, "/applications/package/batches", [
+  const invalidBatchFlag = await postMultipart(app, "/applications/package/batches", [
     ...metadataParts(),
     {name: "validate", value: "maybe"},
   ]);
-  expect(invalidFlag.statusCode).toBe(400);
+  expect(invalidBatchFlag.statusCode).toBe(400);
+
+  const invalidOneShotFlag = await postMultipart(app, "/applications/package", [
+    ...metadataParts(),
+    {name: "validate", value: "maybe"},
+    processPart("alpha"),
+  ]);
+  expect(invalidOneShotFlag.statusCode).toBe(400);
 
   const failing = await createApp({
     validateProcess: async () => {
@@ -471,6 +522,14 @@ test("rejects an invalid validate flag and reports validator failures", async ()
   const upload = await postMultipart(failing.app, `/applications/package/batches/${batchId}/processes`, [processPart("alpha")]);
   expect(upload.statusCode).toBe(503);
   expect(upload.json().error).toContain("no Petriflow version available");
+
+  const oneShot = await postMultipart(failing.app, "/applications/package", [
+    ...metadataParts(),
+    {name: "validate", value: "true"},
+    processPart("alpha"),
+  ]);
+  expect(oneShot.statusCode).toBe(503);
+  expect(oneShot.json().error).toContain("no Petriflow version available");
 
   await app.close();
   await failing.app.close();

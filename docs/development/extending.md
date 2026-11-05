@@ -112,6 +112,20 @@ and may return a promise; the service awaits every rule.
   [Validation](using/validation.md).
 - Rules are enabled by default and can be disabled with `PETRIFLOW_DISABLED_RULES`.
 
+## Application packaging endpoints
+
+`src/ts/routes/application-package.route.ts` registers the HTTP packaging API. It parses multipart uploads with
+`@fastify/multipart`, delegates XML parsing and ZIP creation to `app-packaging.service.ts`, and keeps open batches in
+`package-batch.service.ts`. Batches are process-local, so the API assumes a single server instance and no persistence
+across restarts.
+
+`POST /applications/package` is one-shot. The batch routes start with manifest data, accept process XMLs one or more at
+a time, and finish with a ZIP. Both the one-shot endpoint and a batch can set `validate=true`; each uploaded process is
+then checked by `ValidationService` against the active latest Petriflow version and rejected with `422` when invalid.
+Limits live in `PACKAGE_LIMITS` and in the route options used by tests.
+
+See [Application packaging](operations/application-packaging.md) for the endpoint contract and limits.
+
 ## Updating documentation
 
 A new tool, resource, or rule is user-visible. Update the matching page under `docs/` in the same change — `using/tools.md`,

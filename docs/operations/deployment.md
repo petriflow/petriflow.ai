@@ -77,8 +77,8 @@ location /health {
 }
 ```
 
-If the endpoint is reachable beyond localhost, add authentication at the proxy for both `/mcp` and
-`/admin/petriflow/sync`.
+If the server is reachable beyond localhost, add authentication at the proxy for `/mcp`, `/admin/petriflow/sync`, and
+`/applications/package`.
 
 ## Resources
 

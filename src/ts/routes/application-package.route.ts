@@ -135,6 +135,40 @@ function parseProcesses(files: UploadedFile[]): ProcessXmlFile[] {
   return files.map(file => parseProcessXml(file.filename, file.content));
 }
 
+/** Aggregated result of validating the uploaded processes. */
+interface ProcessValidationReport {
+  invalid: boolean;
+  issues: Array<Record<string, unknown>>;
+}
+
+/** Validates processes and collects issues, failing with 503 when the validator is unavailable. */
+async function validateProcesses(
+  processes: ProcessXmlFile[],
+  validateProcess: (xml: string) => Promise<ValidationResult>,
+): Promise<ProcessValidationReport> {
+  const issues: Array<Record<string, unknown>> = [];
+  let invalid = false;
+
+  for (const process of processes) {
+    let result: ValidationResult;
+    try {
+      result = await validateProcess(process.content.toString("utf8"));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new PackageError(`Process validation is unavailable for ${process.name}: ${message}`, 503);
+    }
+
+    if (!result.valid) {
+      invalid = true;
+    }
+    for (const issue of result.issues) {
+      issues.push({filename: process.name, id: process.id, ...issue});
+    }
+  }
+
+  return {invalid, issues};
+}
+
 function sendZip(reply: FastifyReply, archive: Buffer, appId?: string) {
   const name = appId?.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "application";
   return reply
@@ -216,16 +250,20 @@ export function registerApplicationPackageRoutes(
   app.post("/applications/package", async (request, reply) => {
     try {
       const form = await readForm(request, limits.maxPackageBytes, limits.maxFieldBytes);
-      if (form.fields.validate !== undefined) {
-        throw new PackageError("validate is only supported for batches", 400);
-      }
-
       const source = resolveSource(form, true);
+      const validationEnabled = parseValidateFlag(form.fields);
       if (source.processFiles.length === 0) {
         throw new PackageError("At least one process XML file is required", 400);
       }
 
       const processes = parseProcesses(source.processFiles);
+      if (validationEnabled) {
+        const report = await validateProcesses(processes, validateProcess);
+        if (report.invalid) {
+          return reply.code(422).send({status: "invalid", issues: report.issues});
+        }
+      }
+
       const pkg = buildApplicationPackage({
         manifest: source.manifest,
         metadata: source.metadata,
@@ -271,28 +309,9 @@ export function registerApplicationPackageRoutes(
 
       const processes = parseProcesses(form.files);
       if (batch.validationEnabled) {
-        const issues: Array<Record<string, unknown>> = [];
-        let invalid = false;
-
-        for (const process of processes) {
-          let result: ValidationResult;
-          try {
-            result = await validateProcess(process.content.toString("utf8"));
-          } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            throw new PackageError(`Process validation is unavailable for ${process.name}: ${message}`, 503);
-          }
-
-          if (!result.valid) {
-            invalid = true;
-          }
-          for (const issue of result.issues) {
-            issues.push({filename: process.name, id: process.id, ...issue});
-          }
-        }
-
-        if (invalid) {
-          return reply.code(422).send({status: "invalid", batchId, issues});
+        const report = await validateProcesses(processes, validateProcess);
+        if (report.invalid) {
+          return reply.code(422).send({status: "invalid", batchId, issues: report.issues});
         }
       }
 

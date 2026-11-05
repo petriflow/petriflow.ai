@@ -72,7 +72,7 @@ client's documentation lists.
 
 ## What the client sees
 
-After connecting, the client lists 13 tools and 11 resource templates. A sensible first conversation:
+After connecting, the client lists 14 tools and 11 resource templates. A sensible first conversation:
 
 1. `list_versions` — confirm which Petriflow release is active.
 2. `get_overview` — load the language concepts before modelling.

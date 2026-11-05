@@ -12,7 +12,7 @@ The server ships with a complete Petriflow release bundled in the image, which m
 |---|---|
 | **Transport** | MCP over HTTP at `POST /mcp` (Streamable HTTP), same path for `GET` |
 | **Data modes** | `LOCAL` — bundled snapshot (default). `REMOTE` — synchronized GitHub releases |
-| **Tools** | 13, for discovery, language data, and validation |
+| **Tools** | 14, for discovery, language data, validation, and application packaging |
 | **Resources** | 11 templates over `petriflow://versions/...` |
 | **Validation** | XML well-formedness, XSD, 8 semantic rules, and Groovy action compilation |
 | **Runtime** | Node.js 26, `libxmljs5` native module, Java 21 + Groovy 5.0.5 for action validation |
@@ -50,6 +50,7 @@ pnpm start          # node dist/server.cjs
 | Know what `validate_process` checks | [Validation](using/validation.md) |
 | Understand `latest`, catalogs, and immutability | [Versions and modes](using/versions-and-modes.md) |
 | Deploy it properly | [Deployment](operations/deployment.md) |
+| Package a cloud NAE application bundle | [Application packaging](operations/application-packaging.md) |
 | Work on the code | [Local setup](development/local-setup.md) |
 
 ## Related projects

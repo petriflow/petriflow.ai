@@ -61,7 +61,7 @@ Current tools:
 | `get_example`      | Get the content of one example process                                              |
 | `validate_process` | Validate a process XML against its schema and semantic rules                        |
 | `validate_action`  | Validate a Petriflow action (Groovy code) by compiling it against the Petriflow DSL |
-| `generate-app-manifest` | Generate a `manifest.xml` for an application bundle deployed to cloud NAE      |
+| `generate_app_manifest` | Generate a `manifest.xml` for an application bundle deployed to cloud NAE      |
 
 Tools with an `outputSchema` return `{ structuredContent: { ... } }`; the rest return plain text.
 
@@ -161,8 +161,8 @@ the `<id>` inside each process XML. Generated manifests still omit the optional 
 and `app_meta` fields. The response is `application/zip` with `manifest.xml` at the root and processes under
 `processes/`.
 
-For incremental uploads, use a batch. The `validate` flag is batch-only; sending it to the one-shot endpoint is
-rejected.
+Pass `validate=true` to validate every process before packaging; invalid processes return `422` with issues. For
+incremental uploads, use a batch. `validate=true` works on both the one-shot endpoint and batches.
 
 | Endpoint                                            | Purpose                                                                                                  |
 |-----------------------------------------------------|----------------------------------------------------------------------------------------------------------|

@@ -16,6 +16,7 @@
 
 - [Deployment](operations/deployment.md)
 - [Synchronization](operations/synchronization.md)
+- [Application packaging](operations/application-packaging.md)
 - [Releases](operations/releases.md)
 
 **Developing**
