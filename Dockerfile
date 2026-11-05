@@ -45,7 +45,8 @@ ARG GROOVY_SHA256=eec490f4710cbb0811b935f78b4ec3da6d5eb19a25c692b3c7284ef9a1fc51
 
 # JVM + Groovy power action validation. Verify the pinned Apache binary before installing it.
 RUN apk add --no-cache --virtual .groovy-install-deps curl unzip \
-    && curl --fail --silent --show-error --location \
+    && curl --fail --silent --show-error --location --ipv4 \
+      --retry 5 --retry-delay 2 --retry-all-errors --connect-timeout 15 \
       "https://archive.apache.org/dist/groovy/${GROOVY_VERSION}/distribution/apache-groovy-binary-${GROOVY_VERSION}.zip" \
       --output /tmp/groovy.zip \
     && echo "${GROOVY_SHA256}  /tmp/groovy.zip" | sha256sum -c - \
