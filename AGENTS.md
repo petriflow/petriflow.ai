@@ -49,12 +49,17 @@ Return convention:
 - `src/ts/services/release-sync.service.ts` fetches paginated GitHub release metadata for `petriflow/petriflow`, caches
   the version list and latest stable version, and synchronizes missing published releases.
 - Release assets are named `petriflow-vX.Y.Z.zip`. The archive root contains `petriflow.schema.xsd`, `overview.md`,
-  `actions-definitions.json`, `elements/`, and `examples/`.
-- `components-definitions.json` (field components, keyed by definition id with `names`, `fieldTypes`, `whenToUse`,
-  `params`) currently exists only in `src/petriflow/snapshot/`. It is hand-written from `netgrif/components` v7.0.3
-  (`data-fields.module.ts` registry plus `component.properties` reads), is not required by release validation, and
-  `list_components`/`get_component` fail with "not found for version" on releases that lack it.
-- `PETRIFLOW_MODE` defaults to `REMOTE`. Synchronization runs before listening in REMOTE and can be retried through
+  `actions-definitions.json`, `elements/`, and `examples/`, and may contain `components-definitions.json`.
+- `components-definitions.json` (field components, keyed by definition id) is hand-written from `netgrif/components`
+  v7.0.3 (`data-fields.module.ts` registry plus `component.properties` reads) and currently maintained only in
+  `src/petriflow/snapshot/`. Each definition requires non-empty `names` and `fieldTypes` string arrays, non-empty
+  `description` and `whenToUse` strings, and optional `params` (entries with non-empty `name`, `type`, `description`
+  and a boolean `required`), `examples` (string array), and boolean `deprecated`. It is optional in release archives:
+  `validateComponentsDefinitions` checks its shape when a release publishes it and ignores its absence.
+  `list_components` returns an empty list and `get_component` reports "components are not available for version" for
+  versions that omit it.
+- `PETRIFLOW_MODE` defaults to `LOCAL` while `petriflow/petriflow` releases do not publish `petriflow-vX.Y.Z.zip` assets;
+  REMOTE is opt-in. Synchronization runs before listening in REMOTE and can be retried through
   `POST /admin/petriflow/sync`; LOCAL returns HTTP 409 from that endpoint. Deployment infrastructure is responsible for
   endpoint authentication.
 - `storage.service.ts` persists extracted release files under a versioned directory rooted at
@@ -62,7 +67,7 @@ Return convention:
   Installed releases are immutable: synchronization does not overwrite or delete them.
 - `cache.service.ts` is only for cache data (including release version metadata); release files belong in
   `storage.service.ts`.
-- Tools and resources resolve `"latest"` through the active version catalog. `list-versions` no longer needs to be
+- Tools and resources resolve `"latest"` through the active version catalog. `list_versions` no longer needs to be
   called first.
 - In LOCAL, `src/petriflow/snapshot/` is the explicit checked-in snapshot source; `build.mjs` copies it to
   `dist/petriflow/snapshot/` and startup installs only that version. Do not add implicit fallback behavior: REMOTE never
@@ -105,7 +110,7 @@ Return convention:
   call `getLogger()` rather than capturing a module-local logger binding.
 - `src/ts/services/utils.ts` — latest-version helper.
 - `src/ts/services/schema.service.ts` — `getSchemaXsd(version)` delegates to `PetriflowDataService` (used by
-  `get-schema` tool and `ValidationService`).
+  `get_schema` tool and `ValidationService`).
 - `src/ts/services/validation.service.ts` — `ValidationService` singleton (default export). `validate(xml, version)`
   runs: well-formedness → XSD validation (`libxmljs5`) → registered semantic rules. Rules are registered at startup in
   `src/ts/index.ts`.
@@ -166,8 +171,9 @@ Return convention:
 - Groovy 5.0.5 is downloaded from Apache and SHA-256 verified (`GROOVY_VERSION` / `GROOVY_SHA256`). Update the
   version and checksum together.
 - The application defaults to `HOST=127.0.0.1`; the container sets `HOST=0.0.0.0` for published ports.
-- Runtime writes `dist/cache.json` and `dist/storage`; the image makes `dist` writable by `node` and declares
-  `/app/dist/storage` as a volume. Deployments should use a named volume there.
+- Runtime writes `cache.json` and `storage/` next to the built server: `dist/` locally and `/app/` in the image. The
+  image makes `/app` writable by `node` and declares `/app/storage` as a volume. Deployments should use a named volume
+  there.
 - The `node:26-alpine3.24` image tag follows Node 26 patch releases while keeping the Alpine line fixed, and the pnpm
   lockfile pins the application dependency graph. `apk add` still resolves packages from Alpine repositories at build
   time; for byte-for-byte image reproducibility, also pin/snapshot those OS packages and update them regularly for

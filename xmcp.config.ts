@@ -9,7 +9,7 @@ const config: XmcpConfig = {
     },
     template: {
       name: "Petriflow MCP",
-      description: "MCP server for Petriflow, exposing Petriflow tools, prompts, and resources to MCP-compatible AI clients.",
+      description: "MCP server for Petriflow, exposing Petriflow tools and resources to MCP-compatible AI clients.",
       instructions: "",
       icons: [{src: "src/public/assets/logo.png", mimeType: "image/png"}],
     },

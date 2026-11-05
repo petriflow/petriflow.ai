@@ -92,7 +92,6 @@ jobs:
 
           docker run --detach --name "$CONTAINER_NAME" \
             --publish 127.0.0.1:3000:3000 \
-            --env PETRIFLOW_MODE=LOCAL \
             "${DOCKERHUB_IMAGE}:${IMAGE_TAG}"
 
           healthy=false
@@ -135,8 +134,8 @@ jobs:
           Run from this directory with:
             node --enable-source-maps server.cjs
 
-          Configure HOST, PORT, and PETRIFLOW_MODE as needed. LOCAL mode uses the bundled
-          snapshot; REMOTE mode synchronizes Petriflow releases from GitHub.
+          Configure HOST, PORT, and PETRIFLOW_MODE as needed. LOCAL is the default and uses
+          the bundled snapshot; REMOTE mode synchronizes Petriflow releases from GitHub.
           BUNDLE_README
 
           tar --create --gzip --file "$BUNDLE_FILE" --directory "$BUNDLE_DIR" .

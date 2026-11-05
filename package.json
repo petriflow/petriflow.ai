@@ -1,17 +1,17 @@
 {
   "name": "petriflow.ai",
   "version": "1.0.0",
-  "description": "MCP server for Petriflow, exposing Petriflow tools, prompts, and resources to MCP-compatible AI clients.",
+  "description": "MCP server for Petriflow, exposing Petriflow tools and resources to MCP-compatible AI clients.",
   "private": true,
   "license": "Apache-2.0",
   "author": "Netgrif",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/netgrif/petriflow.ai.git"
+    "url": "git+https://github.com/petriflow/petriflow.ai.git"
   },
-  "homepage": "https://github.com/netgrif/petriflow.ai#readme",
+  "homepage": "https://github.com/petriflow/petriflow.ai#readme",
   "bugs": {
-    "url": "https://github.com/netgrif/petriflow.ai/issues"
+    "url": "https://github.com/petriflow/petriflow.ai/issues"
   },
   "engines": {
     "node": "^26.0.0"

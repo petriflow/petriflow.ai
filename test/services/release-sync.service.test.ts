@@ -20,13 +20,14 @@ class MemoryCache {
   }
 }
 
-function makeZip(): Uint8Array {
+function makeZip(extra: Record<string, Uint8Array> = {}): Uint8Array {
   return zipSync({
     "petriflow.schema.xsd": strToU8("<schema />"),
     "overview.md": strToU8("Overview"),
     "actions-definitions.json": strToU8("{}"),
     "elements/place.xsd": strToU8("<element />"),
     "examples/simple.xml": strToU8("<process />"),
+    ...extra,
   });
 }
 
@@ -75,6 +76,25 @@ test("downloads and installs only missing release ZIPs", async () => {
     expect(second.alreadyInstalledVersions).toEqual(["1.2.3"]);
     expect(calls.filter((url) => url === assetUrl).length).toBe(1);
     expect(storage.readVersionFile("1.2.3", "overview.md")).toBe("Overview");
+  });
+});
+
+test("installs component definitions that a release archive publishes", async () => {
+  const definitions = JSON.stringify({
+    "button-style": {
+      names: ["default"],
+      fieldTypes: ["button"],
+      description: "Button style",
+      whenToUse: "Use for buttons",
+    },
+  });
+  const assetUrl = "https://github.com/petriflow/petriflow/releases/download/v1.2.3/petriflow-v1.2.3.zip";
+  const archive = makeZip({"components-definitions.json": strToU8(definitions)});
+  await withService([release("v1.2.3")], {[assetUrl]: archive}, async (service, storage) => {
+    const report = await service.sync();
+
+    expect(report.failedVersions).toEqual([]);
+    expect(storage.readVersionFile("1.2.3", "components-definitions.json")).toBe(definitions);
   });
 });
 
