@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-17
+
 ### Added
 
 - The `valid-process-identifier` semantic rule checks the root process id. Without an application context it accepts a
   plain safe id or `<appId>/<processId>`; with `appId` it requires the matching application prefix.
 - `validate_process` accepts an optional `appId` to validate a process in application context.
+- The public landing page documents the application packaging endpoints, limits, and examples.
 
 ### Changed
 
