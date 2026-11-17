@@ -7,12 +7,14 @@ import {placeTokensRule} from "../../../src/ts/services/rules/place-tokens.rule"
 import {uniqueActionIdsRule} from "../../../src/ts/services/rules/unique-action-ids.rule";
 import {uniqueIdsRule} from "../../../src/ts/services/rules/unique-ids.rule";
 import {validIdentifiersRule} from "../../../src/ts/services/rules/valid-identifiers.rule";
+import {validProcessIdentifierRule} from "../../../src/ts/services/rules/valid-process-identifier.rule";
 import {validVersionRule} from "../../../src/ts/services/rules/valid-version.rule";
 import {rules} from "../../../src/ts/services/rules";
 
-async function runRule(rule: ValidationRule, contents: string) {
-  const doc = parseXml(`<document>${contents}</document>`);
-  return rule.validate(doc, {version: "1.2.3", xml: contents});
+async function runRule(rule: ValidationRule, contents: string, appId?: string) {
+  const xml = `<document>${contents}</document>`;
+  const doc = parseXml(xml);
+  return rule.validate(doc, {version: "1.2.3", xml, appId});
 }
 
 test("registers every semantic rule exactly once", () => {
@@ -20,6 +22,7 @@ test("registers every semantic rule exactly once", () => {
     "unique-ids",
     "unique-action-ids",
     "valid-identifiers",
+    "valid-process-identifier",
     "valid-version",
     "arc-connectivity",
     "arc-direction",
@@ -76,6 +79,41 @@ describe("valid-identifiers rule", () => {
     expect(invalid).toHaveLength(3);
     expect(invalid.map(({severity}) => severity)).toEqual(["error", "error", "error"]);
     expect(invalid.some(({message}) => message.includes("reserved keyword"))).toBe(true);
+  });
+});
+
+describe("valid-process-identifier rule", () => {
+  test("allows a plain id without application context", async () => {
+    expect(await runRule(validProcessIdentifierRule, "<id>invoice</id>")).toEqual([]);
+  });
+
+  test("allows a well-formed scoped id without application context", async () => {
+    expect(await runRule(validProcessIdentifierRule, "<id>Objednavky/user_ASK</id>")).toEqual([]);
+  });
+
+  test("requires a matching prefix in application context", async () => {
+    expect(await runRule(validProcessIdentifierRule, "<id>invoice</id>", "Objednavky")).toEqual([
+      expect.objectContaining({
+        rule: "valid-process-identifier",
+        severity: "error",
+        message: expect.stringContaining("Objednavky/"),
+      }),
+    ]);
+    expect(await runRule(validProcessIdentifierRule, "<id>Other/user_ASK</id>", "Objednavky"))
+      .toHaveLength(1);
+    expect(await runRule(validProcessIdentifierRule, "<id>Objednavky/user_ASK</id>", "Objednavky"))
+      .toEqual([]);
+  });
+
+  test("rejects malformed ids in both modes", async () => {
+    for (const id of ["a/b/c", "app/process name", "/process", "app/"]) {
+      expect(await runRule(validProcessIdentifierRule, `<id>${id}</id>`), id).toHaveLength(1);
+      expect(await runRule(validProcessIdentifierRule, `<id>${id}</id>`, "app"), id).toHaveLength(1);
+    }
+  });
+
+  test("reports a missing id", async () => {
+    expect(await runRule(validProcessIdentifierRule, "")).toHaveLength(1);
   });
 });
 

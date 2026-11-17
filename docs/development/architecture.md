@@ -56,6 +56,7 @@ MCP tool or resource call
 | `action-validation.service` | Persistent Groovy subprocess for action compilation |
 | `app-manifest.service` | Pure `manifest.xml` generator for cloud NAE application bundles |
 | `app-packaging.service` | Upload parsing, process id extraction, `PACKAGE_LIMITS`, and ZIP construction |
+| `process-identifier` | Shared parser for plain and `<appId>/<processId>` process ids |
 | `package-batch.service` | Process-local in-memory packaging batches with a sliding TTL |
 | `feature-flags.service` | Parses disabled rule/tool lists at startup |
 | `logger.service` | Process-shared Pino logger |

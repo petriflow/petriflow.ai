@@ -122,7 +122,9 @@ across restarts.
 `POST /applications/package` is one-shot. The batch routes start with manifest data, accept process XMLs one or more at
 a time, and finish with a ZIP. Both the one-shot endpoint and a batch can set `validate=true`; each uploaded process is
 then checked by `ValidationService` against the active latest Petriflow version and rejected with `422` when invalid.
-Limits live in `PACKAGE_LIMITS` and in the route options used by tests.
+Packaging always uses application context: process ids must be `<appId>/<processId>` and are written under
+`processes/<appId>/`. `process-identifier.ts` holds the shared parser. Limits live in `PACKAGE_LIMITS` and in the route
+options used by tests.
 
 See [Application packaging](operations/application-packaging.md) for the endpoint contract and limits.
 

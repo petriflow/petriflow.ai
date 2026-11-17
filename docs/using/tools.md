@@ -63,7 +63,7 @@ complete, working processes and the best starting point for a new model.
 
 | Tool | Inputs | Returns |
 |---|---|---|
-| `validate_process` | `version`, `xml` | `valid` plus a list of `issues` |
+| `validate_process` | `version`, `xml`, optional `appId` | `valid` plus a list of `issues` |
 | `validate_action` | `definition` | `valid` plus a list of `issues` |
 
 Both return structured content:
@@ -85,7 +85,8 @@ Both return structured content:
 ```
 
 `validate_process` runs well-formedness, XSD, and semantic rules — see [Validation](using/validation.md) for the full
-pipeline and rule list. `validate_action` compiles Groovy against the Petriflow DSL and needs Java 21 and Groovy on the
+pipeline and rule list. Pass `appId` to validate the process in an application context, where its root id must be
+`<appId>/<processId>`. `validate_action` compiles Groovy against the Petriflow DSL and needs Java 21 and Groovy on the
 host; in the Docker image both are present.
 
 ## Application packaging
@@ -94,10 +95,10 @@ host; in the Docker image both are present.
 |---|---|---|
 | `generate_app_manifest` | `appId`, `name`, `version`, `processes` (optional `description`, `author`, `title`) | A cloud NAE `manifest.xml` as XML text |
 
-`processes` lists process ids that must match the `<id>` inside the packaged process XMLs. `title` defaults to `name`;
-optional fields are omitted when empty. The generated manifest omits the optional NAE `imports`, `dependencies`,
-`assets`, and `app_meta` fields. To build the complete application ZIP, use the
-[packaging endpoints](operations/application-packaging.md).
+`processes` lists ids in the form `<appId>/<processId>`; every prefix must match `appId`, and each id must match the
+root `<id>` inside the packaged process XML. `title` defaults to `name`; optional fields are omitted when empty. The
+generated manifest omits the optional NAE `imports`, `dependencies`, `assets`, and `app_meta` fields. To build the
+complete application ZIP, use the [packaging endpoints](operations/application-packaging.md).
 
 ## Calling conventions
 

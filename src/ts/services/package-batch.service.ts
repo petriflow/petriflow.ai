@@ -1,6 +1,7 @@
 import {randomUUID} from "node:crypto";
 import {generateAppManifest, type AppManifestMetadata} from "./app-manifest.service";
 import {
+  assertProcessBelongsToApp,
   PACKAGE_LIMITS,
   PackageError,
   type ApplicationManifest,
@@ -17,7 +18,6 @@ export interface PackageBatch {
   validationEnabled: boolean;
   processes: ProcessXmlFile[];
   processIds: Set<string>;
-  fileNames: Set<string>;
   totalBytes: number;
 }
 
@@ -84,7 +84,6 @@ export class PackageBatchStore {
       validationEnabled: input.validationEnabled ?? false,
       processes: [],
       processIds: new Set(),
-      fileNames: new Set(),
       totalBytes: 0,
     };
     this.batches.set(batch.id, batch);
@@ -126,18 +125,18 @@ export class PackageBatchStore {
     }
 
     const processIds = new Set(batch.processIds);
-    const fileNames = new Set(batch.fileNames);
+    const appId = batch.manifest?.appId ?? batch.metadata?.appId;
+    if (!appId) {
+      throw new PackageError("Packaging batch has no application id", 400);
+    }
     let addedBytes = 0;
 
     for (const file of files) {
+      assertProcessBelongsToApp(file.id, appId);
       if (processIds.has(file.id)) {
         throw new PackageError(`Duplicate process id: ${file.id}`, 409);
       }
-      if (fileNames.has(file.name)) {
-        throw new PackageError(`Duplicate process file name: ${file.name}`, 409);
-      }
       processIds.add(file.id);
-      fileNames.add(file.name);
       addedBytes += file.content.length;
     }
 
@@ -154,7 +153,6 @@ export class PackageBatchStore {
 
     batch.processes.push(...files);
     batch.processIds = processIds;
-    batch.fileNames = fileNames;
     batch.totalBytes += addedBytes;
     batch.updatedAt = this.now();
     this.retainedBytes += addedBytes;

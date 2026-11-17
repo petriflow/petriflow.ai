@@ -3,11 +3,16 @@ import {InferSchema} from "xmcp";
 import {getLatestVersion} from "../services/utils";
 import {getLogger} from "../services/logger.service";
 import validationService from "../services/validation.service";
+import {APP_ID_PATTERN} from "../services/process-identifier";
 import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const schema = {
   version: z.string().describe("Version of the Petriflow language. Use 'latest' to resolve the cached latest version"),
   xml: z.string().describe("The Petriflow process XML to validate"),
+  appId: z.string().trim().min(1)
+    .regex(APP_ID_PATTERN, "Application id must match [A-Za-z0-9][A-Za-z0-9._-]*")
+    .optional()
+    .describe("Application id; when set, the process id must be <appId>/<processId>"),
 };
 
 export const outputSchema = {
@@ -34,13 +39,13 @@ export const metadata = withToolFeatureFlag({
   }
 });
 
-export default async function validateProcess({version, xml}: InferSchema<typeof schema>) {
+export default async function validateProcess({version, xml, appId}: InferSchema<typeof schema>) {
   if (version === "latest") {
     version = getLatestVersion();
     getLogger().info(`Using cached latest version: ${version}`);
   }
 
-  const result = await validationService.validate(xml, version);
+  const result = await validationService.validate(xml, version, {appId});
 
   getLogger().info(`Validation result: ${result.valid ? "valid" : "invalid"} (${result.issues.length} issue(s))`);
   return {structuredContent: result};

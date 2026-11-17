@@ -13,7 +13,7 @@ import {childText, findRootChildren, findLocal, isJavaIdentifier, JAVA_RESERVED_
  */
 export const validIdentifiersRule: ValidationRule = {
   name: "valid-identifiers",
-  description: "Ensure all ids are valid Java-style identifiers (syntactically and not reserved).",
+  description: "Ensure element and action ids are valid Java-style identifiers (syntactically and not reserved).",
 
   validate(doc) {
     const issues: ValidationIssue[] = [];

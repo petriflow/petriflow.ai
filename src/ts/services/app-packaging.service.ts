@@ -2,6 +2,7 @@ import path from "node:path";
 import {strToU8, zipSync} from "fflate";
 import {parseXml, type Element} from "libxmljs5";
 import {generateAppManifest, type AppManifestMetadata} from "./app-manifest.service";
+import {isValidAppId, parseProcessIdentifier, type ProcessIdentifier} from "./process-identifier";
 
 export const PACKAGE_LIMITS = {
   maxFileBytes: 5 * 1024 * 1024,
@@ -37,6 +38,8 @@ export interface ApplicationPackage {
 export interface ApplicationManifest {
   xml: string;
   content: Buffer;
+  appId: string;
+  processIds: string[];
 }
 
 export interface ApplicationPackageInput {
@@ -117,7 +120,7 @@ export function parseProcessXml(filename: string, content: Buffer): ProcessXmlFi
   return {name, id, content};
 }
 
-/** Parses a provided manifest and requires the NAE application root element. */
+/** Parses a provided manifest, requiring an app id and application-scoped process references. */
 export function parseManifestXml(content: Buffer): ApplicationManifest {
   const text = decodeXml(content, "manifest.xml");
   if (!text.trim()) {
@@ -129,22 +132,76 @@ export function parseManifestXml(content: Buffer): ApplicationManifest {
     throw new PackageError("manifest.xml must have a <cases> root", 400);
   }
 
-  return {xml: text, content};
+  const appId = doc.get<Element>(
+    "//*[local-name()='dataField'][*[local-name()='id']='app_id']/*[local-name()='value']",
+  )?.text().trim() ?? "";
+  if (!appId) {
+    throw new PackageError("manifest.xml must contain a non-empty app_id", 400);
+  }
+  if (!isValidAppId(appId)) {
+    throw new PackageError(`manifest.xml app_id "${appId}" is not a valid application id`, 400);
+  }
+
+  const processIds = doc.find<Element>(
+    "//*[local-name()='dataField'][*[local-name()='id']='processes']/*[local-name()='allowedNets']/*[local-name()='value']",
+  ).map(node => node.text().trim());
+  if (processIds.length === 0) {
+    throw new PackageError("manifest.xml must declare at least one process", 400);
+  }
+  if (new Set(processIds).size !== processIds.length) {
+    throw new PackageError("manifest.xml declares duplicate process ids", 400);
+  }
+
+  for (const processId of processIds) {
+    const identifier = parseProcessIdentifier(processId);
+    if (!identifier) {
+      throw new PackageError(
+        `manifest.xml process id "${processId}" must have the form "<appId>/<processId>"`,
+        400,
+      );
+    }
+    if (identifier.appId !== appId) {
+      throw new PackageError(
+        `manifest.xml process id "${processId}" does not belong to application "${appId}"`,
+        400,
+      );
+    }
+  }
+
+  return {xml: text, content, appId, processIds};
+}
+
+/** Validates that a process id is scoped to the expected application. */
+export function assertProcessBelongsToApp(processId: string, appId: string): ProcessIdentifier {
+  if (!isValidAppId(appId)) {
+    throw new PackageError(`Application id "${appId}" is not valid`, 400);
+  }
+
+  const identifier = parseProcessIdentifier(processId);
+  if (!identifier) {
+    throw new PackageError(
+      `Process id "${processId}" must have the form "<appId>/<processId>"`,
+      400,
+    );
+  }
+  if (identifier.appId !== appId) {
+    throw new PackageError(
+      `Process id "${processId}" belongs to application "${identifier.appId}", not "${appId}"`,
+      400,
+    );
+  }
+
+  return identifier;
 }
 
 function uniqueProcessIds(processes: ProcessXmlFile[]): string[] {
   const ids = new Set<string>();
-  const names = new Set<string>();
 
   for (const process of processes) {
     if (ids.has(process.id)) {
       throw new PackageError(`Duplicate process id: ${process.id}`, 409);
     }
-    if (names.has(process.name)) {
-      throw new PackageError(`Duplicate process file name: ${process.name}`, 409);
-    }
     ids.add(process.id);
-    names.add(process.name);
   }
 
   return [...ids];
@@ -160,17 +217,42 @@ export function buildApplicationPackage(
   }
 
   const processIds = uniqueProcessIds(input.processes);
+  if (!input.manifest && !input.metadata) {
+    throw new PackageError("Manifest metadata is required when manifest.xml is not uploaded", 400);
+  }
+
+  const appId = input.manifest?.appId ?? input.metadata!.appId;
+  if (!appId || !isValidAppId(appId)) {
+    throw new PackageError(`Application id "${appId ?? ""}" is not valid`, 400);
+  }
+
+  const processEntries = input.processes.map(process => {
+    const identifier = assertProcessBelongsToApp(process.id, appId);
+    return {
+      entry: `processes/${appId}/${identifier.processId}.xml`,
+      content: process.content,
+    };
+  });
 
   let manifestXml: string;
   let manifestContent: Buffer;
   if (input.manifest) {
+    const declared = new Set(input.manifest.processIds);
+    const uploaded = new Set(processIds);
+    const missing = [...declared].filter(id => !uploaded.has(id));
+    const extra = [...uploaded].filter(id => !declared.has(id));
+    if (missing.length > 0 || extra.length > 0) {
+      throw new PackageError(
+        `manifest.xml processes do not match uploads (missing: ${missing.join(", ") || "none"}; extra: ${extra.join(", ") || "none"})`,
+        400,
+      );
+    }
+
     manifestXml = input.manifest.xml;
     manifestContent = input.manifest.content;
-  } else if (input.metadata) {
-    manifestXml = generateAppManifest({...input.metadata, processes: processIds});
-    manifestContent = Buffer.from(strToU8(manifestXml));
   } else {
-    throw new PackageError("Manifest metadata is required when manifest.xml is not uploaded", 400);
+    manifestXml = generateAppManifest({...input.metadata!, processes: processIds});
+    manifestContent = Buffer.from(strToU8(manifestXml));
   }
 
   const totalBytes = manifestContent.length +
@@ -182,8 +264,8 @@ export function buildApplicationPackage(
   const entries: Record<string, Uint8Array> = {
     "manifest.xml": new Uint8Array(manifestContent),
   };
-  for (const process of input.processes) {
-    entries[`processes/${process.name}`] = new Uint8Array(process.content);
+  for (const process of processEntries) {
+    entries[process.entry] = new Uint8Array(process.content);
   }
 
   return {

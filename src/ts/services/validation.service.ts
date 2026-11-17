@@ -32,6 +32,13 @@ export interface ValidationContext {
   version: string;
   /** Well-formed input XML as a string. */
   xml: string;
+  /** Application id when validating a process in an application context. */
+  appId?: string;
+}
+
+export interface ValidationOptions {
+  /** Application id; enables application-scoped process id checks. */
+  appId?: string;
 }
 
 /**
@@ -99,9 +106,10 @@ export class ValidationService {
    *
    * @param xml raw process XML string
    * @param version Petriflow version whose cached schema should be used
+   * @param options optional validation context; `appId` enables application-scoped checks
    * @returns a result whose `valid` is false if any issue (error severity) was found
    */
-  async validate(xml: string, version: string): Promise<ValidationResult> {
+  async validate(xml: string, version: string, options: ValidationOptions = {}): Promise<ValidationResult> {
     const issues: ValidationIssue[] = [];
 
     // --- 1. Well-formedness ---
@@ -136,7 +144,7 @@ export class ValidationService {
     }
 
     // --- 3. Semantic rules ---
-    const ctx: ValidationContext = {version, xml};
+    const ctx: ValidationContext = {version, xml, appId: options.appId};
     for (const rule of this._rules.values()) {
       let ruleIssues: ValidationIssue[];
       try {
