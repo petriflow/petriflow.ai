@@ -6,7 +6,7 @@ import {PackageBatchStore} from "../../src/ts/services/package-batch.service";
 import type {ValidationResult} from "../../src/ts/services/validation.service";
 import {multipartBody, type MultipartField, type MultipartPart} from "./multipart.helper";
 
-type Validator = (xml: string) => Promise<ValidationResult>;
+type Validator = (xml: string, appId?: string) => Promise<ValidationResult>;
 
 interface TestAppOptions {
   now?: () => number;
@@ -73,8 +73,24 @@ function metadataParts(overrides: Partial<Record<"appId" | "name" | "version", s
   return Object.entries(values).map(([name, value]) => ({name, value}));
 }
 
-function processPart(id: string, filename = `${id}.xml`): MultipartPart {
-  return {name: "files", filename, content: `<document><id>${id}</id></document>`};
+function processPart(id: string, filename?: string): MultipartPart {
+  const scoped = id.includes("/") ? id : `app/${id}`;
+  const local = scoped.split("/").pop()!;
+  return {name: "files", filename: filename ?? `${local}.xml`, content: `<document><id>${scoped}</id></document>`};
+}
+
+function manifestXml(appId: string, processes: string[] = [`${appId}/process`]): string {
+  return `<cases>
+\t<case>
+\t\t<dataField type="text"><id>app_id</id><value>${appId}</value><version>1</version></dataField>
+\t\t<dataField type="caseRef">
+\t\t\t<id>processes</id>
+\t\t\t<allowedNets>${processes.map(process => `<value>${process}</value>`).join("")}</allowedNets>
+\t\t\t<version>1</version>
+\t\t</dataField>
+\t</case>
+</cases>
+`;
 }
 
 function invalidValidator(issues = [{rule: "xsd", severity: "error" as const, message: "bad"}]): Validator {
@@ -95,17 +111,17 @@ test("packages metadata and process XMLs in one request", async () => {
   expect(response.headers["content-disposition"]).toBe('attachment; filename="app.zip"');
 
   const entries = unzipSync(response.rawPayload);
-  expect(Object.keys(entries).sort()).toEqual(["manifest.xml", "processes/alpha.xml", "processes/beta.xml"]);
+  expect(Object.keys(entries).sort()).toEqual(["manifest.xml", "processes/app/alpha.xml", "processes/app/beta.xml"]);
   const manifest = strFromU8(entries["manifest.xml"]);
-  expect(manifest).toContain("<value>alpha</value>");
-  expect(manifest).toContain("<value>beta</value>");
+  expect(manifest).toContain("<value>app/alpha</value>");
+  expect(manifest).toContain("<value>app/beta</value>");
 
   await app.close();
 });
 
 test("uses an uploaded manifest verbatim and ignores metadata", async () => {
   const {app} = await createApp();
-  const manifest = "<cases><case><title>Provided</title></case></cases>\n";
+  const manifest = manifestXml("app", ["app/alpha"]);
 
   const response = await postMultipart(app, "/applications/package", [
     ...metadataParts({appId: "ignored"}),
@@ -114,22 +130,8 @@ test("uses an uploaded manifest verbatim and ignores metadata", async () => {
   ]);
 
   expect(response.statusCode).toBe(200);
-  expect(response.headers["content-disposition"]).toBe('attachment; filename="application.zip"');
+  expect(response.headers["content-disposition"]).toBe('attachment; filename="app.zip"');
   expect(strFromU8(unzipSync(response.rawPayload)["manifest.xml"])).toBe(manifest);
-
-  await app.close();
-});
-
-test("strips paths from uploaded filenames", async () => {
-  const {app} = await createApp();
-
-  const response = await postMultipart(app, "/applications/package", [
-    ...metadataParts(),
-    processPart("alpha", "../nested/alpha.xml"),
-  ]);
-
-  expect(response.statusCode).toBe(200);
-  expect(Object.keys(unzipSync(response.rawPayload))).toContain("processes/alpha.xml");
 
   await app.close();
 });
@@ -146,7 +148,7 @@ test("validates processes when the one-shot flag is enabled", async () => {
   expect(response.statusCode).toBe(422);
   expect(response.json()).toMatchObject({
     status: "invalid",
-    issues: [{filename: "alpha.xml", id: "alpha", rule: "xsd", severity: "error"}],
+    issues: [{filename: "alpha.xml", id: "app/alpha", rule: "xsd", severity: "error"}],
   });
 
   await app.close();
@@ -166,7 +168,7 @@ test("packages one-shot requests that pass validation", async () => {
   ]);
 
   expect(response.statusCode).toBe(200);
-  expect(Object.keys(unzipSync(response.rawPayload))).toContain("processes/alpha.xml");
+  expect(Object.keys(unzipSync(response.rawPayload))).toContain("processes/app/alpha.xml");
 
   await app.close();
 });
@@ -192,6 +194,101 @@ test("does not validate one-shot requests unless the flag is enabled", async () 
   ]);
   expect(explicitlyOff.statusCode).toBe(200);
   expect(calls).toBe(0);
+
+  await app.close();
+});
+
+test("passes the application id to the validator in both modes", async () => {
+  const seen: Array<string | undefined> = [];
+  const validator: Validator = async (_xml, appId) => {
+    seen.push(appId);
+    return {valid: true, issues: []};
+  };
+  const {app} = await createApp({validateProcess: validator});
+
+  const oneShot = await postMultipart(app, "/applications/package", [
+    ...metadataParts(),
+    {name: "validate", value: "true"},
+    processPart("alpha"),
+  ]);
+  expect(oneShot.statusCode).toBe(200);
+
+  const started = await postMultipart(app, "/applications/package/batches", [
+    ...metadataParts(),
+    {name: "validate", value: "true"},
+  ]);
+  const {batchId} = started.json();
+  const upload = await postMultipart(app, `/applications/package/batches/${batchId}/processes`, [processPart("alpha")]);
+  expect(upload.statusCode).toBe(200);
+
+  expect(seen).toEqual(["app", "app"]);
+
+  await app.close();
+});
+
+test("rejects an invalid application id in metadata", async () => {
+  const {app} = await createApp();
+
+  const response = await postMultipart(app, "/applications/package", [
+    ...metadataParts({appId: "../app"}),
+    processPart("alpha"),
+  ]);
+
+  expect(response.statusCode).toBe(400);
+  expect(response.json().error).toContain("Application id");
+
+  await app.close();
+});
+
+test("rejects an unscoped process id when batch validation is off", async () => {
+  const {app, store} = await createApp();
+
+  const started = await postMultipart(app, "/applications/package/batches", metadataParts());
+  const {batchId} = started.json();
+
+  const upload = await postMultipart(app, `/applications/package/batches/${batchId}/processes`, [
+    {name: "files", filename: "alpha.xml", content: "<document><id>alpha</id></document>"},
+  ]);
+
+  expect(upload.statusCode).toBe(400);
+  expect(upload.json().error).toContain("must have the form");
+  expect(store.get(batchId)?.processes).toEqual([]);
+
+  await app.close();
+});
+
+test("enforces scoped ids even when validation reports valid without the rule", async () => {
+  const {app, store} = await createApp({
+    validateProcess: async () => ({valid: true, issues: []}),
+  });
+
+  const started = await postMultipart(app, "/applications/package/batches", [
+    ...metadataParts(),
+    {name: "validate", value: "true"},
+  ]);
+  const {batchId} = started.json();
+
+  const upload = await postMultipart(app, `/applications/package/batches/${batchId}/processes`, [
+    {name: "files", filename: "alpha.xml", content: "<document><id>alpha</id></document>"},
+  ]);
+
+  expect(upload.statusCode).toBe(400);
+  expect(upload.json().error).toContain("must have the form");
+  expect(store.get(batchId)?.processes).toEqual([]);
+
+  await app.close();
+});
+
+test("rejects a provided manifest that does not declare the uploaded processes", async () => {
+  const {app} = await createApp();
+
+  const response = await postMultipart(app, "/applications/package", [
+    {name: "files", filename: "manifest.xml", content: manifestXml("app", ["app/alpha", "app/missing"])},
+    processPart("alpha"),
+  ]);
+
+  expect(response.statusCode).toBe(400);
+  expect(response.json().error).toContain("do not match");
 
   await app.close();
 });
@@ -264,7 +361,7 @@ test("runs a batch from start through uploads to a finished zip", async () => {
   });
   expect(completed.statusCode).toBe(200);
   expect(Object.keys(unzipSync(completed.rawPayload)).sort())
-    .toEqual(["manifest.xml", "processes/alpha.xml", "processes/beta.xml"]);
+    .toEqual(["manifest.xml", "processes/app/alpha.xml", "processes/app/beta.xml"]);
 
   const again = await app.inject({
     method: "POST",
@@ -306,12 +403,12 @@ test("rejects manifest files at batch start and process files after start", asyn
   expect(started.statusCode).toBe(400);
 
   const withManifest = await postMultipart(app, "/applications/package/batches", [
-    {name: "files", filename: "manifest.xml", content: "<cases><case/></cases>"},
+    {name: "files", filename: "manifest.xml", content: manifestXml("app", ["app/alpha"])},
   ]);
   const batchId = withManifest.json().batchId;
 
   const manifestUpload = await postMultipart(app, `/applications/package/batches/${batchId}/processes`, [
-    {name: "files", filename: "manifest.xml", content: "<cases><case/></cases>"},
+    {name: "files", filename: "manifest.xml", content: manifestXml("app", ["app/alpha"])},
   ]);
   expect(manifestUpload.statusCode).toBe(400);
 
@@ -356,7 +453,7 @@ test("keeps a batch alive when validation outlasts the TTL", async () => {
 
 test("completes a batch that started with an uploaded manifest", async () => {
   const {app} = await createApp();
-  const manifest = "<cases><case><title>Provided</title></case></cases>\n";
+  const manifest = manifestXml("app", ["app/alpha"]);
 
   const started = await postMultipart(app, "/applications/package/batches", [
     {name: "files", filename: "manifest.xml", content: manifest},
@@ -367,6 +464,7 @@ test("completes a batch that started with an uploaded manifest", async () => {
   const completed = await app.inject({method: "POST", url: `/applications/package/batches/${batchId}/complete`});
   expect(completed.statusCode).toBe(200);
   expect(strFromU8(unzipSync(completed.rawPayload)["manifest.xml"])).toBe(manifest);
+  expect(Object.keys(unzipSync(completed.rawPayload))).toContain("processes/app/alpha.xml");
 
   await app.close();
 });
@@ -425,7 +523,7 @@ test("validates processes when the batch flag is enabled", async () => {
   expect(upload.json()).toMatchObject({
     status: "invalid",
     batchId,
-    issues: [{filename: "alpha.xml", id: "alpha", rule: "xsd", severity: "error"}],
+    issues: [{filename: "alpha.xml", id: "app/alpha", rule: "xsd", severity: "error"}],
   });
   expect(store.get(batchId)?.processes).toEqual([]);
 

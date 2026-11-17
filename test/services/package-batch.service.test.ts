@@ -3,7 +3,8 @@ import {PackageError, parseProcessXml} from "../../src/ts/services/app-packaging
 import {PackageBatchStore} from "../../src/ts/services/package-batch.service";
 
 function processFile(name: string, id: string) {
-  return parseProcessXml(name, Buffer.from(`<document><id>${id}</id></document>`));
+  const scoped = id.includes("/") ? id : `app/${id}`;
+  return parseProcessXml(name, Buffer.from(`<document><id>${scoped}</id></document>`));
 }
 
 function packageErrorOf(fn: () => unknown): PackageError {
@@ -63,22 +64,31 @@ test("adds processes and slides the expiry window", () => {
   advance(500);
   const batch = store.addProcesses("batch-1", [processFile("a.xml", "a")]);
 
-  expect(batch.processes.map(process => process.id)).toEqual(["a"]);
+  expect(batch.processes.map(process => process.id)).toEqual(["app/a"]);
   expect(store.expiresAt(batch)).toBe(now() + 1_000);
 });
 
-test("rejects duplicate ids and filenames, including within one upload", () => {
+test("rejects duplicate ids, including within one upload", () => {
   const {store} = createStore();
   store.create({metadata: {appId: "app", name: "App", version: "1"}});
 
   store.addProcesses("batch-1", [processFile("a.xml", "a")]);
   expect(packageErrorOf(() => store.addProcesses("batch-1", [processFile("b.xml", "a")])).statusCode)
     .toBe(409);
-  expect(packageErrorOf(() => store.addProcesses("batch-1", [processFile("a.xml", "b")])).statusCode)
-    .toBe(409);
   expect(packageErrorOf(() => store.addProcesses("batch-1", [
     processFile("c.xml", "same"), processFile("d.xml", "same"),
   ])).statusCode).toBe(409);
+});
+
+test("allows the same uploaded basename with different ids", () => {
+  const {store} = createStore();
+  store.create({metadata: {appId: "app", name: "App", version: "1"}});
+
+  const batch = store.addProcesses("batch-1", [
+    processFile("same.xml", "one"), processFile("same.xml", "two"),
+  ]);
+
+  expect(batch.processes.map(process => process.id)).toEqual(["app/one", "app/two"]);
 });
 
 test("enforces the process limit without a partial add", () => {
@@ -156,7 +166,7 @@ test("sweeps expired batches before enforcing the open-batch limit", () => {
 
 test("counts an uploaded manifest in the package size limit", () => {
   const {store} = createStore({maxPackageBytes: 40});
-  store.create({manifest: {xml: "<cases/>", content: Buffer.alloc(20)}});
+  store.create({manifest: {xml: "<cases/>", content: Buffer.alloc(20), appId: "app", processIds: ["app/a"]}});
 
   expect(packageErrorOf(() => store.addProcesses("batch-1", [processFile("a.xml", "a")])).statusCode)
     .toBe(413);
@@ -179,14 +189,14 @@ test("sweeps expired batches before enforcing retained bytes", () => {
     maxRetainedBytes: 100,
     createId: () => `batch-${++nextId}`,
   });
-  store.create({manifest: {xml: "<cases/>", content: Buffer.alloc(80)}});
+  store.create({manifest: {xml: "<cases/>", content: Buffer.alloc(80), appId: "app", processIds: ["app/a"]}});
 
   advance(50);
   store.create({metadata: {appId: "app", name: "App", version: "1"}});
   advance(60);
 
   const batch = store.addProcesses("batch-2", [processFile("a.xml", "a")]);
-  expect(batch.processes.map(process => process.id)).toEqual(["a"]);
+  expect(batch.processes.map(process => process.id)).toEqual(["app/a"]);
 });
 
 test("caps retained bytes across batches", () => {
@@ -197,7 +207,7 @@ test("caps retained bytes across batches", () => {
   expect(store.get("batch-1")?.processes).toEqual([]);
 
   expect(packageErrorOf(() => store.create({
-    manifest: {xml: "<cases/>", content: Buffer.alloc(11)},
+    manifest: {xml: "<cases/>", content: Buffer.alloc(11), appId: "app", processIds: ["app/a"]},
   })).statusCode).toBe(503);
 });
 

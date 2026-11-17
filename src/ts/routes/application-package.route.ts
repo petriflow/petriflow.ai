@@ -2,6 +2,7 @@ import type {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 import fastifyMultipart from "@fastify/multipart";
 import type {AppManifestMetadata} from "../services/app-manifest.service";
 import {
+  assertProcessBelongsToApp,
   buildApplicationPackage,
   PACKAGE_LIMITS,
   PackageError,
@@ -10,6 +11,7 @@ import {
   type ApplicationManifest,
   type ProcessXmlFile,
 } from "../services/app-packaging.service";
+import {isValidAppId} from "../services/process-identifier";
 import {PackageBatchStore, type PackageBatch} from "../services/package-batch.service";
 import validationService, {type ValidationResult} from "../services/validation.service";
 import petriflowVersionService from "../services/petriflow-version.service";
@@ -22,7 +24,7 @@ export interface ApplicationPackageRouteOptions {
   maxBatches?: number;
   maxRetainedBytes?: number;
   sweepIntervalMs?: number;
-  validateProcess?: (xml: string) => Promise<ValidationResult>;
+  validateProcess?: (xml: string, appId?: string) => Promise<ValidationResult>;
 }
 
 interface UploadedFile {
@@ -89,8 +91,13 @@ function optionalField(fields: Record<string, string>, name: string): string | u
 }
 
 function metadataFromFields(fields: Record<string, string>): AppManifestMetadata {
+  const appId = requiredField(fields, "appId");
+  if (!isValidAppId(appId)) {
+    throw new PackageError(`Application id "${appId}" is not valid`, 400);
+  }
+
   return {
-    appId: requiredField(fields, "appId"),
+    appId,
     name: requiredField(fields, "name"),
     version: requiredField(fields, "version"),
     description: optionalField(fields, "description"),
@@ -144,7 +151,8 @@ interface ProcessValidationReport {
 /** Validates processes and collects issues, failing with 503 when the validator is unavailable. */
 async function validateProcesses(
   processes: ProcessXmlFile[],
-  validateProcess: (xml: string) => Promise<ValidationResult>,
+  validateProcess: (xml: string, appId?: string) => Promise<ValidationResult>,
+  appId?: string,
 ): Promise<ProcessValidationReport> {
   const issues: Array<Record<string, unknown>> = [];
   let invalid = false;
@@ -152,7 +160,7 @@ async function validateProcesses(
   for (const process of processes) {
     let result: ValidationResult;
     try {
-      result = await validateProcess(process.content.toString("utf8"));
+      result = await validateProcess(process.content.toString("utf8"), appId);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new PackageError(`Process validation is unavailable for ${process.name}: ${message}`, 503);
@@ -226,7 +234,8 @@ export function registerApplicationPackageRoutes(
     maxRetainedBytes: limits.maxRetainedBytes,
   });
   const validateProcess = options.validateProcess ??
-    ((xml: string) => validationService.validate(xml, petriflowVersionService.getLatestVersion()));
+    ((xml: string, appId?: string) =>
+      validationService.validate(xml, petriflowVersionService.getLatestVersion(), {appId}));
 
   app.register(fastifyMultipart, {
     limits: {
@@ -257,8 +266,9 @@ export function registerApplicationPackageRoutes(
       }
 
       const processes = parseProcesses(source.processFiles);
+      const appId = source.manifest?.appId ?? source.metadata?.appId;
       if (validationEnabled) {
-        const report = await validateProcesses(processes, validateProcess);
+        const report = await validateProcesses(processes, validateProcess, appId);
         if (report.invalid) {
           return reply.code(422).send({status: "invalid", issues: report.issues});
         }
@@ -269,7 +279,7 @@ export function registerApplicationPackageRoutes(
         metadata: source.metadata,
         processes,
       }, {maxPackageBytes: limits.maxPackageBytes});
-      return sendZip(reply, pkg.archive, source.metadata?.appId);
+      return sendZip(reply, pkg.archive, appId);
     } catch (error) {
       return sendError(reply, error);
     }
@@ -307,12 +317,20 @@ export function registerApplicationPackageRoutes(
         throw new PackageError("No XML files uploaded", 400);
       }
 
+      const appId = batch.manifest?.appId ?? batch.metadata?.appId;
+      if (!appId) {
+        throw new PackageError("Packaging batch has no application id", 400);
+      }
+
       const processes = parseProcesses(form.files);
       if (batch.validationEnabled) {
-        const report = await validateProcesses(processes, validateProcess);
+        const report = await validateProcesses(processes, validateProcess, appId);
         if (report.invalid) {
           return reply.code(422).send({status: "invalid", batchId, issues: report.issues});
         }
+      }
+      for (const process of processes) {
+        assertProcessBelongsToApp(process.id, appId);
       }
 
       if (!batchStore.refresh(batch)) {
@@ -339,7 +357,7 @@ export function registerApplicationPackageRoutes(
         processes: batch.processes,
       }, {maxPackageBytes: limits.maxPackageBytes});
       batchStore.delete(batchId);
-      return sendZip(reply, pkg.archive, batch.metadata?.appId);
+      return sendZip(reply, pkg.archive, batch.metadata?.appId ?? batch.manifest?.appId);
     } catch (error) {
       return sendError(reply, error);
     }

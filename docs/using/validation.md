@@ -5,7 +5,7 @@ Groovy action code. Both return the same shape — a boolean and a list of issue
 
 ## Process validation
 
-`validate_process(version, xml)` runs three stages in order. It returns immediately if the XML is not well-formed;
+`validate_process(version, xml, appId?)` runs three stages in order. It returns immediately if the XML is not well-formed;
 otherwise it runs XSD validation and then the semantic rules, even when XSD errors are found:
 
 1. **Well-formedness** — the XML parses. Issues carry `rule: "xml"`.
@@ -37,12 +37,21 @@ otherwise it runs XSD validation and then the semantic rules, even when XSD erro
 |---|---|
 | `valid-version` | The document version is a valid semantic version |
 | `unique-ids` | Transition and place ids are unique |
-| `valid-identifiers` | Ids are Java-style identifiers and not reserved words |
+| `valid-identifiers` | Element and action ids are Java-style identifiers and not reserved words |
+| `valid-process-identifier` | The root process id is a plain identifier, or `<appId>/<processId>` when validated for an application |
 | `unique-action-ids` | Every action has a unique `id` |
 | `arc-direction` | No arc connects two transitions or two places |
 | `arc-connectivity` | Every arc references an existing transition and place |
 | `place-tokens` | Place tokens are a non-negative integer |
 | `action-validation` | Actions and custom functions compile against the DSL, and field/transition references resolve |
+
+`valid-process-identifier` checks the root `<document>/<id>`. Without an application context, a plain id such as
+`invoice` passes, and a scoped id such as `Objednavky/user_ASK` must still be well-formed. When `validate_process` is
+called with `appId`, the id must be scoped to that exact application; packaging enables this context when
+`validate=true`.
+
+Accepted ids start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens. This is
+narrower than a Java identifier: leading `_` or `$` and non-ASCII characters are rejected.
 
 `action-validation` is asynchronous: it drives a persistent Groovy subprocess, so it is the slowest stage and the only
 one that needs an external runtime. The other rules are pure DOM checks.

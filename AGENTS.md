@@ -107,10 +107,14 @@ Return convention:
   and XMCP adapter module graph. Use stable namespaced keys; do not add a production reset.
 - `src/ts/services/petriflow-data.service.ts` — shared readers for schema, overview, elements, action definitions, and
   examples. Tools, resources, and validation should use this service rather than reading files directly.
-- `src/ts/services/app-manifest.service.ts` — pure `manifest.xml` generator for cloud NAE application bundles. Optional
-  NAE fields (`imports`, `dependencies`, `assets`, `app_meta`) are not generated yet.
+- `src/ts/services/app-manifest.service.ts` — pure `manifest.xml` generator for cloud NAE application bundles; process
+  ids must be `<appId>/<processId>`. Optional NAE fields (`imports`, `dependencies`, `assets`, `app_meta`) are not
+  generated yet.
 - `src/ts/services/app-packaging.service.ts` — parses uploaded manifest/process XML, extracts process ids, enforces
-  `PACKAGE_LIMITS`, and builds the application ZIP with `fflate`.
+  `PACKAGE_LIMITS`, and builds the application ZIP with `fflate`. Processes are written under
+  `processes/<appId>/<processId>.xml`; plain or mismatched process ids are rejected.
+- `src/ts/services/process-identifier.ts` — shared parser for plain process ids and `<appId>/<processId>` ids, used by
+  packaging and the `valid-process-identifier` rule.
 - `src/ts/services/package-batch.service.ts` — process-local in-memory packaging batches with a sliding TTL. Batches are
   not persisted and are not shared between replicas.
 - `src/ts/services/version-completions.service.ts` — resource-template completion values from the active catalog;
@@ -150,6 +154,8 @@ Return convention:
   feature-flagged.
 - `src/ts/services/rules/helpers.ts` has shared DOM/XPath helpers (`childText`, `findRootChildren`, `isJavaIdentifier`,
   `JAVA_RESERVED_WORDS`, `GROOVY_RESERVED_WORDS`, `parseInteger`).
+- `ValidationContext` carries an optional `appId`; `valid-process-identifier` allows a plain root id without it and
+  requires `<appId>/<processId>` when it is present. `validate_process` exposes `appId`; packaging passes its own.
 - `validate(doc, ctx)` receives a libxmljs5 `Document`; use `doc.find(xpath)` / element `.attr()` / `.text()`.
 - `validate` may return a `Promise<ValidationIssue[]>` (the service `await`s every rule); `action-validation.rule.ts` is
   async (it drives the Groovy daemon).

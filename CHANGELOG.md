@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The `valid-process-identifier` semantic rule checks the root process id. Without an application context it accepts a
+  plain safe id or `<appId>/<processId>`; with `appId` it requires the matching application prefix.
+- `validate_process` accepts an optional `appId` to validate a process in application context.
+
+### Changed
+
+- Application packages now write process XMLs under `processes/<appId>/<processId>.xml`, and process ids must be scoped
+  to the package application. Provided `manifest.xml` files must carry an `app_id` and scoped `processes` that match the
+  uploaded set.
+- Uploaded process basenames no longer determine ZIP paths; duplicate process ids remain rejected.
+
 ## [1.1.0] - 2026-11-06
 
 ### Added

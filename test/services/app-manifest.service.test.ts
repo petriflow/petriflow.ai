@@ -8,7 +8,7 @@ test("generates a manifest with all fields and processes in order", () => {
     version: "1.0.0",
     description: "Demo application",
     author: "Netgrif",
-    processes: ["new_model-5", "new_model-6"],
+    processes: ["app/new_model-5", "app/new_model-6"],
   });
 
   expect(xml).toBe(`<cases>
@@ -42,8 +42,8 @@ test("generates a manifest with all fields and processes in order", () => {
 \t\t<dataField type="caseRef">
 \t\t\t<id>processes</id>
 \t\t\t<allowedNets>
-\t\t\t\t<value>new_model-5</value>
-\t\t\t\t<value>new_model-6</value>
+\t\t\t\t<value>app/new_model-5</value>
+\t\t\t\t<value>app/new_model-6</value>
 \t\t\t</allowedNets>
 \t\t\t<version>1</version>
 \t\t</dataField>
@@ -54,7 +54,7 @@ test("generates a manifest with all fields and processes in order", () => {
 
 test("omits value elements for empty or blank optional fields and falls back for blank title", () => {
   const xml = generateAppManifest({
-    appId: "app", name: "App", version: "1.0.0", processes: ["p"],
+    appId: "app", name: "App", version: "1.0.0", processes: ["app/p"],
     description: "", author: "   ", title: "   ",
   });
   expect(xml).toContain("\t\t\t<id>description</id>\n\t\t\t<version>1</version>");
@@ -64,18 +64,28 @@ test("omits value elements for empty or blank optional fields and falls back for
 });
 
 test("uses the title when given and falls back to the name", () => {
-  expect(generateAppManifest({appId: "a", name: "Name", title: "Title", version: "1", processes: ["p"]}))
+  expect(generateAppManifest({appId: "app", name: "Name", title: "Title", version: "1", processes: ["app/p"]}))
     .toContain("<title>Title</title>");
-  expect(generateAppManifest({appId: "a", name: "Name", version: "1", processes: ["p"]}))
+  expect(generateAppManifest({appId: "app", name: "Name", version: "1", processes: ["app/p"]}))
     .toContain("<title>Name</title>");
 });
 
-test("escapes XML special characters", () => {
+test("escapes XML special characters in text fields", () => {
   const xml = generateAppManifest({
-    appId: "a&b", name: "<Name>", version: "1", description: "\"D\" 'E'", processes: ["p&q"],
+    appId: "app", name: "<Name>", title: "A & B", version: "1", description: "\"D\" 'E'", processes: ["app/p"],
   });
-  expect(xml).toContain("a&amp;b");
+  expect(xml).toContain("<title>A &amp; B</title>");
   expect(xml).toContain("&lt;Name&gt;");
   expect(xml).toContain("&quot;D&quot; &apos;E&apos;");
-  expect(xml).toContain("p&amp;q");
+});
+
+test("rejects invalid application ids and unscoped or mismatched process ids", () => {
+  expect(() => generateAppManifest({appId: "a&b", name: "App", version: "1", processes: ["a&b/p"]}))
+    .toThrow(/application id/i);
+  expect(() => generateAppManifest({appId: "app", name: "App", version: "1", processes: ["p"]}))
+    .toThrow(/must have the form/);
+  expect(() => generateAppManifest({appId: "app", name: "App", version: "1", processes: ["other/p"]}))
+    .toThrow(/does not belong/);
+  expect(() => generateAppManifest({appId: "app", name: "App", version: "1", processes: ["app/p", "app/p"]}))
+    .toThrow(/duplicate/i);
 });

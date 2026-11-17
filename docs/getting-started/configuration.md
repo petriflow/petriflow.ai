@@ -61,8 +61,8 @@ PETRIFLOW_DISABLED_RULES=action-validation
 PETRIFLOW_DISABLED_TOOLS=get_action,get_component,get_element,get_example,list_actions,list_components,list_elements,list_examples
 ```
 
-Validation rule names: `valid-version`, `unique-ids`, `valid-identifiers`, `unique-action-ids`, `arc-direction`,
-`arc-connectivity`, `place-tokens`, `action-validation`.
+Validation rule names: `valid-version`, `unique-ids`, `valid-identifiers`, `valid-process-identifier`,
+`unique-action-ids`, `arc-direction`, `arc-connectivity`, `place-tokens`, `action-validation`.
 
 Tool names: `list_versions`, `get_overview`, `get_schema`, `list_elements`, `get_element`, `list_actions`,
 `get_action`, `list_components`, `get_component`, `list_examples`, `get_example`, `validate_process`, `validate_action`,

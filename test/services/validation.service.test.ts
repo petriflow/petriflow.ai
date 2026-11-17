@@ -89,6 +89,23 @@ test("returns XSD errors and converts a thrown rule into an issue while continui
   expect(laterRule).toHaveBeenCalledOnce();
 });
 
+test("passes the application context to semantic rules", async () => {
+  const service = new ValidationService();
+  const seen: Array<string | undefined> = [];
+  service.registerRule({
+    name: "context",
+    description: "records appId",
+    validate: (_doc, context) => {
+      seen.push(context.appId);
+      return [];
+    },
+  });
+
+  await service.validate("<document><value>ok</value></document>", "1.2.3", {appId: "app"});
+
+  expect(seen).toEqual(["app"]);
+});
+
 test("shares registered rules across default validation service module reloads", async () => {
   const firstModule = await import("../../src/ts/services/validation.service");
   const first = firstModule.default;

@@ -1,3 +1,5 @@
+import {isValidAppId, parseProcessIdentifier} from "./process-identifier";
+
 export interface AppManifestMetadata {
   appId: string;
   name: string;
@@ -43,9 +45,34 @@ function caseRefField(id: string, values: string[]): string[] {
   ];
 }
 
+function validateManifestInput(input: AppManifestInput): void {
+  if (!isValidAppId(input.appId)) {
+    throw new Error(`Application id "${input.appId}" is not valid. It must match [A-Za-z0-9][A-Za-z0-9._-]*.`);
+  }
+
+  const seen = new Set<string>();
+  for (const processId of input.processes) {
+    if (seen.has(processId)) {
+      throw new Error(`Duplicate process id: ${processId}`);
+    }
+    seen.add(processId);
+
+    const identifier = parseProcessIdentifier(processId);
+    if (!identifier) {
+      throw new Error(`Process id "${processId}" must have the form "<appId>/<processId>".`);
+    }
+    if (identifier.appId !== input.appId) {
+      throw new Error(
+        `Process id "${processId}" does not belong to application "${input.appId}".`,
+      );
+    }
+  }
+}
+
 // TODO: add the optional NAE application fields that are not generated yet:
 // imports, dependencies, assets, app_meta.
 export function generateAppManifest(input: AppManifestInput): string {
+  validateManifestInput(input);
   const title = input.title?.trim() || input.name;
   const lines = [
     "<cases>",

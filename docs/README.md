@@ -14,7 +14,7 @@ The server ships with a complete Petriflow release bundled in the image, which m
 | **Data modes** | `LOCAL` — bundled snapshot (default). `REMOTE` — synchronized GitHub releases |
 | **Tools** | 14, for discovery, language data, validation, and application packaging |
 | **Resources** | 11 templates over `petriflow://versions/...` |
-| **Validation** | XML well-formedness, XSD, 8 semantic rules, and Groovy action compilation |
+| **Validation** | XML well-formedness, XSD, 9 semantic rules, and Groovy action compilation |
 | **Runtime** | Node.js 26, `libxmljs5` native module, Java 21 + Groovy 5.0.5 for action validation |
 
 ## Quick start

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="MCP server exposing Petriflow tools and resources to MCP-compatible AI clients."/>
+  <meta name="description" content="MCP server exposing Petriflow tools and resources to MCP-compatible AI clients, plus application packaging endpoints."/>
   <title>Petriflow MCP Server</title>
   <link rel="icon" href="assets/favicon.ico"/>
   <style>
@@ -327,6 +327,7 @@
   <div class="badges">
     <span class="badge dot">Streamable HTTP transport</span>
     <span class="badge">Apache-2.0</span>
+    <span class="badge">Cloud NAE packaging</span>
   </div>
 
   <section id="about">
@@ -337,12 +338,12 @@
       for <a href="https://github.com/petriflow/petriflow" target="_blank" rel="noopener">Petriflow</a>, letting
       MCP-compatible
       AI tools explore the Petriflow language (schema, elements, actions, components, examples) and validate processes
-      &mdash;
-      all over a single HTTP endpoint. It's built with <a href="https://xmcp.dev" target="_blank"
-                                                          rel="noopener">xmcp</a> + Fastify.
+      over HTTP. The same server can build cloud NAE application package ZIPs. It's built with
+      <a href="https://xmcp.dev" target="_blank" rel="noopener">xmcp</a> + Fastify.
     </p>
     <p>
-      <strong>Status:</strong> functional MCP server exposing the Petriflow tooling listed below.
+      <strong>Status:</strong> functional MCP server exposing the Petriflow tooling listed below, plus an HTTP
+      application packaging API.
     </p>
   </section>
 
@@ -530,8 +531,8 @@
         </tr>
         <tr>
           <td><code>validate_process</code></td>
-          <td>Validate a process XML against its schema and semantic rules</td>
-          <td><code>version</code>, <code>xml</code>: string</td>
+          <td>Validate a process XML against its schema and semantic rules; pass <code>appId</code> for application-scoped process ids</td>
+          <td><code>version</code>, <code>xml</code>: string; optional <code>appId</code></td>
         </tr>
         <tr>
           <td><code>validate_action</code></td>
@@ -540,12 +541,104 @@
         </tr>
         <tr>
           <td><code>generate_app_manifest</code></td>
-          <td>Generate a manifest.xml for a cloud NAE application bundle</td>
+          <td>Generate a manifest.xml for a cloud NAE application bundle; process ids must be <code>&lt;appId&gt;/&lt;processId&gt;</code></td>
           <td><code>appId</code>, <code>name</code>, <code>version</code>, <code>processes</code>, optional <code>description</code>, <code>author</code>, <code>title</code></td>
         </tr>
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section id="packaging">
+    <h2>Application packaging endpoints</h2>
+    <p>
+      Besides MCP, the server exposes an HTTP API that builds a cloud NAE application ZIP from Petriflow process XMLs.
+      A package contains <code>manifest.xml</code> at the root and each process under
+      <code>processes/&lt;appId&gt;/&lt;processId&gt;.xml</code>. A process XML must have its root
+      <code>&lt;id&gt;</code> in the form <code>&lt;appId&gt;/&lt;processId&gt;</code>.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>Method and path</th>
+          <th>Purpose</th>
+          <th>Request</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><code>POST /applications/package</code></td>
+          <td>Build and return the application ZIP in one request.</td>
+          <td>multipart/form-data with <code>appId</code>, <code>name</code>, and <code>version</code> (required),
+            optional <code>description</code>, <code>author</code>, <code>title</code>, and <code>validate=true</code>,
+            plus one or more process XML files. Uploading <code>manifest.xml</code> uses it verbatim instead of the
+            metadata fields.
+          </td>
+        </tr>
+        <tr>
+          <td><code>POST /applications/package/batches</code></td>
+          <td>Start an in-memory packaging batch.</td>
+          <td>Manifest fields or <code>manifest.xml</code>, plus optional <code>validate=true</code>. Returns
+            <code>batchId</code>, <code>processCount</code>, <code>validate</code>, and <code>expiresAt</code>.
+          </td>
+        </tr>
+        <tr>
+          <td><code>POST /applications/package/batches/{batchId}/processes</code></td>
+          <td>Add one or more process XMLs to the batch.</td>
+          <td>multipart/form-data with process XML files scoped to the batch application.</td>
+        </tr>
+        <tr>
+          <td><code>POST /applications/package/batches/{batchId}/complete</code></td>
+          <td>Return the finished ZIP and delete the batch.</td>
+          <td>No body.</td>
+        </tr>
+        <tr>
+          <td><code>DELETE /applications/package/batches/{batchId}</code></td>
+          <td>Cancel the batch.</td>
+          <td>No body.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top:12px;">
+      A provided <code>manifest.xml</code> supplies <code>app_id</code> and the process list; its declared processes
+      must match the uploaded set. Without a manifest, the manifest is generated from the metadata and process ids.
+      With <code>validate=true</code>, processes are checked against the active Petriflow version in application context;
+      invalid processes return <code>422</code> with issues and are not added.
+    </p>
+
+    <div class="code-wrap">
+      <pre><code>curl -X POST <span class="packaging-url">http://localhost:3000/applications/package</span> \
+  -F appId=my-app \
+  -F name='My App' \
+  -F version=1.0.0 \
+  -F files=@processes/order.xml \
+  -o my-app.zip</code></pre>
+      <button class="copy-btn" type="button">Copy</button>
+    </div>
+
+    <p style="margin-top:12px; font-size:0.85rem;">Incremental batch upload:</p>
+    <div class="code-wrap">
+      <pre><code>batch=$(curl -s -X POST <span class="packaging-url">http://localhost:3000/applications/package</span>/batches \
+  -F appId=my-app -F name='My App' -F version=1.0.0 -F validate=true)
+id=$(echo "$batch" | jq -r .batchId)
+
+curl -X POST "<span class="packaging-url">http://localhost:3000/applications/package</span>/batches/$id/processes" \
+  -F files=@processes/order.xml
+
+curl -X POST "<span class="packaging-url">http://localhost:3000/applications/package</span>/batches/$id/complete" \
+  -o my-app.zip</code></pre>
+      <button class="copy-btn" type="button">Copy</button>
+    </div>
+
+    <p style="margin-top:12px; font-size:0.85rem;">
+      Limits: 5 MiB per file, 100 files per request, 16 KiB per field, 100 processes and 50 MiB per application,
+      10 open batches, and 200 MiB retained. Batches expire after 30 minutes without an upload, are lost on restart,
+      and are not shared between replicas. These endpoints are not authenticated; protect them at the ingress.
+    </p>
   </section>
 
   <footer>
@@ -564,11 +657,15 @@
   (function () {
     var mcpUrl = window.location.origin + "/mcp";
     var healthUrl = window.location.origin + "/health";
+    var packagingUrl = window.location.origin + "/applications/package";
     document.querySelectorAll(".mcp-url").forEach(function (el) {
       el.textContent = mcpUrl;
     });
     document.querySelectorAll(".health-url").forEach(function (el) {
       el.textContent = healthUrl;
+    });
+    document.querySelectorAll(".packaging-url").forEach(function (el) {
+      el.textContent = packagingUrl;
     });
   })();
 
