@@ -63,7 +63,7 @@ A missing or invalid snapshot stops startup in `LOCAL` mode; there is no remote 
 ## Working with the Groovy delegate
 
 `src/groovy/lib/ActionDelegate.groovy` is generated from `netgrif/application-engine`; never edit it by hand. The
-generator pins the source with `NAE_REF` (currently `v7.0.3`) in `src/groovy/tools/generate-delegate.groovy`. The NAE
+generator pins the source with `NAE_REF` (currently `v7.1.0`) in `src/groovy/tools/generate-delegate.groovy`. The NAE
 source is not vendored in this repository.
 
 ```bash

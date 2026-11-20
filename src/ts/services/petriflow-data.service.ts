@@ -103,11 +103,42 @@ export class PetriflowDataService {
 
   getAction(version: string, name: string): Record<string, any> {
     const actions = this.readJsonRecord(version, "actions-definitions.json");
-    const action = actions[name];
+    const action = this.resolveAction(actions, name);
     if (!action || typeof action !== "object") {
       throw new Error(`Action ${name} not found`);
     }
     return {...action, name};
+  }
+
+  /**
+   * Resolves a base action name, a numbered alternative (`choose-1`), or a DSL chain entry (`chain-then`).
+   * The most specific matching base name wins, and an exact top-level name always takes precedence.
+   */
+  private resolveAction(actions: Record<string, any>, name: string): Record<string, any> | undefined {
+    if (Object.hasOwn(actions, name)) {
+      return actions[name];
+    }
+
+    let resolved: Record<string, any> | undefined;
+    let resolvedBaseLength = 0;
+    for (const [base, definition] of Object.entries(actions)) {
+      if (!definition || typeof definition !== "object" || !name.startsWith(`${base}-`)) {
+        continue;
+      }
+      const suffix = name.slice(base.length + 1);
+      let candidate: Record<string, any> | undefined;
+      if (Array.isArray(definition.alts) && /^\d+$/.test(suffix)) {
+        candidate = definition.alts[Number(suffix)];
+      } else if (definition.dslChain && typeof definition.dslChain === "object"
+        && Object.hasOwn(definition.dslChain, suffix)) {
+        candidate = definition.dslChain[suffix];
+      }
+      if (candidate && typeof candidate === "object" && base.length > resolvedBaseLength) {
+        resolved = candidate;
+        resolvedBaseLength = base.length;
+      }
+    }
+    return resolved;
   }
 
   listComponents(version: string): ListedComponent[] {

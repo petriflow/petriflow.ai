@@ -51,7 +51,7 @@ Return convention:
 - Release assets are named `petriflow-vX.Y.Z.zip`. The archive root contains `petriflow.schema.xsd`, `overview.md`,
   `actions-definitions.json`, `elements/`, and `examples/`, and may contain `components-definitions.json`.
 - `components-definitions.json` (field components, keyed by definition id) is hand-written from `netgrif/components`
-  v7.0.3 (`data-fields.module.ts` registry plus `component.properties` reads) and currently maintained only in
+  v7.1.0 (`data-fields.module.ts` registry plus `component.properties` reads) and currently maintained only in
   `src/petriflow/snapshot/`. Each definition requires non-empty `names` and `fieldTypes` string arrays, non-empty
   `description` and `whenToUse` strings, and optional `params` (entries with non-empty `name`, `type`, `description`
   and a boolean `required`), `examples` (string array), and boolean `deprecated`. It is optional in release archives:
@@ -131,9 +131,12 @@ Return convention:
   Pure reference helpers can be tested directly; daemon tests should use a fake child process rather than require
   Groovy.
 - `src/groovy/lib/ActionDelegate.groovy` is generated from `netgrif/application-engine` (pinned `NAE_REF` in
-  `src/groovy/tools/generate-delegate.groovy`, currently `v7.0.3`); never edit it by hand. Regenerate with
+  `src/groovy/tools/generate-delegate.groovy`, currently `v7.1.0`); never edit it by hand. Regenerate with
   `groovy src/groovy/tools/generate-delegate.groovy`, or `--source <file>` for a local NAE checkout and `--check` to
   detect drift. The NAE source itself is not vendored in this repository.
+- Stub classes in `ActionDelegate.groovy` get explicit no-arg and `Object... args` constructors from the generator, and
+  `Validator.groovy` normalizes fully-qualified `com.netgrif.application.engine…` references to the stub simple name.
+  Keep both behaviors when regenerating: exact constructor signatures reject valid code that passes `i18n(...)` results.
 
 ## MCP Resources
 

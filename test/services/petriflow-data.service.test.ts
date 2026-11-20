@@ -87,6 +87,34 @@ test("reads schema, overview, elements, actions, and examples from release stora
   });
 });
 
+test("resolves action alternatives and DSL chain entries by their listed names", () => {
+  withData((service) => {
+    expect(service.getAction("1.2.3", "choose")).toMatchObject({
+      alts: [
+        {signature: "choose(a)", description: "First"},
+        {signature: "choose(b)", description: "Second"},
+      ],
+    });
+    expect(service.getAction("1.2.3", "choose-0")).toEqual({
+      name: "choose-0", signature: "choose(a)", description: "First",
+    });
+    expect(service.getAction("1.2.3", "choose-1")).toEqual({
+      name: "choose-1", signature: "choose(b)", description: "Second",
+    });
+    expect(service.getAction("1.2.3", "chain-then")).toEqual({
+      name: "chain-then", signature: "then()", description: "Chain",
+    });
+  });
+});
+
+test("reports an unknown action instead of failing on a missing definition", () => {
+  withData((service) => {
+    expect(() => service.getAction("1.2.3", "choose-5")).toThrow(/Action choose-5 not found/);
+    expect(() => service.getAction("1.2.3", "missing-1")).toThrow(/Action missing-1 not found/);
+    expect(() => service.getAction("1.2.3", "send-1")).toThrow(/Action send-1 not found/);
+  });
+});
+
 test("resolves latest and reports missing release files clearly", () => {
   withData((service) => {
     expect(service.getOverview("latest")).toBe("# Overview");

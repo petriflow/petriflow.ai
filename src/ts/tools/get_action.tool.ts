@@ -5,7 +5,7 @@ import {withToolFeatureFlag} from "../services/feature-flags.service";
 
 export const schema = {
   version: z.string().describe("Version of the schema"),
-  name: z.string().describe("Name of the action"),
+  name: z.string().describe("Name of the action: the base name or an entry from list_actions such as choose-0"),
 };
 
 const actionVariantSchema = z.object({

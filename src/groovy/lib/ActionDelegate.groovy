@@ -1,7 +1,7 @@
 // AUTO-GENERATED — do not edit by hand.
-// Source: netgrif/application-engine@v7.0.3
+// Source: netgrif/application-engine@v7.1.0
 // Path: application-engine/src/main/groovy/com/netgrif/application/engine/petrinet/domain/dataset/logic/action/ActionDelegate.groovy
-// SHA-256: f2cbd012f00be6829439d0fcb124f268bd25c5d43e7b2e50d87afa4b90a7eb04
+// SHA-256: 2ad220b5fc2479ccd8a10cced48c27a794a1aaacc0a748d1a90a882720cd7e89
 // Regenerate (pinned NAE ref): groovy src/groovy/tools/generate-delegate.groovy
 // Regenerate (local NAE checkout): groovy src/groovy/tools/generate-delegate.groovy --source /path/to/ActionDelegate.groovy
 // Stripped ActionDelegate: full DSL method surface, no Spring/NAE runtime deps.
@@ -26,29 +26,78 @@ class Stub {
 class AbstractUser extends Stub {
     String fullName
     String email
+    AbstractUser() {}
+    AbstractUser(Object... args) {}
 }
-class Action extends Stub {}
-class AsyncRunner extends Stub {}
+class Action extends Stub {
+    Action() {}
+    Action(Object... args) {}
+}
+class AsyncRunner extends Stub {
+    AsyncRunner() {}
+    AsyncRunner(Object... args) {}
+}
 class Case extends Stub {
     String title
     String color
     PetriNet petriNet
     Map dataSet
     List tasks
+    Case() {}
+    Case(Object... args) {}
 }
-class CaseField extends Field {}
-class CaseSearchRequest extends Stub {}
-class ChangedField extends Stub {}
-class ChoiceField extends Field {}
-class DashboardItemBody extends Stub {}
-class DashboardItemService extends Stub {}
-class DashboardManagementBody extends Stub {}
-class DashboardManagementService extends Stub {}
-class DynamicValidation extends Stub {}
-class ElasticTaskSearchRequest extends Stub {}
-class EventOutcome extends Stub {}
-class ExportConfiguration extends Stub {}
-class ExportDataConfig extends Stub {}
+class CaseField extends Field {
+    CaseField() {}
+    CaseField(Object... args) {}
+}
+class CaseSearchRequest extends Stub {
+    CaseSearchRequest() {}
+    CaseSearchRequest(Object... args) {}
+}
+class ChangedField extends Stub {
+    ChangedField() {}
+    ChangedField(Object... args) {}
+}
+class ChoiceField extends Field {
+    ChoiceField() {}
+    ChoiceField(Object... args) {}
+}
+class DashboardItemBody extends Stub {
+    DashboardItemBody() {}
+    DashboardItemBody(Object... args) {}
+}
+class DashboardItemService extends Stub {
+    DashboardItemService() {}
+    DashboardItemService(Object... args) {}
+}
+class DashboardManagementBody extends Stub {
+    DashboardManagementBody() {}
+    DashboardManagementBody(Object... args) {}
+}
+class DashboardManagementService extends Stub {
+    DashboardManagementService() {}
+    DashboardManagementService(Object... args) {}
+}
+class DynamicValidation extends Stub {
+    DynamicValidation() {}
+    DynamicValidation(Object... args) {}
+}
+class ElasticTaskSearchRequest extends Stub {
+    ElasticTaskSearchRequest() {}
+    ElasticTaskSearchRequest(Object... args) {}
+}
+class EventOutcome extends Stub {
+    EventOutcome() {}
+    EventOutcome(Object... args) {}
+}
+class ExportConfiguration extends Stub {
+    ExportConfiguration() {}
+    ExportConfiguration(Object... args) {}
+}
+class ExportDataConfig extends Stub {
+    ExportDataConfig() {}
+    ExportDataConfig(Object... args) {}
+}
 class Field extends Stub {
     Object type
     Map options
@@ -56,79 +105,271 @@ class Field extends Stub {
     Object defaultValue
     Map behavior
     Object validations
+    Field() {}
+    Field(Object... args) {}
 }
-class FieldActionsRunner extends Stub {}
-class FieldBehavior extends Stub {}
-class FieldFactory extends Stub {}
-class FileField extends Field {}
-class FileFieldInputStream extends Stub {}
-class FileFieldValue extends Stub {}
-class FilterBody extends Stub {}
-class FilterConfigurationProperties extends Stub {}
-class FrontendActionOutcome extends Stub {}
-class GetDataEventOutcome extends Stub {}
-class GroupService extends Stub {}
+class FieldActionsRunner extends Stub {
+    FieldActionsRunner() {}
+    FieldActionsRunner(Object... args) {}
+}
+class FieldBehavior extends Stub {
+    FieldBehavior() {}
+    FieldBehavior(Object... args) {}
+}
+class FieldFactory extends Stub {
+    FieldFactory() {}
+    FieldFactory(Object... args) {}
+}
+class FileField extends Field {
+    FileField() {}
+    FileField(Object... args) {}
+}
+class FileFieldInputStream extends Stub {
+    FileFieldInputStream() {}
+    FileFieldInputStream(Object... args) {}
+}
+class FileFieldValue extends Stub {
+    FileFieldValue() {}
+    FileFieldValue(Object... args) {}
+}
+class FilterBody extends Stub {
+    FilterBody() {}
+    FilterBody(Object... args) {}
+}
+class FilterConfigurationProperties extends Stub {
+    FilterConfigurationProperties() {}
+    FilterConfigurationProperties(Object... args) {}
+}
+class FrontendActionOutcome extends Stub {
+    FrontendActionOutcome() {}
+    FrontendActionOutcome(Object... args) {}
+}
+class GetDataEventOutcome extends Stub {
+    GetDataEventOutcome() {}
+    GetDataEventOutcome(Object... args) {}
+}
+class Group extends Stub {
+    Group() {}
+    Group(Object... args) {}
+}
+class GroupService extends Stub {
+    GroupService() {}
+    GroupService(Object... args) {}
+}
 class I18nString extends Stub {
+    I18nString() {}
+    I18nString(Object... args) {}
 }
-class IConfigurableMenuService extends Stub {}
-class IDataService extends Stub {}
-class IDataValidationExpressionEvaluator extends Stub {}
-class IElasticCaseService extends Stub {}
-class IElasticTaskService extends Stub {}
-class IExportService extends Stub {}
-class IFilterImportExportService extends Stub {}
-class IImpersonationService extends Stub {}
-class IMailAttemptService extends Stub {}
-class IMailService extends Stub {}
-class IMenuImportExportService extends Stub {}
-class IMenuItemService extends Stub {}
-class IPdfGenerator extends Stub {}
-class IPetriNetService extends Stub {}
-class IRegistrationService extends Stub {}
-class IStorageResolverService extends Stub {}
-class IUserFilterSearchService extends Stub {}
-class IWorkflowService extends Stub {}
-class InitValueExpressionEvaluator extends Stub {}
-class LoggedUser extends Stub {}
-class MailConfigurationProperties extends Stub {}
-class MailDraft extends Stub {}
-class MapOptionsField extends Field {}
-class MenuItemBody extends Stub {}
-class MessageResource extends Stub {}
-class ModuleHolder extends Stub {}
-class MultichoiceMapField extends Field {}
-class NewUserRequest extends Stub {}
-class Nullable extends Stub {}
-class Page extends Stub {}
-class Pageable extends Stub {}
-class PaginationProperties extends Stub {}
+class IConfigurableMenuService extends Stub {
+    IConfigurableMenuService() {}
+    IConfigurableMenuService(Object... args) {}
+}
+class IDataService extends Stub {
+    IDataService() {}
+    IDataService(Object... args) {}
+}
+class IDataValidationExpressionEvaluator extends Stub {
+    IDataValidationExpressionEvaluator() {}
+    IDataValidationExpressionEvaluator(Object... args) {}
+}
+class IElasticCaseService extends Stub {
+    IElasticCaseService() {}
+    IElasticCaseService(Object... args) {}
+}
+class IElasticTaskService extends Stub {
+    IElasticTaskService() {}
+    IElasticTaskService(Object... args) {}
+}
+class IExportService extends Stub {
+    IExportService() {}
+    IExportService(Object... args) {}
+}
+class IFilterImportExportService extends Stub {
+    IFilterImportExportService() {}
+    IFilterImportExportService(Object... args) {}
+}
+class IImpersonationService extends Stub {
+    IImpersonationService() {}
+    IImpersonationService(Object... args) {}
+}
+class IMailAttemptService extends Stub {
+    IMailAttemptService() {}
+    IMailAttemptService(Object... args) {}
+}
+class IMailService extends Stub {
+    IMailService() {}
+    IMailService(Object... args) {}
+}
+class IMenuImportExportService extends Stub {
+    IMenuImportExportService() {}
+    IMenuImportExportService(Object... args) {}
+}
+class IMenuItemService extends Stub {
+    IMenuItemService() {}
+    IMenuItemService(Object... args) {}
+}
+class IPdfGenerator extends Stub {
+    IPdfGenerator() {}
+    IPdfGenerator(Object... args) {}
+}
+class IPetriNetService extends Stub {
+    IPetriNetService() {}
+    IPetriNetService(Object... args) {}
+}
+class IRegistrationService extends Stub {
+    IRegistrationService() {}
+    IRegistrationService(Object... args) {}
+}
+class IStorageResolverService extends Stub {
+    IStorageResolverService() {}
+    IStorageResolverService(Object... args) {}
+}
+class IUserFilterSearchService extends Stub {
+    IUserFilterSearchService() {}
+    IUserFilterSearchService(Object... args) {}
+}
+class IWorkflowService extends Stub {
+    IWorkflowService() {}
+    IWorkflowService(Object... args) {}
+}
+class InitValueExpressionEvaluator extends Stub {
+    InitValueExpressionEvaluator() {}
+    InitValueExpressionEvaluator(Object... args) {}
+}
+class LoggedUser extends Stub {
+    LoggedUser() {}
+    LoggedUser(Object... args) {}
+}
+class MailConfigurationProperties extends Stub {
+    MailConfigurationProperties() {}
+    MailConfigurationProperties(Object... args) {}
+}
+class MailDraft extends Stub {
+    MailDraft() {}
+    MailDraft(Object... args) {}
+}
+class MapOptionsField extends Field {
+    MapOptionsField() {}
+    MapOptionsField(Object... args) {}
+}
+class MenuItemBody extends Stub {
+    MenuItemBody() {}
+    MenuItemBody(Object... args) {}
+}
+class MessageResource extends Stub {
+    MessageResource() {}
+    MessageResource(Object... args) {}
+}
+class ModuleHolder extends Stub {
+    ModuleHolder() {}
+    ModuleHolder(Object... args) {}
+}
+class MultichoiceMapField extends Field {
+    MultichoiceMapField() {}
+    MultichoiceMapField(Object... args) {}
+}
+class NewUserRequest extends Stub {
+    NewUserRequest() {}
+    NewUserRequest(Object... args) {}
+}
+class Nullable extends Stub {
+    Nullable() {}
+    Nullable(Object... args) {}
+}
+class Page extends Stub {
+    Page() {}
+    Page(Object... args) {}
+}
+class Pageable extends Stub {
+    Pageable() {}
+    Pageable(Object... args) {}
+}
+class PaginationProperties extends Stub {
+    PaginationProperties() {}
+    PaginationProperties(Object... args) {}
+}
+class Pair extends Stub {
+    Pair() {}
+    Pair(Object... args) {}
+}
 class PetriNet extends Stub {
     Map transitions
     Map dataSet
+    PetriNet() {}
+    PetriNet(Object... args) {}
 }
-class PluginHolder extends Stub {}
-class Predicate extends Stub {}
-class ProcessRole extends Stub {}
-class ProcessRoleService extends Stub {}
-class Scheduler extends Stub {}
-class SecurityConfigurationProperties extends Stub {}
-class SetDataEventOutcome extends Stub {}
-class TabbedCaseViewBody extends Stub {}
+class PluginHolder extends Stub {
+    PluginHolder() {}
+    PluginHolder(Object... args) {}
+}
+class Predicate extends Stub {
+    Predicate() {}
+    Predicate(Object... args) {}
+}
+class ProcessRole extends Stub {
+    ProcessRole() {}
+    ProcessRole(Object... args) {}
+}
+class ProcessRoleService extends Stub {
+    ProcessRoleService() {}
+    ProcessRoleService(Object... args) {}
+}
+class Scheduler extends Stub {
+    Scheduler() {}
+    Scheduler(Object... args) {}
+}
+class SecurityConfigurationProperties extends Stub {
+    SecurityConfigurationProperties() {}
+    SecurityConfigurationProperties(Object... args) {}
+}
+class SetDataEventOutcome extends Stub {
+    SetDataEventOutcome() {}
+    SetDataEventOutcome(Object... args) {}
+}
+class TabbedCaseViewBody extends Stub {
+    TabbedCaseViewBody() {}
+    TabbedCaseViewBody(Object... args) {}
+}
 class Task extends Stub {
     String caseId
     String transitionId
     Map dataSet
+    Task() {}
+    Task(Object... args) {}
 }
-class TaskEventOutcome extends Stub {}
-class TaskService extends Stub {}
+class TaskEventOutcome extends Stub {
+    TaskEventOutcome() {}
+    TaskEventOutcome(Object... args) {}
+}
+class TaskService extends Stub {
+    TaskService() {}
+    TaskService(Object... args) {}
+}
 class Transition extends Stub {
     Map dataSet
+    Transition() {}
+    Transition(Object... args) {}
 }
-class UserDetailsServiceImpl extends Stub {}
-class UserService extends Stub {}
-class Validation extends Stub {}
-class Version extends Stub {}
-class ViewBody extends Stub {}
+class UserDetailsServiceImpl extends Stub {
+    UserDetailsServiceImpl() {}
+    UserDetailsServiceImpl(Object... args) {}
+}
+class UserService extends Stub {
+    UserService() {}
+    UserService(Object... args) {}
+}
+class Validation extends Stub {
+    Validation() {}
+    Validation(Object... args) {}
+}
+class Version extends Stub {
+    Version() {}
+    Version(Object... args) {}
+}
+class ViewBody extends Stub {
+    ViewBody() {}
+    ViewBody(Object... args) {}
+}
 
 // --- Typed DSL chain results ---
 class ChangeResult {
@@ -441,6 +682,20 @@ class ActionDelegate {
     def getCorrectedUri(String uncheckedPath) { null }
     def getFieldOfTask(String taskId, String fieldId) { null }
     def resolveStoragePath(Case aCase, String fileFieldId, String fileName) { null }
+    def findGroupByIdentifier(String identifier) { null }
+    def findGroupById(String groupId) { null }
+    def findGroups(Closure predicate = null, Pageable pageable = null) { null }
+    def createGroup(String identifier, String title = null, AbstractUser owner = null) { null }
+    void deleteGroup(Group group) {}
+    def saveGroup(Group group) { null }
+    def addUserToGroup(String groupId, String userId, String realmId) { null }
+    def removeUserFromGroup(String groupId, String userId, String realmId) { null }
+    def addAuthorityToGroup(String groupId, String authorityId) { null }
+    def removeAuthorityFromGroup(String groupId, String authorityId) { null }
+    def addRoleToGroup(String groupId, String roleId) { null }
+    def removeRoleFromGroup(String groupId, String roleId) { null }
+    def addSubGroup(String groupId, String subGroupId) { null }
+    def removeSubGroup(String groupId, String subGroupId) { null }
 
     // Loose overloads for dynamically-typed function bodies.
     ChangeResult change(Object field, Case targetCase = null, Optional targetTask = null) { null }

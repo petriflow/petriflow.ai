@@ -42,6 +42,10 @@ if (!libDir.exists()) {
 def delegateSource = new File(libDir, "ActionDelegate.groovy").text
 def extensionSource = new File(libDir, "DynamicTypeCheckingExtension.groovy").text
 
+// Type names declared by the stripped delegate. Used to normalize fully-qualified
+// NAE type references to the stub names the delegate actually declares.
+def stubTypeNames = (delegateSource =~ /(?m)^\s*class\s+([A-Za-z_$][\w$]*)/).collect { it[1] } as Set
+
 // Compile the type-checking extension so it is available to the @CompileStatic
 // annotation when the action code is compiled.
 def classLoader = new GroovyClassLoader(this.class.classLoader)
@@ -56,13 +60,13 @@ while ((line = reader.readLine()) != null) {
     if (line.trim().isEmpty()) {
         continue
     }
-    def result = validate(line, slurper, delegateSource, classLoader)
+    def result = validate(line, slurper, delegateSource, stubTypeNames, classLoader)
     writer.write(JsonOutput.toJson(result))
     writer.newLine()
     writer.flush()
 }
 
-def validate(String line, JsonSlurper slurper, String delegateSource, GroovyClassLoader classLoader) {
+def validate(String line, JsonSlurper slurper, String delegateSource, Set stubTypeNames, GroovyClassLoader classLoader) {
     def request
     try {
         request = slurper.parseText(line)
@@ -72,7 +76,8 @@ def validate(String line, JsonSlurper slurper, String delegateSource, GroovyClas
 
     // Mode 1: validate a standalone function body (a Groovy closure).
     if (request.function != null) {
-        return compile(functionWrap(request.function), delegateSource, classLoader, FUNCTION_LINE_OFFSET)
+        return compile(functionWrap(normalizeNaeTypeRefs(request.function, stubTypeNames)),
+                delegateSource, classLoader, FUNCTION_LINE_OFFSET)
     }
 
     // Mode 2 (and default): validate an action, optionally with injected functions.
@@ -81,7 +86,8 @@ def validate(String line, JsonSlurper slurper, String delegateSource, GroovyClas
         return [ok: false, issues: [[rule: "request", severity: "error", message: "Missing 'source' or 'function' field"]]]
     }
     def functions = request.functions ?: []
-    return compile(wrap(source, functions), delegateSource, classLoader, actionLineOffset(functions))
+    return compile(wrap(normalizeNaeTypeRefs(source, stubTypeNames), functions),
+            delegateSource, classLoader, actionLineOffset(functions))
 }
 
 // Number of lines in the action wrapper preamble *before* the injected functions.
@@ -110,6 +116,17 @@ def compile(String wrapped, String delegateSource, GroovyClassLoader classLoader
     } catch (Exception e) {
         return [ok: false, issues: [[rule: "compile", severity: "error", message: "Unexpected error: ${e.message}"]]]
     }
+}
+
+// The stripped delegate keeps every stub domain type in the default package,
+// while NAE code may reference them by their fully-qualified name (for example
+// com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody).
+// Rewrite those references to the declared stub simple name. Only names the
+// delegate actually declares are rewritten, so unknown NAE classes still fail
+// to resolve. The replacement keeps the line count, so line numbers stay valid.
+def normalizeNaeTypeRefs(String source, Set stubTypeNames) {
+    def pattern = /(?<![\w$])com\.netgrif\.application\.engine(?:\.[A-Za-z_$][\w$]*)*\.([A-Za-z_$][\w$]*)/
+    return source.replaceAll(pattern) { match -> stubTypeNames.contains(match[1]) ? match[1] : match[0] }
 }
 
 def wrap(String source, List functions) {

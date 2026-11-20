@@ -25,7 +25,7 @@ import org.codehaus.groovy.ast.*
 // ---------------------------------------------------------------------------
 
 def NAE_REPO = "netgrif/application-engine"
-def NAE_REF = "v7.0.3"
+def NAE_REF = "v7.1.0"
 def NAE_PATH = "application-engine/src/main/groovy/com/netgrif/application/engine/petrinet/domain/dataset/logic/action/ActionDelegate.groovy"
 def DEFAULT_OUT = "src/groovy/lib/ActionDelegate.groovy"
 def CONNECT_TIMEOUT_MS = 10_000
@@ -258,14 +258,28 @@ def SPECIAL_STUBS = [
     "I18nString": "class I18nString extends Stub {\n}",
 ]
 
-stubTypes.each { type ->
-    if (SPECIAL_STUBS.containsKey(type)) {
-        sb << SPECIAL_STUBS[type] << "\n"
-    } else if (FIELD_SUBTYPES.contains(type)) {
-        sb << "class ${type} extends Field {}\n"
+// Stubs accept any constructor arguments: valid action code passes dynamically
+// typed values (e.g. the result of i18n(...)) into NAE constructors, which no
+// exact stub signature can match under @CompileStatic.
+def withConstructor = { String type, String declaration ->
+    def constructor = "    ${type}() {}\n    ${type}(Object... args) {}\n"
+    if (declaration.endsWith("{}")) {
+        declaration.substring(0, declaration.length() - 1) + "\n" + constructor + "}"
     } else {
-        sb << "class ${type} extends Stub {}\n"
+        declaration.replaceFirst(/\}\s*$/, constructor + "}")
     }
+}
+
+stubTypes.each { type ->
+    def declaration
+    if (SPECIAL_STUBS.containsKey(type)) {
+        declaration = SPECIAL_STUBS[type]
+    } else if (FIELD_SUBTYPES.contains(type)) {
+        declaration = "class ${type} extends Field {}"
+    } else {
+        declaration = "class ${type} extends Stub {}"
+    }
+    sb << withConstructor(type, declaration) << "\n"
 }
 sb << "\n"
 

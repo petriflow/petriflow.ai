@@ -5,7 +5,7 @@ import versionCompletions from "../../../../../../services/version-completions.s
 
 export const schema = {
   version: z.string().describe("Petriflow language version"),
-  action: z.string().describe("Name of the action"),
+  action: z.string().describe("Name of the action: the base name or an entry from list_actions such as choose-0"),
 };
 
 export const complete = versionCompletions;

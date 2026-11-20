@@ -52,7 +52,22 @@ transition: t.transitionId;        ->  Transition transition = null
 This is done with a regex because the format is strict, and because `f`/`t` are
 used *only* for Petriflow references (they never appear in the compiled Groovy).
 
-### 2. Static compilation (Groovy side)
+### 2. NAE type-reference normalization (Groovy side)
+
+The stripped delegate keeps its stub domain types in the default package, while
+action code may reference them by their full NAE name:
+
+```groovy
+new com.netgrif.application.engine.objects.workflow.domain.menu.MenuItemBody(...)
+```
+
+`Validator.groovy` rewrites such `com.netgrif.application.engine…` references to
+the stub simple name (`MenuItemBody`) when the delegate declares that class.
+Only NAE types that have a stub are rewritten, so an unknown NAE class still
+fails with `unable to resolve class`. Line numbers are preserved; columns on a
+rewritten line shift with the shorter name.
+
+### 3. Static compilation (Groovy side)
 
 The daemon wraps the normalized code in a statically-compiled class that extends
 the stripped `ActionDelegate`:
@@ -73,7 +88,7 @@ Compiling to `Phases.CLASS_GENERATION` gives two things for free:
   by static type checking, because the method must resolve against
   `ActionDelegate`.
 
-### 3. Dynamic type-checking extension
+### 4. Dynamic type-checking extension
 
 The DSL is dynamically typed: `field.value` is `Object` and is indexed
 (`value[0]`), iterated (`value.collect { ... }`), and passed around freely.
@@ -137,6 +152,10 @@ The generator:
   the delegate's context fields, including generic arguments such as
   `Optional<Task>` and `List<EventOutcome>`. Stubs are empty: the generated class
   is only used for compilation, so no implementation is copied.
+- Gives every stub an explicit no-arg and `Object... args` constructor. Valid
+  actions pass dynamically typed values (for example the result of `i18n(...)`)
+  into NAE constructors, so an exact constructor signature would reject correct
+  code under `@CompileStatic`.
 - Emits typed result classes for the DSL chains (`change(...).value { ... }`,
   `changeCaseProperty(...).about { ... }`, `make(...).on(...).when { ... }`, …).
 - Emits the delegate's non-static fields — the DSL context (`useCase`, `task`,
@@ -219,6 +238,10 @@ compiling. The closure parameter names are preserved; parameter *types* are
   `useCase.processIdentifier`, `userService.loggedOrSystem`,
   `field.value.path`). The runtime image ships Groovy 5.0.5, which accepts the
   same code; a local Groovy 4 environment still reports it.
+- **Unstubbed NAE classes** — a fully-qualified reference to an NAE class that
+  the stripped delegate does not declare (for example `MenuItemView`) is still
+  reported as `unable to resolve class`. Extend the delegate surface by
+  regenerating from a newer NAE release.
 
 ## Requirements
 
