@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-11-20
+
+### Added
+
+- NAE is upgraded to v7.1.0; the Groovy `ActionDelegate` surface now exposes the group API (`findGroupByIdentifier`,
+  `findGroups`, `createGroup`, `deleteGroup`, `saveGroup`, and the group membership methods).
+
+### Changed
+
+- `get_action` accepts the suffixed entries returned by `list_actions` (`choose-1`, `make-on`) in addition to base
+  definition names, and returns the requested name.
+- The Groovy action validator rewrites fully-qualified `com.netgrif.application.engine…` type references to the
+  matching stub, so actions that name NAE classes (such as `MenuItemBody` in menu imports) validate.
+
+### Fixed
+
+- Stub types accept no-arg and variadic constructor calls, so valid actions that pass `i18n(...)` results into NAE
+  constructors are no longer rejected.
+- Unknown actions and out-of-range alternatives report `Action … not found` instead of a `TypeError`.
+
 ## [1.1.1] - 2026-11-17
 
 ### Added
